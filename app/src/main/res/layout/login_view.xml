@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/server"
+            android:autoText="false"
+            android:clickable="true"
+            android:contentDescription="Server"
+            android:editable="true"
+            android:layout_marginLeft="75dp"
+            android:layout_marginRight="160dp"
+            android:layout_alignTop="@+id/port"
+            android:layout_alignParentStart="true"/>
+
+    <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/port"
+            android:clickable="true"
+            android:contentDescription="Port"
+            android:editable="true"
+            android:layout_marginLeft="75dp"
+            android:layout_marginRight="75dp"
+            android:layout_centerVertical="true"
+            android:layout_alignStart="@+id/postLoginButton"/>
+
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Login"
+            android:id="@+id/postLoginButton"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="106dp"
+            android:clickable="true"
+            android:onClick="onClick"
+            android:layout_alignParentEnd="false"/>
+
+    <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/username"
+            android:autoText="false"
+            android:clickable="true"
+            android:contentDescription="Username"
+            android:editable="true"
+            android:layout_marginLeft="75dp"
+            android:layout_marginRight="75dp"
+            android:layout_above="@+id/server"
+            android:layout_centerHorizontal="true"/>
+</RelativeLayout>

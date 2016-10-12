@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">DirecTor</string>
+    <string name="title_section_1"> Contacts </string>
+    <string name="title_section_2"> Inbox </string>
+</resources>
