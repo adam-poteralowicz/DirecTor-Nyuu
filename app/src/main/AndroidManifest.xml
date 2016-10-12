@@ -20,6 +20,8 @@
             </intent-filter>
         </activity>
 
+        <service android:name="com.apap.director.im.domain.chat.service.TCPChatService"></service>
+
         <activity android:name=".activity.AuthUserActivity"></activity>
         <activity android:name=".activity.ContactsActivity"></activity>
         <activity android:name=".activity.InboxActivity"></activity>

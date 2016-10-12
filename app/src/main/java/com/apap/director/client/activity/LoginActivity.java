@@ -46,13 +46,14 @@ public class LoginActivity extends Activity {
             ServiceConnection connection = new ServiceConnection() {
                 @Override
                 public void onServiceConnected(ComponentName name, IBinder service) {
-                    Log.i("ServiceConnection", "Connected");
+                    Log.v("HAI/ServiceConnection", "Connected");
+                    Log.v("HAI", "HAI HAI HAI");
                     SimpleBinder binder = (SimpleBinder) service;
                     chatService = (TCPChatService) binder.getService();
 
 
                     try {
-                        chatService.connect("localhost","5222");
+                        chatService.connect("Http://dev02.sagiton.pl",5222);
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (XMPPException e) {
@@ -60,20 +61,23 @@ public class LoginActivity extends Activity {
                     } catch (SmackException e) {
                         e.printStackTrace();
                     }
+
+                    Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);
+                    startActivityForResult(selectedIntent, 0002);
                 }
 
                 @Override
                 public void onServiceDisconnected(ComponentName name) {
-                    Log.i("ServiceConnection", "Disonnected");
+                    Log.v("HAIServiceConnection", "Disonnected");
                 }
 
             };
 
-            bindService(new Intent(this, TCPChatService.class), connection, Context.BIND_AUTO_CREATE);
+            Log.v("HAI/LoginActivity", "Trying to bind...");
+            Intent intent = new Intent(this, TCPChatService.class);
+            bindService(intent, connection, Context.BIND_AUTO_CREATE);
 
 
-            Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);
-            startActivityForResult(selectedIntent, 0002);
         }
 
     }

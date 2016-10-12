@@ -36,7 +36,7 @@ public abstract class AbstractChatService extends Service implements Chat {
         connection.login(username, password);
     }
 
-    public void connect(String host, String port) throws IOException, XMPPException, SmackException {
+    public void connect(String host, int port) throws IOException, XMPPException, SmackException {
         connection.connect();
 
         chatManager = ChatManager.getInstanceFor(connection);
