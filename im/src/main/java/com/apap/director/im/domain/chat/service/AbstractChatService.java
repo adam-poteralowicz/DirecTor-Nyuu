@@ -3,6 +3,7 @@ package com.apap.director.im.domain.chat.service;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.apap.director.im.domain.chat.event.ChatEventListener;
 import com.apap.director.im.domain.message.event.MessageEventListener;
@@ -45,8 +46,15 @@ public abstract class AbstractChatService extends Service implements Chat {
     }
 
     public void sendMessage(String to, String body) throws SmackException.NotConnectedException {
-        Message message = new Message(to, body);
+
+        Log.v("HAI/AbstractChatService", "Sending message to "+to);
+
+
+        Message message = new Message();
+        message.setBody(body);
+        message.setType(Message.Type.chat);
         org.jivesoftware.smack.chat.Chat chat = chatManager.createChat(to);
+
         chat.sendMessage(message);
 
         //TODO: create chat, add it to specific contact, close on deletion

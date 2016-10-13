@@ -56,6 +56,10 @@ public class LoginActivity extends Activity {
                     chatService.connect("dev02.sagiton.pl",5222);
                     chatService.login("1234", "1234");
 
+
+                    Log.v("HAI/LoginActivity", "WAITED");
+                    chatService.sendMessage("ejabberd@dev02.sagiton.pl", "hai from app");
+
                     Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);
                     startActivityForResult(selectedIntent, 0002);
                 }

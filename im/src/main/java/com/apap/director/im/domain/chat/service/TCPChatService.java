@@ -3,9 +3,12 @@ package com.apap.director.im.domain.chat.service;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.apap.director.im.domain.chat.event.ChatEventListener;
+
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.chat.ChatManager;
+import org.jivesoftware.smack.chat.*;
+import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
@@ -69,8 +72,7 @@ public class TCPChatService extends AbstractChatService {
 
                 Log.v("HAI/Async", "HAI :)");
                 chatManager = ChatManager.getInstanceFor(connection);
-                chatManager.addChatListener(chatEventListener);
-
+                chatManager.addChatListener(new ChatEventListener());
                 Log.v("HAI/Async", String.valueOf(connection.isConnected()));
                 return null;
             }
@@ -78,5 +80,34 @@ public class TCPChatService extends AbstractChatService {
 
     }
 
+    @Override
+    public void sendMessage(final String to, final String body) {
+        new AsyncTask<Void, Void, Void>(){
 
+            @Override
+            protected Void doInBackground(Void... params) {
+                Log.v("HAI/Async", "Message :)");
+                try {
+                    org.jivesoftware.smack.chat.Chat chat = chatManager.createChat(to);
+                    Log.v("HAI/AbstractChatService", "Sending message to "+to);
+                    chat.sendMessage("STRING MSG");
+                    Message message = new Message();
+                    message.setBody(body);
+                    message.setType(Message.Type.chat);
+                    chat.sendMessage(message);
+                } catch (SmackException.NotConnectedException e1) {
+                    e1.printStackTrace();
+                } catch (SmackException e) {
+                    e.printStackTrace();
+                }
+
+                Log.v("HAI/Async", "Authenticated: "+String.valueOf(connection.isAuthenticated()));
+
+
+                return null;
+            }
+
+        }.execute();
+
+    }
 }

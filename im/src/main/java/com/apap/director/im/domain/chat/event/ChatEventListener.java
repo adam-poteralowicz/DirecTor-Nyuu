@@ -11,10 +11,10 @@ import javax.inject.Inject;
 
 public class ChatEventListener implements ChatManagerListener {
 
-    @Inject
-    MessageEventListener listener;
+    MessageEventListener listener = new MessageEventListener();
 
     public void chatCreated(Chat chat, boolean isLocal) {
+        Log.v("HAI/ChatEventListener", "HAI!");
         chat.addMessageListener(listener);
         Log.v("HAI/ChatEventListener", "Chat with "+chat.getParticipant()+" created");
     }
