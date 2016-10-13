@@ -14,16 +14,21 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.activity.AuthUserActivity;
 import com.apap.director.client.activity.SingleContactActivity;
-import com.apap.director.client.dao.model.Contact;
-import com.apap.director.client.dao.model.ContactDao;
-import com.apap.director.client.dao.model.DaoSession;
+import com.apap.director.im.dao.model.Contact;
+import com.apap.director.im.dao.model.ContactDao;
+import com.apap.director.im.dao.model.DaoSession;
 
 import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 public class ContactsFragment extends Fragment {
 
     public AuthUserActivity aua;
     Intent intent;
+
+    @Inject @Named("contactDao") DaoSession daoSession;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -37,10 +42,10 @@ public class ContactsFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
 
+        ((App) getActivity().getApplication()).getDaoComponent().inject(this);
         super.onActivityCreated(savedInstanceState);
         ListView contactsListView = (ListView) getActivity().findViewById(R.id.contactsView);
 
-        DaoSession daoSession = ((App) App.getContext()).getContactDaoSession();
         ContactDao contactDao = daoSession.getContactDao();
         final List<Contact> contactsList = contactDao.loadAll();
 

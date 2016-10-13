@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
+import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.im.domain.chat.service.TCPChatService;
 import com.apap.director.im.util.SimpleBinder;
@@ -21,8 +22,6 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
 import java.io.IOException;
-
-
 
 public class LoginActivity extends Activity {
 
@@ -64,6 +63,7 @@ public class LoginActivity extends Activity {
                     Log.v("HAI", "HAI HAI HAI");
                     SimpleBinder binder = (SimpleBinder) service;
                     chatService = (TCPChatService) binder.getService();
+                    ((App) getApplication()).getChatComponent().inject(chatService);
 
                     username = String.valueOf(usernameField.getText());
                     password = String.valueOf(passwordField.getText());
@@ -75,7 +75,7 @@ public class LoginActivity extends Activity {
 
 
                     Log.v("HAI/LoginActivity", "WAITED");
-                    chatService.sendMessage("ejabberd@dev02.sagiton.pl", "hai from app");
+                    chatService.sendMessage("ala@ALA-PC", "hai from app");
 
                     shimmer.cancel();
                     Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);

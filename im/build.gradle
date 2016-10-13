@@ -35,6 +35,9 @@ dependencies {
     compile 'org.igniterealtime.smack:smack-im:4.1.8'
     compile 'org.igniterealtime.smack:smack-tcp:4.1.8'
 
+    compile 'org.greenrobot:greendao:3.2.0'
+    compile 'org.greenrobot:greendao-generator:3.2.0'
+
     compile 'com.google.dagger:dagger:2.0.1'
     apt "com.google.dagger:dagger-compiler:2.0.1"
 

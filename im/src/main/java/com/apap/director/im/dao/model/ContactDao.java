@@ -1,4 +1,4 @@
-package com.apap.director.client.dao.model;
+package com.apap.director.im.dao.model;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteStatement;

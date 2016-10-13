@@ -24,23 +24,33 @@ import com.apap.director.im.util.SimpleBinder;
 
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatMessageListener;
+import com.apap.director.im.dao.model.Conversation;
+import com.apap.director.im.dao.model.ConversationDao;
+import com.apap.director.im.dao.model.DaoSession;
+import com.apap.director.im.dao.model.Message;
 
 import java.util.ArrayList;
 import java.util.Date;
 
-public class NewMsgActivity extends Activity /*implements ChatMessageListener*/ {
+import javax.inject.Inject;
+import javax.inject.Named;
+
+public class NewMsgActivity extends Activity {
     EditText newMessageField;
     TextView recipient;
     ListView messagesView;
     ArrayList<String> messages_list;
     ArrayAdapter<String> arrayAdapter;
+
+    @Inject @Named("conversationDao") DaoSession daoSession;
+
     TCPChatService chatService;
 
     public void onCreate(Bundle savedInstanceState) {
+        ((App) getApplication()).getDaoComponent().inject(this);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_msg_view);
-
-//        MessageModule
 
         messagesView = (ListView) findViewById(R.id.conversationView);
         newMessageField = (EditText) findViewById(R.id.messengerField);
@@ -51,7 +61,6 @@ public class NewMsgActivity extends Activity /*implements ChatMessageListener*/ 
             recipient.setText(getIntent().getStringExtra("msgTitle"));
         }
 
-        DaoSession daoSession = ((App) getApplicationContext()).getConversationDaoSession();
         ConversationDao conversationDao = daoSession.getConversationDao();
         final Conversation conversation = conversationDao.load(String.valueOf(recipient.getText()));
 
@@ -139,17 +148,6 @@ public class NewMsgActivity extends Activity /*implements ChatMessageListener*/ 
 
     }
 
-
-
-
-
-
-    // MessageEventListener -- opcja awaryjna
-
-//    @Override
-//    public void processMessage(Chat chat, org.jivesoftware.smack.packet.Message message) {
-//
-//    }
 }
 
 
