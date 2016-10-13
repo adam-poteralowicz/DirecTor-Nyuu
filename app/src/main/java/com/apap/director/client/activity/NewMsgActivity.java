@@ -103,7 +103,7 @@ public class NewMsgActivity extends Activity /*implements ChatMessageListener*/ 
 
 
 
-        Log.v("HAI/LoginActivity", "Trying to bind...");
+        Log.v("HAI/NewMsgActivity", "Trying to bind...");
         Intent intent = new Intent(this, TCPChatService.class);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
 
@@ -133,7 +133,8 @@ public class NewMsgActivity extends Activity /*implements ChatMessageListener*/ 
         messagesView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
         messagesView.setStackFromBottom(true);
 
-        //chatService.sendMessage(message.getRecipient(), message.getContent());
+        chatService.sendMessage(message.getRecipient(), message.getContent());
+
     }
 
 

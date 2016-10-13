@@ -14,11 +14,15 @@ import android.widget.EditText;
 import com.apap.director.client.R;
 import com.apap.director.im.domain.chat.service.TCPChatService;
 import com.apap.director.im.util.SimpleBinder;
+import com.romainpiel.shimmer.Shimmer;
+import com.romainpiel.shimmer.ShimmerTextView;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
 import java.io.IOException;
+
+
 
 public class LoginActivity extends Activity {
 
@@ -26,6 +30,8 @@ public class LoginActivity extends Activity {
     String username, password, server;
     Integer port;
     EditText usernameField, passwordField, serverField, portField;
+    Shimmer shimmer;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -38,6 +44,11 @@ public class LoginActivity extends Activity {
         passwordField.setHint("Password");
         serverField = (EditText) findViewById(R.id.server);
         serverField.setHint("Server");
+        ShimmerTextView shimmerTextView = (ShimmerTextView) findViewById(R.id.shimmer_tv);
+
+        shimmer = new Shimmer();
+        shimmer.start(shimmerTextView);
+
 
     }
 
@@ -66,6 +77,7 @@ public class LoginActivity extends Activity {
                     Log.v("HAI/LoginActivity", "WAITED");
                     chatService.sendMessage("ejabberd@dev02.sagiton.pl", "hai from app");
 
+                    shimmer.cancel();
                     Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);
                     startActivityForResult(selectedIntent, 0002);
                 }

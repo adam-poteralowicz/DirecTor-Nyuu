@@ -3,15 +3,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-    <ListView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/conversationView"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/newMsgRecipient"
-            android:scrollbarStyle="insideInset"
-            android:layout_above="@+id/sendButton"/>
-
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="30dp"
@@ -19,7 +10,8 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:textSize="25sp"
-            android:textIsSelectable="false"/>
+            android:textIsSelectable="false"
+        android:textColor="@color/colorAccent" />
 
     <Button
             style="?android:attr/buttonStyleSmall"
@@ -51,5 +43,13 @@
             android:layout_toStartOf="@+id/sendButton"
             android:maxLines="3"
             />
+
+    <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/conversationView"
+        android:scrollbarStyle="insideInset"
+        android:layout_below="@+id/newMsgRecipient"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>
