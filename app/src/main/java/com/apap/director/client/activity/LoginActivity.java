@@ -32,13 +32,13 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_view);
 
-        EditText usernameField = (EditText) findViewById(R.id.username);
+        usernameField = (EditText) findViewById(R.id.username);
         usernameField.setHint("Username");
-        EditText passwordField = (EditText) findViewById(R.id.password);
+        passwordField = (EditText) findViewById(R.id.password);
         passwordField.setHint("Password");
-        EditText serverField = (EditText) findViewById(R.id.server);
+        serverField = (EditText) findViewById(R.id.server);
         serverField.setHint("Server");
-        EditText portField = (EditText) findViewById(R.id.port);
+        portField = (EditText) findViewById(R.id.port);
         portField.setHint("Port");
 
     }
