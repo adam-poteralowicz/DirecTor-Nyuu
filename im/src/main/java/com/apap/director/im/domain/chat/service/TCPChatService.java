@@ -13,9 +13,37 @@ import java.io.IOException;
 
 public class TCPChatService extends AbstractChatService {
 
-
-
     public TCPChatService() {
+    }
+
+    //TODO: Move async tasks to other classes
+    //TODO: Clean the code
+
+    @Override
+    public void login(final String username, final String password){
+        new AsyncTask<Void, Void, Void>(){
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                Log.v("HAI/Async", "Login :)");
+                try {
+                    connection.login(username, password);
+                } catch (XMPPException e) {
+                    e.printStackTrace();
+                } catch (SmackException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Log.v("HAI/Async", "Authenticated: "+String.valueOf(connection.isAuthenticated()));
+
+
+                return null;
+            }
+
+        }.execute();
+
     }
 
     @Override
