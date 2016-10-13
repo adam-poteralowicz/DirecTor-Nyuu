@@ -38,8 +38,6 @@ public class LoginActivity extends Activity {
         passwordField.setHint("Password");
         serverField = (EditText) findViewById(R.id.server);
         serverField.setHint("Server");
-        portField = (EditText) findViewById(R.id.port);
-        portField.setHint("Port");
 
     }
 
@@ -59,7 +57,7 @@ public class LoginActivity extends Activity {
                     username = String.valueOf(usernameField.getText());
                     password = String.valueOf(passwordField.getText());
                     server = String.valueOf(serverField.getText());
-                    port = Integer.parseInt(String.valueOf(portField.getText()));
+                    port = 5222;
 
                     chatService.connect(server, port);
                     chatService.login(username, password);

@@ -1,7 +1,13 @@
 package com.apap.director.client.activity;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
 import android.view.View;
 import android.widget.*;
 
@@ -11,19 +17,30 @@ import com.apap.director.client.dao.model.Conversation;
 import com.apap.director.client.dao.model.ConversationDao;
 import com.apap.director.client.dao.model.DaoSession;
 import com.apap.director.client.dao.model.Message;
+import com.apap.director.im.domain.chat.service.TCPChatService;
+import com.apap.director.im.domain.message.event.MessageEventListener;
+import com.apap.director.im.domain.message.module.MessageModule;
+import com.apap.director.im.util.SimpleBinder;
+
+import org.jivesoftware.smack.chat.Chat;
+import org.jivesoftware.smack.chat.ChatMessageListener;
 
 import java.util.ArrayList;
 import java.util.Date;
 
-public class NewMsgActivity extends Activity {
+public class NewMsgActivity extends Activity /*implements ChatMessageListener*/ {
     EditText newMessageField;
     TextView recipient;
     ListView messagesView;
     ArrayList<String> messages_list;
     ArrayAdapter<String> arrayAdapter;
+    TCPChatService chatService;
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_msg_view);
+
+//        MessageModule
 
         messagesView = (ListView) findViewById(R.id.conversationView);
         newMessageField = (EditText) findViewById(R.id.messengerField);
@@ -63,6 +80,36 @@ public class NewMsgActivity extends Activity {
     }
 
     public void onClick(View view) {
+
+        ServiceConnection connection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                Log.v("HAI/ServiceConnection", "Connected");
+                Log.v("HAI", "HAI HAI HAI");
+                SimpleBinder binder = (SimpleBinder) service;
+                chatService = (TCPChatService) binder.getService();
+
+
+                Log.v("HAI/NewMsgActivity", "WAITED");
+                chatService.sendMessage("ejabberd@dev02.sagiton.pl", "hai from app");
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                Log.v("HAIServiceConnection", "Disconnected");
+            }
+
+        };
+
+
+
+        Log.v("HAI/LoginActivity", "Trying to bind...");
+        Intent intent = new Intent(this, TCPChatService.class);
+        bindService(intent, connection, Context.BIND_AUTO_CREATE);
+
+
+
+
         DaoSession daoSession = ((App) getApplicationContext()).getConversationDaoSession();
         ConversationDao conversationDao = daoSession.getConversationDao();
         Message message = new Message();
@@ -80,10 +127,26 @@ public class NewMsgActivity extends Activity {
 
         Conversation conversation = conversationDao.load(String.valueOf(recipient.getText()));
         conversation.getMessages().add(message);
-
         arrayAdapter.notifyDataSetChanged();
+
+        // ----Set autoscroll of listview when a new message arrives----//
+        messagesView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
+        messagesView.setStackFromBottom(true);
+
+        //chatService.sendMessage(message.getRecipient(), message.getContent());
     }
 
+
+
+
+
+
+    // MessageEventListener -- opcja awaryjna
+
+//    @Override
+//    public void processMessage(Chat chat, org.jivesoftware.smack.packet.Message message) {
+//
+//    }
 }
 
 

@@ -7,7 +7,9 @@ import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
 
 public class MessageEventListener implements ChatMessageListener{
+
     public void processMessage(Chat chat, Message message) {
-        Log.v("MessageEvenListener", message.getFrom()+": "+message.getBody());
+        Log.v("MessageEventListener", message.getFrom()+": "+message.getBody());
+
     }
 }
