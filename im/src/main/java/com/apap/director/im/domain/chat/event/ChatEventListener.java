@@ -16,6 +16,6 @@ public class ChatEventListener implements ChatManagerListener {
 
     public void chatCreated(Chat chat, boolean isLocal) {
         chat.addMessageListener(listener);
-        Log.i("ChatEventListener", "Chat with "+chat.getParticipant()+" created");
+        Log.v("HAI/ChatEventListener", "Chat with "+chat.getParticipant()+" created");
     }
 }

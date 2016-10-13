@@ -1,7 +1,11 @@
 package com.apap.director.im.domain.chat.service;
 
+import android.os.AsyncTask;
+import android.util.Log;
+
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
@@ -9,16 +13,42 @@ import java.io.IOException;
 
 public class TCPChatService extends AbstractChatService {
 
+
+
     public TCPChatService() {
     }
 
     @Override
-    public void connect(String host, int port) throws IOException, XMPPException, SmackException {
+    public void connect(final String host, final int port){
 
-        XMPPTCPConnectionConfiguration.Builder builder = XMPPTCPConnectionConfiguration.builder();
-        this.connection = new XMPPTCPConnection(builder.setServiceName(host).setPort(port).build());
+        new AsyncTask<Void, Void, Void>(){
 
-        super.connect(host, port);
+            @Override
+            protected Void doInBackground(Void... params) {
+
+                XMPPTCPConnectionConfiguration.Builder builder = XMPPTCPConnectionConfiguration.builder();
+                connection = new XMPPTCPConnection(builder.setServiceName(host).setPort(port).build());
+
+                try {
+                    connection.connect();
+                } catch (SmackException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (XMPPException e) {
+                    e.printStackTrace();
+                }
+
+                Log.v("HAI/Async", "HAI :)");
+                chatManager = ChatManager.getInstanceFor(connection);
+                chatManager.addChatListener(chatEventListener);
+
+                Log.v("HAI/Async", String.valueOf(connection.isConnected()));
+                return null;
+            }
+        }.execute();
+
     }
+
 
 }

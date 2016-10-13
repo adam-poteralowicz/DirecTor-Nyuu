@@ -52,15 +52,8 @@ public class LoginActivity extends Activity {
                     chatService = (TCPChatService) binder.getService();
 
 
-                    try {
-                        chatService.connect("Http://dev02.sagiton.pl",5222);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (XMPPException e) {
-                        e.printStackTrace();
-                    } catch (SmackException e) {
-                        e.printStackTrace();
-                    }
+
+                    chatService.connect("dev02.sagiton.pl",5222);
 
                     Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);
                     startActivityForResult(selectedIntent, 0002);
