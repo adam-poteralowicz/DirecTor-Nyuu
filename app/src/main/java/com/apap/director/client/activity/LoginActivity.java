@@ -23,6 +23,9 @@ import java.io.IOException;
 public class LoginActivity extends Activity {
 
     TCPChatService chatService;
+    String username, password, server;
+    Integer port;
+    EditText usernameField, passwordField, serverField, portField;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -31,6 +34,8 @@ public class LoginActivity extends Activity {
 
         EditText usernameField = (EditText) findViewById(R.id.username);
         usernameField.setHint("Username");
+        EditText passwordField = (EditText) findViewById(R.id.password);
+        passwordField.setHint("Password");
         EditText serverField = (EditText) findViewById(R.id.server);
         serverField.setHint("Server");
         EditText portField = (EditText) findViewById(R.id.port);
@@ -51,10 +56,13 @@ public class LoginActivity extends Activity {
                     SimpleBinder binder = (SimpleBinder) service;
                     chatService = (TCPChatService) binder.getService();
 
+                    username = String.valueOf(usernameField.getText());
+                    password = String.valueOf(passwordField.getText());
+                    server = String.valueOf(serverField.getText());
+                    port = Integer.parseInt(String.valueOf(portField.getText()));
 
-
-                    chatService.connect("dev02.sagiton.pl",5222);
-                    chatService.login("1234", "1234");
+                    chatService.connect(server, port);
+                    chatService.login(username, password);
 
 
                     Log.v("HAI/LoginActivity", "WAITED");
