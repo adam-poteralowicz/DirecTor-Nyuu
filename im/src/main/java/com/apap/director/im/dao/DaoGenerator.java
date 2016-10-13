@@ -1,4 +1,4 @@
-package com.apap.director.client.dao;
+package com.apap.director.im.dao;
 
 import org.greenrobot.greendao.generator.Entity;
 import org.greenrobot.greendao.generator.Property;

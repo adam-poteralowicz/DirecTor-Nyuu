@@ -8,13 +8,16 @@ import android.widget.*;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.client.dao.model.ContactDao;
-import com.apap.director.client.dao.model.Conversation;
-import com.apap.director.client.dao.model.ConversationDao;
-import com.apap.director.client.dao.model.DaoSession;
+import com.apap.director.im.dao.model.ContactDao;
+import com.apap.director.im.dao.model.Conversation;
+import com.apap.director.im.dao.model.ConversationDao;
+import com.apap.director.im.dao.model.DaoSession;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 public class SingleContactActivity extends Activity {
 
@@ -24,9 +27,16 @@ public class SingleContactActivity extends Activity {
     ListView options;
     Intent intent;
 
+    @Inject @Named("contactDao") DaoSession contactDaoSession;
+    @Inject @Named("conversationDao") DaoSession conversationDaoSession;
+
     public void onCreate(Bundle savedInstanceState) {
+        ((App) getApplication()).getDaoComponent().inject(this);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.single_contact_view);
+        ((App) getApplication()).getDaoComponent().inject(this);
+
 
 
         final String contactNameFromIntent = getIntent().getStringExtra("contactName");
@@ -54,8 +64,7 @@ public class SingleContactActivity extends Activity {
                 switch (position) {
                     case 0:
                     {
-                        DaoSession daoSession = ((App) getApplicationContext()).getConversationDaoSession();
-                        final ConversationDao conversationDao = daoSession.getConversationDao();
+                        final ConversationDao conversationDao = conversationDaoSession.getConversationDao();
                         Conversation conversation = new Conversation();
                         conversation.setRecipient(contactNameFromIntent);
                         if (conversationDao.load(contactNameFromIntent) == null) {
@@ -69,8 +78,7 @@ public class SingleContactActivity extends Activity {
                     }
                     case 1:
                     {
-                        DaoSession daoSession = ((App) getApplicationContext()).getContactDaoSession();
-                        final ContactDao contactDao = daoSession.getContactDao();
+                        final ContactDao contactDao = contactDaoSession.getContactDao();
 
                         contactDao.queryBuilder().where(ContactDao.Properties.Name.eq(contactNameFromIntent))
                                 .buildDelete().executeDeleteWithoutDetachingEntities();

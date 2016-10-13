@@ -14,15 +14,19 @@ import android.widget.Toast;
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.activity.NewMsgActivity;
-import com.apap.director.client.dao.model.Conversation;
-import com.apap.director.client.dao.model.ConversationDao;
-import com.apap.director.client.dao.model.DaoSession;
+import com.apap.director.im.dao.model.Conversation;
+import com.apap.director.im.dao.model.ConversationDao;
+import com.apap.director.im.dao.model.DaoSession;
 
 import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 public class InboxFragment extends Fragment {
 
     Intent intent;
+    @Inject @Named("conversationDao") DaoSession daoSession;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -34,11 +38,13 @@ public class InboxFragment extends Fragment {
 
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
+
+        ((App) getActivity().getApplication()).getDaoComponent().inject(this);
+
         super.onActivityCreated(savedInstanceState);
 
         ListView msgListView = (ListView) getActivity().findViewById(R.id.msgList);
 
-        DaoSession daoSession = ((App) App.getContext()).getConversationDaoSession();
         ConversationDao conversationDao = daoSession.getConversationDao();
         final List<Conversation> conversationsList = conversationDao.loadAll();
 
@@ -63,7 +69,6 @@ public class InboxFragment extends Fragment {
 
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                DaoSession daoSession = ((App) App.getContext()).getConversationDaoSession();
                 ConversationDao conversationDao = daoSession.getConversationDao();
                 conversationDao.deleteByKey(conversationsList.get(position).getRecipient());
                 arrayAdapter.notifyDataSetChanged();

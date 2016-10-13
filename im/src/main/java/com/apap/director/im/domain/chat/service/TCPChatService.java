@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.apap.director.im.domain.chat.event.ChatEventListener;
+import com.apap.director.im.domain.message.event.MessageEventListener;
 
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.SmackException;
@@ -15,11 +16,15 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+
 public class TCPChatService extends AbstractChatService {
 
     public TCPChatService() {
     }
 
+    @Inject
+    public MessageEventListener testlistener;
     //TODO: Move async tasks to other classes
     //TODO: Clean the code
 
@@ -57,6 +62,14 @@ public class TCPChatService extends AbstractChatService {
 
             @Override
             protected Void doInBackground(Void... params) {
+
+
+                if(testlistener == null){
+                    Log.v("HAI/TCPChatService", "NULL");
+                }
+                else{
+                    Log.v("HAI/TCPChatService", "NOT NULL");
+                }
 
                 XMPPTCPConnectionConfiguration.Builder builder = XMPPTCPConnectionConfiguration.builder();
                 connection = new XMPPTCPConnection(builder.setConnectTimeout(10000).setHost(host).setServiceName("ala-pc").setPort(port).setSecurityMode(XMPPTCPConnectionConfiguration.SecurityMode.disabled).build());

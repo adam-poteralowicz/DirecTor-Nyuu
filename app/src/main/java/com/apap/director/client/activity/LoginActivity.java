@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
+import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.im.domain.chat.service.TCPChatService;
 import com.apap.director.im.util.SimpleBinder;
@@ -55,6 +56,7 @@ public class LoginActivity extends Activity {
                     Log.v("HAI", "HAI HAI HAI");
                     SimpleBinder binder = (SimpleBinder) service;
                     chatService = (TCPChatService) binder.getService();
+                    ((App) getApplication()).getChatComponent().inject(chatService);
 
                     username = String.valueOf(usernameField.getText());
                     password = String.valueOf(passwordField.getText());

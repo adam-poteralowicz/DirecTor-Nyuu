@@ -7,13 +7,16 @@ import android.widget.*;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.client.dao.model.Conversation;
-import com.apap.director.client.dao.model.ConversationDao;
-import com.apap.director.client.dao.model.DaoSession;
-import com.apap.director.client.dao.model.Message;
+import com.apap.director.im.dao.model.Conversation;
+import com.apap.director.im.dao.model.ConversationDao;
+import com.apap.director.im.dao.model.DaoSession;
+import com.apap.director.im.dao.model.Message;
 
 import java.util.ArrayList;
 import java.util.Date;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 public class NewMsgActivity extends Activity {
     EditText newMessageField;
@@ -21,7 +24,12 @@ public class NewMsgActivity extends Activity {
     ListView messagesView;
     ArrayList<String> messages_list;
     ArrayAdapter<String> arrayAdapter;
+
+    @Inject @Named("conversationDao") DaoSession daoSession;
+
     public void onCreate(Bundle savedInstanceState) {
+        ((App) getApplication()).getDaoComponent().inject(this);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_msg_view);
 
@@ -34,7 +42,6 @@ public class NewMsgActivity extends Activity {
             recipient.setText(getIntent().getStringExtra("msgTitle"));
         }
 
-        DaoSession daoSession = ((App) getApplicationContext()).getConversationDaoSession();
         ConversationDao conversationDao = daoSession.getConversationDao();
         final Conversation conversation = conversationDao.load(String.valueOf(recipient.getText()));
 
@@ -63,7 +70,6 @@ public class NewMsgActivity extends Activity {
     }
 
     public void onClick(View view) {
-        DaoSession daoSession = ((App) getApplicationContext()).getConversationDaoSession();
         ConversationDao conversationDao = daoSession.getConversationDao();
         Message message = new Message();
         message.setRecipient(String.valueOf(recipient.getText()));
