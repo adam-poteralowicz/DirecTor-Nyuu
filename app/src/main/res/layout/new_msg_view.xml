@@ -5,13 +5,13 @@
 
     <TextView
             android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:id="@+id/newMsgRecipient"
+        android:id="@+id/newMsgRecipient"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:textSize="25sp"
             android:textIsSelectable="false"
-        android:textColor="@color/colorAccent" />
+        android:textColor="@color/colorAccent"
+        android:layout_height="40dp" />
 
     <Button
             style="?android:attr/buttonStyleSmall"

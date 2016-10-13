@@ -133,7 +133,9 @@ public class NewMsgActivity extends Activity /*implements ChatMessageListener*/ 
         messagesView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
         messagesView.setStackFromBottom(true);
 
-        chatService.sendMessage(message.getRecipient(), message.getContent());
+        if (chatService == null)
+            Toast.makeText(NewMsgActivity.this, "chat service null", Toast.LENGTH_LONG).show();
+        //chatService.sendMessage(message.getRecipient(), message.getContent());
 
     }
 
