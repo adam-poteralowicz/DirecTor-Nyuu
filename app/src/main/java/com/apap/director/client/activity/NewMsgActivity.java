@@ -13,10 +13,6 @@ import android.widget.*;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.client.dao.model.Conversation;
-import com.apap.director.client.dao.model.ConversationDao;
-import com.apap.director.client.dao.model.DaoSession;
-import com.apap.director.client.dao.model.Message;
 import com.apap.director.im.domain.chat.service.TCPChatService;
 import com.apap.director.im.domain.message.event.MessageEventListener;
 import com.apap.director.im.domain.message.module.MessageModule;
@@ -119,7 +115,7 @@ public class NewMsgActivity extends Activity {
 
 
 
-        DaoSession daoSession = ((App) getApplicationContext()).getConversationDaoSession();
+//        DaoSession daoSession = ((App) getApplicationContext()).getConversationDaoSession();
         ConversationDao conversationDao = daoSession.getConversationDao();
         Message message = new Message();
         message.setRecipient(String.valueOf(recipient.getText()));
