@@ -13,13 +13,10 @@ import android.widget.*;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
+import com.apap.director.im.dao.model.MessageDao;
 import com.apap.director.im.domain.chat.service.TCPChatService;
-import com.apap.director.im.domain.message.event.MessageEventListener;
-import com.apap.director.im.domain.message.module.MessageModule;
 import com.apap.director.im.util.SimpleBinder;
 
-import org.jivesoftware.smack.chat.Chat;
-import org.jivesoftware.smack.chat.ChatMessageListener;
 import com.apap.director.im.dao.model.Conversation;
 import com.apap.director.im.dao.model.ConversationDao;
 import com.apap.director.im.dao.model.DaoSession;
@@ -38,7 +35,8 @@ public class NewMsgActivity extends Activity {
     ArrayList<String> messages_list;
     ArrayAdapter<String> arrayAdapter;
 
-    @Inject @Named("conversationDao") DaoSession daoSession;
+    @Inject @Named("conversationDao") DaoSession conversationDaoSession;
+    @Inject @Named("messageDao") DaoSession messageDaoSession;
 
     TCPChatService chatService;
 
@@ -57,7 +55,7 @@ public class NewMsgActivity extends Activity {
             recipient.setText(getIntent().getStringExtra("msgTitle"));
         }
 
-        ConversationDao conversationDao = daoSession.getConversationDao();
+        ConversationDao conversationDao = conversationDaoSession.getConversationDao();
         final Conversation conversation = conversationDao.load(String.valueOf(recipient.getText()));
 
         messages_list = new ArrayList<String>();
@@ -115,8 +113,9 @@ public class NewMsgActivity extends Activity {
 
 
 
-//        DaoSession daoSession = ((App) getApplicationContext()).getConversationDaoSession();
-        ConversationDao conversationDao = daoSession.getConversationDao();
+//        DaoSession conversationDaoSession = ((App) getApplicationContext()).getConversationDaoSession();
+        ConversationDao conversationDao = conversationDaoSession.getConversationDao();
+        MessageDao messageDao = messageDaoSession.getMessageDao();
         Message message = new Message();
         message.setRecipient(String.valueOf(recipient.getText()));
         message.setDate(new Date());

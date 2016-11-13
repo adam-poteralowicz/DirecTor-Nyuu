@@ -17,13 +17,12 @@ public class Message {
     @NotNull
     private String conversationId;
 
-    @Generated(hash = 637306882)
+    @Generated
     public Message() {
     }
 
-    @Generated(hash = 1987768833)
-    public Message(String sender, String recipient, String content, java.util.Date date,
-            @NotNull String conversationId) {
+    @Generated
+    public Message(String sender, String recipient, String content, java.util.Date date, String conversationId) {
         this.sender = sender;
         this.recipient = recipient;
         this.content = content;

@@ -56,42 +56,43 @@ public class LoginActivity extends Activity {
 
         if (view.getId() == R.id.postLoginButton) {
 
-            ServiceConnection connection = new ServiceConnection() {
-                @Override
-                public void onServiceConnected(ComponentName name, IBinder service) {
-                    Log.v("HAI/ServiceConnection", "Connected");
-                    Log.v("HAI", "HAI HAI HAI");
-                    SimpleBinder binder = (SimpleBinder) service;
-                    chatService = (TCPChatService) binder.getService();
-                    ((App) getApplication()).getChatComponent().inject(chatService);
+            shimmer.cancel();
+            Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);
+            startActivityForResult(selectedIntent, 0002);
 
-                    username = String.valueOf(usernameField.getText());
-                    password = String.valueOf(passwordField.getText());
-                    server = String.valueOf(serverField.getText());
-                    port = 5222;
+//            ServiceConnection connection = new ServiceConnection() {
+//                @Override
+//                public void onServiceConnected(ComponentName name, IBinder service) {
+//                    Log.v("HAI/ServiceConnection", "Connected");
+//                    Log.v("HAI", "HAI HAI HAI");
+//                    SimpleBinder binder = (SimpleBinder) service;
+//                    chatService = (TCPChatService) binder.getService();
+//                    ((App) getApplication()).getChatComponent().inject(chatService);
+//
+//                    username = String.valueOf(usernameField.getText());
+//                    password = String.valueOf(passwordField.getText());
+//                    server = String.valueOf(serverField.getText());
+//                    port = 5222;
+//
+//                    chatService.connect(server, port);
+//                    chatService.login(username, password);
+//
+//
+//                    Log.v("HAI/LoginActivity", "WAITED");
+//                    chatService.sendMessage("ala@ALA-PC", "hai from app");
 
-                    chatService.connect(server, port);
-                    chatService.login(username, password);
+//                }
 
+//                @Override
+//                public void onServiceDisconnected(ComponentName name) {
+//                    Log.v("HAIServiceConnection", "Disonnected");
+//                }
+//
+//            };
 
-                    Log.v("HAI/LoginActivity", "WAITED");
-                    chatService.sendMessage("ala@ALA-PC", "hai from app");
-
-                    shimmer.cancel();
-                    Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);
-                    startActivityForResult(selectedIntent, 0002);
-                }
-
-                @Override
-                public void onServiceDisconnected(ComponentName name) {
-                    Log.v("HAIServiceConnection", "Disonnected");
-                }
-
-            };
-
-            Log.v("HAI/LoginActivity", "Trying to bind...");
-            Intent intent = new Intent(this, TCPChatService.class);
-            bindService(intent, connection, Context.BIND_AUTO_CREATE);
+//            Log.v("HAI/LoginActivity", "Trying to bind...");
+//            Intent intent = new Intent(this, TCPChatService.class);
+//            bindService(intent, connection, Context.BIND_AUTO_CREATE);
 
 
         }

@@ -13,11 +13,11 @@ public class Contact {
     @Id
     private String name;
 
-    @Generated(hash = 672515148)
+    @Generated
     public Contact() {
     }
 
-    @Generated(hash = 45249444)
+    @Generated
     public Contact(String name) {
         this.name = name;
     }
@@ -34,5 +34,4 @@ public class Contact {
     public String toString() {
         return name;
     }
-
 }

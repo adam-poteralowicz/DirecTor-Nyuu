@@ -14,7 +14,7 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
 
     public static void main(String[] args) throws Exception {
 
-        Schema schema = new Schema(1, "com.apap.director.dao.model");
+        Schema schema = new Schema(1, "com.apap.director.im.dao.model");
 
         Entity contact = schema.addEntity("Contact");
         contact.addStringProperty("name").primaryKey();
@@ -40,6 +40,6 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
         Property contactIdProperty = conversation.addStringProperty("contactId").getProperty();
         conversation.addToOne(contact, contactIdProperty);
 
-        new DaoGenerator().generateAll(schema, "../DirecTor-Client/DirecTor-Client-android/src/main/java");
+        new DaoGenerator().generateAll(schema, "../DirecTor-Nyuu/im/src/main/java");
     }
 }
