@@ -67,6 +67,7 @@ public class NewMsgActivity extends Activity {
                 messages_list.add(conversation.getMessages().get(i).getContent());
             }
         }
+        conversation.resetMessages();
         arrayAdapter = new ArrayAdapter<String>(
                 App.getContext(),
                 android.R.layout.simple_list_item_1,
@@ -120,9 +121,12 @@ public class NewMsgActivity extends Activity {
         ConversationDao conversationDao = conversationDaoSession.getConversationDao();
         MessageDao messageDao = messageDaoSession.getMessageDao();
 
-        //TODO: check if conversation exists
+        Conversation conversation;
+        boolean newConversation = false;
+        if (conversationDao.getKey(conversationDao.load(String.valueOf(recipient.getText()))) != null ) {
+            conversation = conversationDao.load(String.valueOf(recipient.getText()));
+        } else  { conversation = new Conversation(); newConversation = true; }
 
-        Conversation conversation = new Conversation();
         List<Message> messages = conversation.getMessages();
         Message message = new Message();
         message.setRecipient(String.valueOf(recipient.getText()));
@@ -144,10 +148,14 @@ public class NewMsgActivity extends Activity {
         message.setConversationId(conversation.getContactId());
         messageDao.insert(message);
         messages.add(message);
+        conversation.resetMessages();
 
-        //conversation.getMessages().add(message); // Entity is detached from DAO context ; loadDeep(), queryDeep()
-        //conversationDao.insertOrReplace(conversation);   // potrzebne?
-        //conversationDao.save(conversation); // potrzebne?
+        if (newConversation) {
+            conversationDao.insert(conversation);
+        }
+
+// Entity is detached from DAO context ; loadDeep(), queryDeep()
+
         arrayAdapter.notifyDataSetChanged();
 
         // ----Set autoscroll of listview when a new message arrives----//
