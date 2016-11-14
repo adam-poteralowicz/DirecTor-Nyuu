@@ -59,21 +59,23 @@ public class NewMsgActivity extends Activity {
 
         ConversationDao conversationDao = conversationDaoSession.getConversationDao();
         final Conversation conversation = conversationDao.load(String.valueOf(recipient.getText()));
+        //final Conversation conversation = conversationDao.queryBuilder().where(conversationDao.Properties.Recipient.eq(String.valueOf(recipient.getText())));
 
         messages_list = new ArrayList<String>();
         if (!conversation.getMessages().isEmpty()) {
+            Log.v("Conversation messages #", Integer.toString(conversation.getMessages().size()));
             for (int i = 0; i < conversation.getMessages().size(); i++) {
-                Log.v("Conversation messages #", Integer.toString(conversation.getMessages().size()));
                 messages_list.add(conversation.getMessages().get(i).getContent());
             }
         }
-        conversation.resetMessages();
+
         arrayAdapter = new ArrayAdapter<String>(
                 App.getContext(),
                 android.R.layout.simple_list_item_1,
                 messages_list);
 
         messagesView.setAdapter(arrayAdapter);
+        //conversation.resetMessages();
 
         messagesView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -122,10 +124,12 @@ public class NewMsgActivity extends Activity {
         MessageDao messageDao = messageDaoSession.getMessageDao();
 
         Conversation conversation;
-        boolean newConversation = false;
-        if (conversationDao.getKey(conversationDao.load(String.valueOf(recipient.getText()))) != null ) {
+        //boolean newConversation = false;
+        //if (conversationDao.load(String.valueOf(recipient.getText())) != null ) {
+            Log.v("ConversationDao","not null");
             conversation = conversationDao.load(String.valueOf(recipient.getText()));
-        } else  { conversation = new Conversation(); newConversation = true; }
+        //} else  { Log.v("ConversationDao", "null: new Conversation");
+        //    conversation = new Conversation(); newConversation = true; }
 
         List<Message> messages = conversation.getMessages();
         Message message = new Message();
@@ -139,6 +143,7 @@ public class NewMsgActivity extends Activity {
         } else {
             messages_list.add(String.valueOf(newMessageField.getText()));
             message.setContent(String.valueOf(newMessageField.getText()));
+            Log.v("Message sent", String.valueOf(newMessageField.getText()));
         }
 
         conversation.setContactId(message.getRecipient());
@@ -147,17 +152,21 @@ public class NewMsgActivity extends Activity {
 
         message.setConversationId(conversation.getContactId());
         messageDao.insert(message);
+        messageDao.update(message); // MESSAGE does not have a single-column primary key
         messages.add(message);
-        conversation.resetMessages();
 
-        if (newConversation) {
-            conversationDao.insert(conversation);
-        }
 
-// Entity is detached from DAO context ; loadDeep(), queryDeep()
+        //if (newConversation) {
+            conversationDao.insertOrReplace(conversation);
+            conversationDao.update(conversation);
+        //}
+
+        Log.v("ConversationDao rows", Integer.toString(conversationDao.getDatabase()
+                .rawQuery("SELECT * FROM " + conversationDao.getTablename(), null).getCount()));
+
+        //conversation.resetMessages();
 
         arrayAdapter.notifyDataSetChanged();
-
         // ----Set autoscroll of listview when a new message arrives----//
         messagesView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
         messagesView.setStackFromBottom(true);
