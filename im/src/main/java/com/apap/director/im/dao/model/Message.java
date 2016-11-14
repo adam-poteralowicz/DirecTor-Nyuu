@@ -14,11 +14,15 @@ public class Message {
     private String content;
     private java.util.Date date;
 
-    @NotNull
+    @Id
     private String conversationId;
 
     @Generated
     public Message() {
+    }
+
+    public Message(String conversationId) {
+        this.conversationId = conversationId;
     }
 
     @Generated
@@ -62,13 +66,11 @@ public class Message {
         this.date = date;
     }
 
-    @NotNull
     public String getConversationId() {
         return conversationId;
     }
 
-    /** Not-null value; ensure this value is available before it is saved to the database. */
-    public void setConversationId(@NotNull String conversationId) {
+    public void setConversationId(String conversationId) {
         this.conversationId = conversationId;
     }
 

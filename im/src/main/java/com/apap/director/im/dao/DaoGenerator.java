@@ -30,9 +30,10 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
         message.addStringProperty("recipient");
         message.addStringProperty("content");
         message.addDateProperty("date");
+//        message.addIdProperty().autoincrement().primaryKey();
 
         // one Conversation has "many" Messages
-        Property conversationIdMessage = message.addStringProperty("conversationId").notNull().getProperty();
+        Property conversationIdMessage = message.addStringProperty("conversationId").primaryKey().getProperty();
         ToMany conversationToMessages = conversation.addToMany(message, conversationIdMessage);
         conversationToMessages.setName("messages");
 

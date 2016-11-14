@@ -172,5 +172,4 @@ public class Conversation {
     public String toString() {
         return recipient;
     }
-
 }

@@ -16,7 +16,7 @@ import org.greenrobot.greendao.query.QueryBuilder;
 /** 
  * DAO for table "MESSAGE".
 */
-public class MessageDao extends AbstractDao<Message, Void> {
+public class MessageDao extends AbstractDao<Message, String> {
 
     public static final String TABLENAME = "MESSAGE";
 
@@ -29,7 +29,7 @@ public class MessageDao extends AbstractDao<Message, Void> {
         public final static Property Recipient = new Property(1, String.class, "recipient", false, "RECIPIENT");
         public final static Property Content = new Property(2, String.class, "content", false, "CONTENT");
         public final static Property Date = new Property(3, java.util.Date.class, "date", false, "DATE");
-        public final static Property ConversationId = new Property(4, String.class, "conversationId", false, "CONVERSATION_ID");
+        public final static Property ConversationId = new Property(4, String.class, "conversationId", true, "CONVERSATION_ID");
     }
 
     private Query<Message> conversation_MessagesQuery;
@@ -50,7 +50,7 @@ public class MessageDao extends AbstractDao<Message, Void> {
                 "\"RECIPIENT\" TEXT," + // 1: recipient
                 "\"CONTENT\" TEXT," + // 2: content
                 "\"DATE\" INTEGER," + // 3: date
-                "\"CONVERSATION_ID\" TEXT NOT NULL );"); // 4: conversationId
+                "\"CONVERSATION_ID\" TEXT PRIMARY KEY NOT NULL );"); // 4: conversationId
     }
 
     /** Drops the underlying database table. */
@@ -82,7 +82,11 @@ public class MessageDao extends AbstractDao<Message, Void> {
         if (date != null) {
             stmt.bindLong(4, date.getTime());
         }
-        stmt.bindString(5, entity.getConversationId());
+ 
+        String conversationId = entity.getConversationId();
+        if (conversationId != null) {
+            stmt.bindString(5, conversationId);
+        }
     }
 
     @Override
@@ -108,12 +112,16 @@ public class MessageDao extends AbstractDao<Message, Void> {
         if (date != null) {
             stmt.bindLong(4, date.getTime());
         }
-        stmt.bindString(5, entity.getConversationId());
+ 
+        String conversationId = entity.getConversationId();
+        if (conversationId != null) {
+            stmt.bindString(5, conversationId);
+        }
     }
 
     @Override
-    public Void readKey(Cursor cursor, int offset) {
-        return null;
+    public String readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4);
     }    
 
     @Override
@@ -123,7 +131,7 @@ public class MessageDao extends AbstractDao<Message, Void> {
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // recipient
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // content
             cursor.isNull(offset + 3) ? null : new java.util.Date(cursor.getLong(offset + 3)), // date
-            cursor.getString(offset + 4) // conversationId
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) // conversationId
         );
         return entity;
     }
@@ -134,24 +142,26 @@ public class MessageDao extends AbstractDao<Message, Void> {
         entity.setRecipient(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setContent(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setDate(cursor.isNull(offset + 3) ? null : new java.util.Date(cursor.getLong(offset + 3)));
-        entity.setConversationId(cursor.getString(offset + 4));
+        entity.setConversationId(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
      }
     
     @Override
-    protected final Void updateKeyAfterInsert(Message entity, long rowId) {
-        // Unsupported or missing PK type
-        return null;
+    protected final String updateKeyAfterInsert(Message entity, long rowId) {
+        return entity.getConversationId();
     }
     
     @Override
-    public Void getKey(Message entity) {
-        return null;
+    public String getKey(Message entity) {
+        if(entity != null) {
+            return entity.getConversationId();
+        } else {
+            return null;
+        }
     }
 
     @Override
     public boolean hasKey(Message entity) {
-        // TODO
-        return false;
+        return entity.getConversationId() != null;
     }
 
     @Override
