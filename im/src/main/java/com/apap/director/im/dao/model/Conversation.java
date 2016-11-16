@@ -13,11 +13,16 @@ import org.greenrobot.greendao.DaoException;
  */
 @Entity(active = true)
 public class Conversation {
+
+    @Id(autoincrement = true)
+    private Long id;
+
+    @NotNull
     private String sender;
 
-    @Id
+    @NotNull
     private String recipient;
-    private String contactId;
+    private long contactId;
 
     /** Used to resolve relations */
     @Generated
@@ -31,10 +36,10 @@ public class Conversation {
     private Contact contact;
 
     @Generated
-    private transient String contact__resolvedKey;
+    private transient Long contact__resolvedKey;
 
     @ToMany(joinProperties = {
-        @JoinProperty(name = "recipient", referencedName = "conversationId")
+        @JoinProperty(name = "id", referencedName = "conversationId")
     })
     private List<Message> messages;
 
@@ -42,12 +47,13 @@ public class Conversation {
     public Conversation() {
     }
 
-    public Conversation(String recipient) {
-        this.recipient = recipient;
+    public Conversation(Long id) {
+        this.id = id;
     }
 
     @Generated
-    public Conversation(String sender, String recipient, String contactId) {
+    public Conversation(Long id, String sender, String recipient, long contactId) {
+        this.id = id;
         this.sender = sender;
         this.recipient = recipient;
         this.contactId = contactId;
@@ -60,35 +66,47 @@ public class Conversation {
         myDao = daoSession != null ? daoSession.getConversationDao() : null;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @NotNull
     public String getSender() {
         return sender;
     }
 
-    public void setSender(String sender) {
+    /** Not-null value; ensure this value is available before it is saved to the database. */
+    public void setSender(@NotNull String sender) {
         this.sender = sender;
     }
 
+    @NotNull
     public String getRecipient() {
         return recipient;
     }
 
-    public void setRecipient(String recipient) {
+    /** Not-null value; ensure this value is available before it is saved to the database. */
+    public void setRecipient(@NotNull String recipient) {
         this.recipient = recipient;
     }
 
-    public String getContactId() {
+    public long getContactId() {
         return contactId;
     }
 
-    public void setContactId(String contactId) {
+    public void setContactId(long contactId) {
         this.contactId = contactId;
     }
 
     /** To-one relationship, resolved on first access. */
     @Generated
     public Contact getContact() {
-        String __key = this.contactId;
-        if (contact__resolvedKey == null || contact__resolvedKey != __key) {
+        long __key = this.contactId;
+        if (contact__resolvedKey == null || !contact__resolvedKey.equals(__key)) {
             __throwIfDetached();
             ContactDao targetDao = daoSession.getContactDao();
             Contact contactNew = targetDao.load(__key);
@@ -102,9 +120,12 @@ public class Conversation {
 
     @Generated
     public void setContact(Contact contact) {
+        if (contact == null) {
+            throw new DaoException("To-one property 'contactId' has not-null constraint; cannot set to-one to null");
+        }
         synchronized (this) {
             this.contact = contact;
-            contactId = contact == null ? null : contact.getName();
+            contactId = contact.getId();
             contact__resolvedKey = contactId;
         }
     }
@@ -115,7 +136,7 @@ public class Conversation {
         if (messages == null) {
             __throwIfDetached();
             MessageDao targetDao = daoSession.getMessageDao();
-            List<Message> messagesNew = targetDao._queryConversation_Messages(recipient);
+            List<Message> messagesNew = targetDao._queryConversation_Messages(id);
             synchronized (this) {
                 if(messages == null) {
                     messages = messagesNew;

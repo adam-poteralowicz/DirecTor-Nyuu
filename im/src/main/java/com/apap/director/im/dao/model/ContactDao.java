@@ -1,10 +1,13 @@
 package com.apap.director.im.dao.model;
 
+import java.util.List;
+import java.util.ArrayList;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteStatement;
 
 import org.greenrobot.greendao.AbstractDao;
 import org.greenrobot.greendao.Property;
+import org.greenrobot.greendao.internal.SqlUtils;
 import org.greenrobot.greendao.internal.DaoConfig;
 import org.greenrobot.greendao.database.Database;
 import org.greenrobot.greendao.database.DatabaseStatement;
@@ -13,7 +16,7 @@ import org.greenrobot.greendao.database.DatabaseStatement;
 /** 
  * DAO for table "CONTACT".
 */
-public class ContactDao extends AbstractDao<Contact, String> {
+public class ContactDao extends AbstractDao<Contact, Long> {
 
     public static final String TABLENAME = "CONTACT";
 
@@ -22,8 +25,12 @@ public class ContactDao extends AbstractDao<Contact, String> {
      * Can be used for QueryBuilder and for referencing column names.
      */
     public static class Properties {
-        public final static Property Name = new Property(0, String.class, "name", true, "NAME");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
+        public final static Property Name = new Property(1, String.class, "name", false, "NAME");
+        public final static Property ConversationId = new Property(2, long.class, "conversationId", false, "CONVERSATION_ID");
     }
+
+    private DaoSession daoSession;
 
 
     public ContactDao(DaoConfig config) {
@@ -32,13 +39,16 @@ public class ContactDao extends AbstractDao<Contact, String> {
     
     public ContactDao(DaoConfig config, DaoSession daoSession) {
         super(config, daoSession);
+        this.daoSession = daoSession;
     }
 
     /** Creates the underlying database table. */
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"CONTACT\" (" + //
-                "\"NAME\" TEXT PRIMARY KEY NOT NULL );"); // 0: name
+                "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
+                "\"NAME\" TEXT NOT NULL ," + // 1: name
+                "\"CONVERSATION_ID\" INTEGER NOT NULL );"); // 2: conversationId
     }
 
     /** Drops the underlying database table. */
@@ -51,49 +61,64 @@ public class ContactDao extends AbstractDao<Contact, String> {
     protected final void bindValues(DatabaseStatement stmt, Contact entity) {
         stmt.clearBindings();
  
-        String name = entity.getName();
-        if (name != null) {
-            stmt.bindString(1, name);
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
         }
+        stmt.bindString(2, entity.getName());
+        stmt.bindLong(3, entity.getConversationId());
     }
 
     @Override
     protected final void bindValues(SQLiteStatement stmt, Contact entity) {
         stmt.clearBindings();
  
-        String name = entity.getName();
-        if (name != null) {
-            stmt.bindString(1, name);
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
         }
+        stmt.bindString(2, entity.getName());
+        stmt.bindLong(3, entity.getConversationId());
     }
 
     @Override
-    public String readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0);
+    protected final void attachEntity(Contact entity) {
+        super.attachEntity(entity);
+        entity.__setDaoSession(daoSession);
+    }
+
+    @Override
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     @Override
     public Contact readEntity(Cursor cursor, int offset) {
         Contact entity = new Contact( //
-            cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0) // name
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.getString(offset + 1), // name
+            cursor.getLong(offset + 2) // conversationId
         );
         return entity;
     }
      
     @Override
     public void readEntity(Cursor cursor, Contact entity, int offset) {
-        entity.setName(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setName(cursor.getString(offset + 1));
+        entity.setConversationId(cursor.getLong(offset + 2));
      }
     
     @Override
-    protected final String updateKeyAfterInsert(Contact entity, long rowId) {
-        return entity.getName();
+    protected final Long updateKeyAfterInsert(Contact entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     @Override
-    public String getKey(Contact entity) {
+    public Long getKey(Contact entity) {
         if(entity != null) {
-            return entity.getName();
+            return entity.getId();
         } else {
             return null;
         }
@@ -101,7 +126,7 @@ public class ContactDao extends AbstractDao<Contact, String> {
 
     @Override
     public boolean hasKey(Contact entity) {
-        return entity.getName() != null;
+        return entity.getId() != null;
     }
 
     @Override
@@ -109,4 +134,97 @@ public class ContactDao extends AbstractDao<Contact, String> {
         return true;
     }
     
+    private String selectDeep;
+
+    protected String getSelectDeep() {
+        if (selectDeep == null) {
+            StringBuilder builder = new StringBuilder("SELECT ");
+            SqlUtils.appendColumns(builder, "T", getAllColumns());
+            builder.append(',');
+            SqlUtils.appendColumns(builder, "T0", daoSession.getConversationDao().getAllColumns());
+            builder.append(" FROM CONTACT T");
+            builder.append(" LEFT JOIN CONVERSATION T0 ON T.\"CONVERSATION_ID\"=T0.\"_id\"");
+            builder.append(' ');
+            selectDeep = builder.toString();
+        }
+        return selectDeep;
+    }
+    
+    protected Contact loadCurrentDeep(Cursor cursor, boolean lock) {
+        Contact entity = loadCurrent(cursor, 0, lock);
+        int offset = getAllColumns().length;
+
+        Conversation conversation = loadCurrentOther(daoSession.getConversationDao(), cursor, offset);
+         if(conversation != null) {
+            entity.setConversation(conversation);
+        }
+
+        return entity;    
+    }
+
+    public Contact loadDeep(Long key) {
+        assertSinglePk();
+        if (key == null) {
+            return null;
+        }
+
+        StringBuilder builder = new StringBuilder(getSelectDeep());
+        builder.append("WHERE ");
+        SqlUtils.appendColumnsEqValue(builder, "T", getPkColumns());
+        String sql = builder.toString();
+        
+        String[] keyArray = new String[] { key.toString() };
+        Cursor cursor = db.rawQuery(sql, keyArray);
+        
+        try {
+            boolean available = cursor.moveToFirst();
+            if (!available) {
+                return null;
+            } else if (!cursor.isLast()) {
+                throw new IllegalStateException("Expected unique result, but count was " + cursor.getCount());
+            }
+            return loadCurrentDeep(cursor, true);
+        } finally {
+            cursor.close();
+        }
+    }
+    
+    /** Reads all available rows from the given cursor and returns a list of new ImageTO objects. */
+    public List<Contact> loadAllDeepFromCursor(Cursor cursor) {
+        int count = cursor.getCount();
+        List<Contact> list = new ArrayList<Contact>(count);
+        
+        if (cursor.moveToFirst()) {
+            if (identityScope != null) {
+                identityScope.lock();
+                identityScope.reserveRoom(count);
+            }
+            try {
+                do {
+                    list.add(loadCurrentDeep(cursor, false));
+                } while (cursor.moveToNext());
+            } finally {
+                if (identityScope != null) {
+                    identityScope.unlock();
+                }
+            }
+        }
+        return list;
+    }
+    
+    protected List<Contact> loadDeepAllAndCloseCursor(Cursor cursor) {
+        try {
+            return loadAllDeepFromCursor(cursor);
+        } finally {
+            cursor.close();
+        }
+    }
+    
+
+    /** A raw-style query where you can pass any WHERE clause and arguments. */
+    public List<Contact> queryDeep(String where, String... selectionArg) {
+        Cursor cursor = db.rawQuery(getSelectDeep() + where, selectionArg);
+        return loadDeepAllAndCloseCursor(cursor);
+    }
+ 
 }

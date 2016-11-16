@@ -16,7 +16,7 @@ import org.greenrobot.greendao.query.QueryBuilder;
 /** 
  * DAO for table "MESSAGE".
 */
-public class MessageDao extends AbstractDao<Message, String> {
+public class MessageDao extends AbstractDao<Message, Long> {
 
     public static final String TABLENAME = "MESSAGE";
 
@@ -25,11 +25,12 @@ public class MessageDao extends AbstractDao<Message, String> {
      * Can be used for QueryBuilder and for referencing column names.
      */
     public static class Properties {
-        public final static Property Sender = new Property(0, String.class, "sender", false, "SENDER");
-        public final static Property Recipient = new Property(1, String.class, "recipient", false, "RECIPIENT");
-        public final static Property Content = new Property(2, String.class, "content", false, "CONTENT");
-        public final static Property Date = new Property(3, java.util.Date.class, "date", false, "DATE");
-        public final static Property ConversationId = new Property(4, String.class, "conversationId", true, "CONVERSATION_ID");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
+        public final static Property Sender = new Property(1, String.class, "sender", false, "SENDER");
+        public final static Property Recipient = new Property(2, String.class, "recipient", false, "RECIPIENT");
+        public final static Property Content = new Property(3, String.class, "content", false, "CONTENT");
+        public final static Property Date = new Property(4, java.util.Date.class, "date", false, "DATE");
+        public final static Property ConversationId = new Property(5, long.class, "conversationId", false, "CONVERSATION_ID");
     }
 
     private Query<Message> conversation_MessagesQuery;
@@ -46,11 +47,12 @@ public class MessageDao extends AbstractDao<Message, String> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"MESSAGE\" (" + //
-                "\"SENDER\" TEXT," + // 0: sender
-                "\"RECIPIENT\" TEXT," + // 1: recipient
-                "\"CONTENT\" TEXT," + // 2: content
-                "\"DATE\" INTEGER," + // 3: date
-                "\"CONVERSATION_ID\" TEXT PRIMARY KEY NOT NULL );"); // 4: conversationId
+                "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
+                "\"SENDER\" TEXT NOT NULL ," + // 1: sender
+                "\"RECIPIENT\" TEXT NOT NULL ," + // 2: recipient
+                "\"CONTENT\" TEXT NOT NULL ," + // 3: content
+                "\"DATE\" INTEGER NOT NULL ," + // 4: date
+                "\"CONVERSATION_ID\" INTEGER NOT NULL );"); // 5: conversationId
     }
 
     /** Drops the underlying database table. */
@@ -63,97 +65,70 @@ public class MessageDao extends AbstractDao<Message, String> {
     protected final void bindValues(DatabaseStatement stmt, Message entity) {
         stmt.clearBindings();
  
-        String sender = entity.getSender();
-        if (sender != null) {
-            stmt.bindString(1, sender);
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
         }
- 
-        String recipient = entity.getRecipient();
-        if (recipient != null) {
-            stmt.bindString(2, recipient);
-        }
- 
-        String content = entity.getContent();
-        if (content != null) {
-            stmt.bindString(3, content);
-        }
- 
-        java.util.Date date = entity.getDate();
-        if (date != null) {
-            stmt.bindLong(4, date.getTime());
-        }
- 
-        String conversationId = entity.getConversationId();
-        if (conversationId != null) {
-            stmt.bindString(5, conversationId);
-        }
+        stmt.bindString(2, entity.getSender());
+        stmt.bindString(3, entity.getRecipient());
+        stmt.bindString(4, entity.getContent());
+        stmt.bindLong(5, entity.getDate().getTime());
+        stmt.bindLong(6, entity.getConversationId());
     }
 
     @Override
     protected final void bindValues(SQLiteStatement stmt, Message entity) {
         stmt.clearBindings();
  
-        String sender = entity.getSender();
-        if (sender != null) {
-            stmt.bindString(1, sender);
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
         }
- 
-        String recipient = entity.getRecipient();
-        if (recipient != null) {
-            stmt.bindString(2, recipient);
-        }
- 
-        String content = entity.getContent();
-        if (content != null) {
-            stmt.bindString(3, content);
-        }
- 
-        java.util.Date date = entity.getDate();
-        if (date != null) {
-            stmt.bindLong(4, date.getTime());
-        }
- 
-        String conversationId = entity.getConversationId();
-        if (conversationId != null) {
-            stmt.bindString(5, conversationId);
-        }
+        stmt.bindString(2, entity.getSender());
+        stmt.bindString(3, entity.getRecipient());
+        stmt.bindString(4, entity.getContent());
+        stmt.bindLong(5, entity.getDate().getTime());
+        stmt.bindLong(6, entity.getConversationId());
     }
 
     @Override
-    public String readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4);
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     @Override
     public Message readEntity(Cursor cursor, int offset) {
         Message entity = new Message( //
-            cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // sender
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // recipient
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // content
-            cursor.isNull(offset + 3) ? null : new java.util.Date(cursor.getLong(offset + 3)), // date
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) // conversationId
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.getString(offset + 1), // sender
+            cursor.getString(offset + 2), // recipient
+            cursor.getString(offset + 3), // content
+            new java.util.Date(cursor.getLong(offset + 4)), // date
+            cursor.getLong(offset + 5) // conversationId
         );
         return entity;
     }
      
     @Override
     public void readEntity(Cursor cursor, Message entity, int offset) {
-        entity.setSender(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
-        entity.setRecipient(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setContent(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setDate(cursor.isNull(offset + 3) ? null : new java.util.Date(cursor.getLong(offset + 3)));
-        entity.setConversationId(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setSender(cursor.getString(offset + 1));
+        entity.setRecipient(cursor.getString(offset + 2));
+        entity.setContent(cursor.getString(offset + 3));
+        entity.setDate(new java.util.Date(cursor.getLong(offset + 4)));
+        entity.setConversationId(cursor.getLong(offset + 5));
      }
     
     @Override
-    protected final String updateKeyAfterInsert(Message entity, long rowId) {
-        return entity.getConversationId();
+    protected final Long updateKeyAfterInsert(Message entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     @Override
-    public String getKey(Message entity) {
+    public Long getKey(Message entity) {
         if(entity != null) {
-            return entity.getConversationId();
+            return entity.getId();
         } else {
             return null;
         }
@@ -161,7 +136,7 @@ public class MessageDao extends AbstractDao<Message, String> {
 
     @Override
     public boolean hasKey(Message entity) {
-        return entity.getConversationId() != null;
+        return entity.getId() != null;
     }
 
     @Override
@@ -170,7 +145,7 @@ public class MessageDao extends AbstractDao<Message, String> {
     }
     
     /** Internal query to resolve the "messages" to-many relationship of Conversation. */
-    public List<Message> _queryConversation_Messages(String conversationId) {
+    public List<Message> _queryConversation_Messages(long conversationId) {
         synchronized (this) {
             if (conversation_MessagesQuery == null) {
                 QueryBuilder<Message> queryBuilder = queryBuilder();

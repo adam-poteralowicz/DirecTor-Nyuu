@@ -16,7 +16,7 @@ import org.greenrobot.greendao.database.DatabaseStatement;
 /** 
  * DAO for table "CONVERSATION".
 */
-public class ConversationDao extends AbstractDao<Conversation, String> {
+public class ConversationDao extends AbstractDao<Conversation, Long> {
 
     public static final String TABLENAME = "CONVERSATION";
 
@@ -25,9 +25,10 @@ public class ConversationDao extends AbstractDao<Conversation, String> {
      * Can be used for QueryBuilder and for referencing column names.
      */
     public static class Properties {
-        public final static Property Sender = new Property(0, String.class, "sender", false, "SENDER");
-        public final static Property Recipient = new Property(1, String.class, "recipient", true, "RECIPIENT");
-        public final static Property ContactId = new Property(2, String.class, "contactId", false, "CONTACT_ID");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
+        public final static Property Sender = new Property(1, String.class, "sender", false, "SENDER");
+        public final static Property Recipient = new Property(2, String.class, "recipient", false, "RECIPIENT");
+        public final static Property ContactId = new Property(3, long.class, "contactId", false, "CONTACT_ID");
     }
 
     private DaoSession daoSession;
@@ -46,9 +47,10 @@ public class ConversationDao extends AbstractDao<Conversation, String> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"CONVERSATION\" (" + //
-                "\"SENDER\" TEXT," + // 0: sender
-                "\"RECIPIENT\" TEXT PRIMARY KEY NOT NULL ," + // 1: recipient
-                "\"CONTACT_ID\" TEXT);"); // 2: contactId
+                "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
+                "\"SENDER\" TEXT NOT NULL ," + // 1: sender
+                "\"RECIPIENT\" TEXT NOT NULL ," + // 2: recipient
+                "\"CONTACT_ID\" INTEGER NOT NULL );"); // 3: contactId
     }
 
     /** Drops the underlying database table. */
@@ -61,40 +63,26 @@ public class ConversationDao extends AbstractDao<Conversation, String> {
     protected final void bindValues(DatabaseStatement stmt, Conversation entity) {
         stmt.clearBindings();
  
-        String sender = entity.getSender();
-        if (sender != null) {
-            stmt.bindString(1, sender);
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
         }
- 
-        String recipient = entity.getRecipient();
-        if (recipient != null) {
-            stmt.bindString(2, recipient);
-        }
- 
-        String contactId = entity.getContactId();
-        if (contactId != null) {
-            stmt.bindString(3, contactId);
-        }
+        stmt.bindString(2, entity.getSender());
+        stmt.bindString(3, entity.getRecipient());
+        stmt.bindLong(4, entity.getContactId());
     }
 
     @Override
     protected final void bindValues(SQLiteStatement stmt, Conversation entity) {
         stmt.clearBindings();
  
-        String sender = entity.getSender();
-        if (sender != null) {
-            stmt.bindString(1, sender);
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
         }
- 
-        String recipient = entity.getRecipient();
-        if (recipient != null) {
-            stmt.bindString(2, recipient);
-        }
- 
-        String contactId = entity.getContactId();
-        if (contactId != null) {
-            stmt.bindString(3, contactId);
-        }
+        stmt.bindString(2, entity.getSender());
+        stmt.bindString(3, entity.getRecipient());
+        stmt.bindLong(4, entity.getContactId());
     }
 
     @Override
@@ -104,36 +92,39 @@ public class ConversationDao extends AbstractDao<Conversation, String> {
     }
 
     @Override
-    public String readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1);
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     @Override
     public Conversation readEntity(Cursor cursor, int offset) {
         Conversation entity = new Conversation( //
-            cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // sender
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // recipient
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2) // contactId
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.getString(offset + 1), // sender
+            cursor.getString(offset + 2), // recipient
+            cursor.getLong(offset + 3) // contactId
         );
         return entity;
     }
      
     @Override
     public void readEntity(Cursor cursor, Conversation entity, int offset) {
-        entity.setSender(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
-        entity.setRecipient(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setContactId(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setSender(cursor.getString(offset + 1));
+        entity.setRecipient(cursor.getString(offset + 2));
+        entity.setContactId(cursor.getLong(offset + 3));
      }
     
     @Override
-    protected final String updateKeyAfterInsert(Conversation entity, long rowId) {
-        return entity.getRecipient();
+    protected final Long updateKeyAfterInsert(Conversation entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     @Override
-    public String getKey(Conversation entity) {
+    public Long getKey(Conversation entity) {
         if(entity != null) {
-            return entity.getRecipient();
+            return entity.getId();
         } else {
             return null;
         }
@@ -141,7 +132,7 @@ public class ConversationDao extends AbstractDao<Conversation, String> {
 
     @Override
     public boolean hasKey(Conversation entity) {
-        return entity.getRecipient() != null;
+        return entity.getId() != null;
     }
 
     @Override
@@ -158,7 +149,7 @@ public class ConversationDao extends AbstractDao<Conversation, String> {
             builder.append(',');
             SqlUtils.appendColumns(builder, "T0", daoSession.getContactDao().getAllColumns());
             builder.append(" FROM CONVERSATION T");
-            builder.append(" LEFT JOIN CONTACT T0 ON T.\"CONTACT_ID\"=T0.\"NAME\"");
+            builder.append(" LEFT JOIN CONTACT T0 ON T.\"CONTACT_ID\"=T0.\"_id\"");
             builder.append(' ');
             selectDeep = builder.toString();
         }
@@ -170,7 +161,9 @@ public class ConversationDao extends AbstractDao<Conversation, String> {
         int offset = getAllColumns().length;
 
         Contact contact = loadCurrentOther(daoSession.getContactDao(), cursor, offset);
-        entity.setContact(contact);
+         if(contact != null) {
+            entity.setContact(contact);
+        }
 
         return entity;    
     }
