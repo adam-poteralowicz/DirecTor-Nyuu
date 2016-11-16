@@ -16,6 +16,7 @@ import com.apap.director.im.dao.model.Message;
 import org.greenrobot.greendao.async.AsyncOperation;
 import org.greenrobot.greendao.async.AsyncOperationListener;
 import org.greenrobot.greendao.async.AsyncSession;
+import org.greenrobot.greendao.database.Database;
 import org.greenrobot.greendao.query.QueryBuilder;
 import org.greenrobot.greendao.query.WhereCondition;
 

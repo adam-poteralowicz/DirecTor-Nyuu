@@ -2,6 +2,7 @@ package com.apap.director.im.dao.model;
 
 import java.util.List;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
 import org.greenrobot.greendao.AbstractDao;
@@ -56,7 +57,7 @@ public class MessageDao extends AbstractDao<Message, Long> {
     }
 
     /** Drops the underlying database table. */
-    public static void dropTable(Database db, boolean ifExists) {
+    public static void dropTable(SQLiteDatabase db, boolean ifExists) {
         String sql = "DROP TABLE " + (ifExists ? "IF EXISTS " : "") + "\"MESSAGE\"";
         db.execSQL(sql);
     }

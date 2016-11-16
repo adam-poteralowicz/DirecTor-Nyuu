@@ -27,7 +27,7 @@ public class DaoMaster extends AbstractDaoMaster {
     }
 
     /** Drops underlying database table using DAOs. */
-    public static void dropAllTables(Database db, boolean ifExists) {
+    public static void dropAllTables(SQLiteDatabase db, boolean ifExists) {
         ContactDao.dropTable(db, ifExists);
         ConversationDao.dropTable(db, ifExists);
         MessageDao.dropTable(db, ifExists);
@@ -92,7 +92,7 @@ public class DaoMaster extends AbstractDaoMaster {
         }
 
         @Override
-        public void onUpgrade(Database db, int oldVersion, int newVersion) {
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             Log.i("greenDAO", "Upgrading schema from version " + oldVersion + " to " + newVersion + " by dropping all tables");
             dropAllTables(db, true);
             onCreate(db);
