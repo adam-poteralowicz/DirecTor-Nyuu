@@ -31,7 +31,6 @@ public class LoginActivity extends Activity {
     EditText usernameField, passwordField, serverField, portField;
     Shimmer shimmer;
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,8 +46,6 @@ public class LoginActivity extends Activity {
 
         shimmer = new Shimmer();
         shimmer.start(shimmerTextView);
-
-
     }
 
     public void onClick(View view) {
@@ -93,9 +90,6 @@ public class LoginActivity extends Activity {
 //            Log.v("HAI/LoginActivity", "Trying to bind...");
 //            Intent intent = new Intent(this, TCPChatService.class);
 //            bindService(intent, connection, Context.BIND_AUTO_CREATE);
-
-
         }
-
     }
 }

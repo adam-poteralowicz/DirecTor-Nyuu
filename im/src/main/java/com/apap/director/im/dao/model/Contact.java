@@ -18,7 +18,7 @@ public class Contact {
 
     @NotNull
     private String name;
-    private long conversationId;
+    private Long conversationId;
 
     /** Used to resolve relations */
     @Generated
@@ -43,7 +43,7 @@ public class Contact {
     }
 
     @Generated
-    public Contact(Long id, String name, long conversationId) {
+    public Contact(Long id, String name, Long conversationId) {
         this.id = id;
         this.name = name;
         this.conversationId = conversationId;
@@ -74,18 +74,18 @@ public class Contact {
         this.name = name;
     }
 
-    public long getConversationId() {
+    public Long getConversationId() {
         return conversationId;
     }
 
-    public void setConversationId(long conversationId) {
+    public void setConversationId(Long conversationId) {
         this.conversationId = conversationId;
     }
 
     /** To-one relationship, resolved on first access. */
     @Generated
     public Conversation getConversation() {
-        long __key = this.conversationId;
+        Long __key = this.conversationId;
         if (conversation__resolvedKey == null || !conversation__resolvedKey.equals(__key)) {
             __throwIfDetached();
             ConversationDao targetDao = daoSession.getConversationDao();
@@ -100,12 +100,9 @@ public class Contact {
 
     @Generated
     public void setConversation(Conversation conversation) {
-        if (conversation == null) {
-            throw new DaoException("To-one property 'conversationId' has not-null constraint; cannot set to-one to null");
-        }
         synchronized (this) {
             this.conversation = conversation;
-            conversationId = conversation.getId();
+            conversationId = conversation == null ? null : conversation.getId();
             conversation__resolvedKey = conversationId;
         }
     }

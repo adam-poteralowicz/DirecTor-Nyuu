@@ -244,6 +244,35 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
     }
 
     @Override
+    public synchronized Contact getContactByName(String name) {
+        Contact contact = null;
+        try {
+            openReadableDb();
+            ContactDao contactDao = daoSession.getContactDao();
+            contact = contactDao.queryBuilder().where(ContactDao.Properties.Name.eq(name)).list().get(0);
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return contact;
+    }
+
+    // Chyba jest zle
+    @Override
+    public synchronized Conversation getConversationByContactId(Long contactId) {
+        Conversation conversation = null;
+        try {
+            openReadableDb();
+            ConversationDao conversationDao = daoSession.getConversationDao();
+            conversation = conversationDao.loadDeep(contactId);
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return conversation;
+    }
+
+    @Override
     public synchronized Conversation insertOrUpdateConversation(Conversation conversation) {
         try {
             if (conversation != null) {

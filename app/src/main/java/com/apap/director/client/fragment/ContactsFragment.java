@@ -14,10 +14,13 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.activity.AuthUserActivity;
 import com.apap.director.client.activity.SingleContactActivity;
+import com.apap.director.client.manager.DatabaseManager;
+import com.apap.director.client.manager.IDatabaseManager;
 import com.apap.director.im.dao.model.Contact;
 import com.apap.director.im.dao.model.ContactDao;
 import com.apap.director.im.dao.model.DaoSession;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -26,9 +29,9 @@ import javax.inject.Named;
 public class ContactsFragment extends Fragment {
 
     public AuthUserActivity aua;
+    private IDatabaseManager databaseManager;
+    private ArrayList<Contact> contactList;
     Intent intent;
-
-    @Inject @Named("contactDao") DaoSession daoSession;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,24 +47,27 @@ public class ContactsFragment extends Fragment {
 
         ((App) getActivity().getApplication()).getDaoComponent().inject(this);
         super.onActivityCreated(savedInstanceState);
-        ListView contactsListView = (ListView) getActivity().findViewById(R.id.contactsView);
+        final ListView contactsListView = (ListView) getActivity().findViewById(R.id.contactsView);
 
-        ContactDao contactDao = daoSession.getContactDao();
-        final List<Contact> contactsList = contactDao.loadAll();
+        // init database manager
+        databaseManager = new DatabaseManager(getActivity());
 
+        contactList = new ArrayList<Contact>();
         ArrayAdapter<Contact> arrayAdapter = new ArrayAdapter<Contact>(
                 App.getContext(),
                 android.R.layout.simple_list_item_1,
-                contactsList);
+                contactList);
         contactsListView.setAdapter(arrayAdapter);
 
         intent = new Intent(App.getContext(), SingleContactActivity.class);
         contactsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                intent.putExtra("contactName", contactsList.get(position).getName());
+                intent.putExtra("contactName", contactList.get(position).getName());
                 startActivity(intent);
             }
         });
     }
+
+
 }

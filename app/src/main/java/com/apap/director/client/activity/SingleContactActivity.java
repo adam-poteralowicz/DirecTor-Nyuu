@@ -8,6 +8,8 @@ import android.widget.*;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
+import com.apap.director.client.manager.DatabaseManager;
+import com.apap.director.client.manager.IDatabaseManager;
 import com.apap.director.im.dao.model.ContactDao;
 import com.apap.director.im.dao.model.Conversation;
 import com.apap.director.im.dao.model.ConversationDao;
@@ -21,23 +23,19 @@ import javax.inject.Named;
 
 public class SingleContactActivity extends Activity {
 
+    private IDatabaseManager databaseManager;
     List<String> myOptionsList = null;
-
     TextView contactNameView;
     ListView options;
     Intent intent;
 
-    @Inject @Named("contactDao") DaoSession contactDaoSession;
-    @Inject @Named("conversationDao") DaoSession conversationDaoSession;
-
     public void onCreate(Bundle savedInstanceState) {
         ((App) getApplication()).getDaoComponent().inject(this);
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.single_contact_view);
-        ((App) getApplication()).getDaoComponent().inject(this);
 
-
+        // init database manager
+        databaseManager = new DatabaseManager(this);
 
         final String contactNameFromIntent = getIntent().getStringExtra("contactName");
         contactNameView = (TextView) findViewById(R.id.contactName);
@@ -64,11 +62,11 @@ public class SingleContactActivity extends Activity {
                 switch (position) {
                     case 0:
                     {
-                        final ConversationDao conversationDao = conversationDaoSession.getConversationDao();
-                        Conversation conversation = new Conversation();
-                        conversation.setRecipient(contactNameFromIntent);
-                        if (conversationDao.load(contactNameFromIntent) == null) {
-                            conversationDao.insertOrReplace(conversation);
+                        Long contactId = databaseManager.getContactByName(contactNameFromIntent).getId();
+                        if (databaseManager.getConversationByContactId(contactId) == null) {
+                            Conversation conversation = new Conversation();
+                            conversation.setRecipient(contactNameFromIntent);
+                            databaseManager.insertOrUpdateConversation(conversation);
                         }
 
                         intent = new Intent(App.getContext(), NewMsgActivity.class);
@@ -78,11 +76,7 @@ public class SingleContactActivity extends Activity {
                     }
                     case 1:
                     {
-                        final ContactDao contactDao = contactDaoSession.getContactDao();
-
-                        contactDao.queryBuilder().where(ContactDao.Properties.Name.eq(contactNameFromIntent))
-                                .buildDelete().executeDeleteWithoutDetachingEntities();
-
+                        databaseManager.deleteContactByName(contactNameFromIntent);
                         intent = new Intent(App.getContext(), AuthUserActivity.class);
                         startActivity(intent);
                         break;
@@ -105,6 +99,41 @@ public class SingleContactActivity extends Activity {
             Intent selectedIntent = new Intent(SingleContactActivity.this, AuthUserActivity.class);
             startActivityForResult(selectedIntent, 0011);
 
+    }
+
+    /**
+     * Called after your activity has been stopped, prior to it being started again.
+     * Always followed by onStart()
+     */
+    @Override
+    protected void onRestart() {
+        if (databaseManager == null)
+            databaseManager = new DatabaseManager(this);
+
+        super.onRestart();
+    }
+
+    /**
+     * Called after onRestoreInstanceState(Bundle), onRestart(), or onPause(), for your activity
+     * to start interacting with the user.
+     */
+    @Override
+    protected void onResume() {
+        // init database manager
+        databaseManager = DatabaseManager.getInstance(this);
+
+        super.onResume();
+    }
+
+    /**
+     * Called when you are no longer visible to the user.
+     */
+    @Override
+    protected void onStop() {
+        if (databaseManager != null)
+            databaseManager.closeDbConnections();
+
+        super.onStop();
     }
 
 

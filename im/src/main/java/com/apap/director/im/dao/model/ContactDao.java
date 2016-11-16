@@ -28,7 +28,7 @@ public class ContactDao extends AbstractDao<Contact, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Name = new Property(1, String.class, "name", false, "NAME");
-        public final static Property ConversationId = new Property(2, long.class, "conversationId", false, "CONVERSATION_ID");
+        public final static Property ConversationId = new Property(2, Long.class, "conversationId", false, "CONVERSATION_ID");
     }
 
     private DaoSession daoSession;
@@ -49,7 +49,7 @@ public class ContactDao extends AbstractDao<Contact, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"CONTACT\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"NAME\" TEXT NOT NULL ," + // 1: name
-                "\"CONVERSATION_ID\" INTEGER NOT NULL );"); // 2: conversationId
+                "\"CONVERSATION_ID\" INTEGER);"); // 2: conversationId
     }
 
     /** Drops the underlying database table. */
@@ -67,7 +67,11 @@ public class ContactDao extends AbstractDao<Contact, Long> {
             stmt.bindLong(1, id);
         }
         stmt.bindString(2, entity.getName());
-        stmt.bindLong(3, entity.getConversationId());
+ 
+        Long conversationId = entity.getConversationId();
+        if (conversationId != null) {
+            stmt.bindLong(3, conversationId);
+        }
     }
 
     @Override
@@ -79,7 +83,11 @@ public class ContactDao extends AbstractDao<Contact, Long> {
             stmt.bindLong(1, id);
         }
         stmt.bindString(2, entity.getName());
-        stmt.bindLong(3, entity.getConversationId());
+ 
+        Long conversationId = entity.getConversationId();
+        if (conversationId != null) {
+            stmt.bindLong(3, conversationId);
+        }
     }
 
     @Override
@@ -98,7 +106,7 @@ public class ContactDao extends AbstractDao<Contact, Long> {
         Contact entity = new Contact( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.getString(offset + 1), // name
-            cursor.getLong(offset + 2) // conversationId
+            cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2) // conversationId
         );
         return entity;
     }
@@ -107,7 +115,7 @@ public class ContactDao extends AbstractDao<Contact, Long> {
     public void readEntity(Cursor cursor, Contact entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setName(cursor.getString(offset + 1));
-        entity.setConversationId(cursor.getLong(offset + 2));
+        entity.setConversationId(cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2));
      }
     
     @Override
@@ -156,9 +164,7 @@ public class ContactDao extends AbstractDao<Contact, Long> {
         int offset = getAllColumns().length;
 
         Conversation conversation = loadCurrentOther(daoSession.getConversationDao(), cursor, offset);
-         if(conversation != null) {
-            entity.setConversation(conversation);
-        }
+        entity.setConversation(conversation);
 
         return entity;    
     }

@@ -60,6 +60,12 @@ public interface IDatabaseManager {
     boolean deleteContactById(Long contactId);
 
     /**
+     * @param name - of the user we want to fetch
+     * @return Return a contact by its name
+     */
+    Contact getContactByName(String name);
+
+    /**
      * @param contactId - of the user we want to fetch
      * @return Return a contact by its id
      */
@@ -69,6 +75,12 @@ public interface IDatabaseManager {
      * Delete all the contacts from the DB
      */
     void deleteContacts();
+
+    /**
+     *  @param contactId - of the user we want to fetch
+     * @return a conversation by its id
+     */
+    Conversation getConversationByContactId(Long contactId);
 
     /**
      * Insert or update a conversation object into the DB

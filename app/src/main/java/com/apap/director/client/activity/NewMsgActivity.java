@@ -13,6 +13,8 @@ import android.widget.*;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
+import com.apap.director.client.manager.DatabaseManager;
+import com.apap.director.client.manager.IDatabaseManager;
 import com.apap.director.im.dao.model.MessageDao;
 import com.apap.director.im.domain.chat.service.TCPChatService;
 import com.apap.director.im.util.SimpleBinder;
@@ -35,16 +37,13 @@ public class NewMsgActivity extends Activity {
     ListView messagesView;
     ArrayList<String> messages_list;
     ArrayAdapter<String> arrayAdapter;
-
-    @Inject @Named("conversationDao") DaoSession conversationDaoSession;
-    @Inject @Named("messageDao") DaoSession messageDaoSession;
-    @Inject @Named("contactDao") DaoSession contactDaoSession;
+    private IDatabaseManager databaseManager;
+    private Long contactId;
 
     TCPChatService chatService;
 
     public void onCreate(Bundle savedInstanceState) {
         ((App) getApplication()).getDaoComponent().inject(this);
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_msg_view);
 
@@ -57,12 +56,14 @@ public class NewMsgActivity extends Activity {
             recipient.setText(getIntent().getStringExtra("msgTitle"));
         }
 
-        ConversationDao conversationDao = conversationDaoSession.getConversationDao();
-        final Conversation conversation = conversationDao.load(String.valueOf(recipient.getText()));
-        //final Conversation conversation = conversationDao.queryBuilder().where(conversationDao.Properties.Recipient.eq(String.valueOf(recipient.getText())));
+        // init database manager
+        databaseManager = new DatabaseManager(this);
+
+        contactId = databaseManager.getContactByName(String.valueOf(recipient.getText())).getId();
+        final Conversation conversation = databaseManager.getConversationByContactId(contactId);
 
         messages_list = new ArrayList<String>();
-        if (!conversation.getMessages().isEmpty()) {
+        if (conversation.getMessages().size() != 0) {
             Log.v("Conversation messages #", Integer.toString(conversation.getMessages().size()));
             for (int i = 0; i < conversation.getMessages().size(); i++) {
                 messages_list.add(conversation.getMessages().get(i).getContent());
@@ -73,10 +74,7 @@ public class NewMsgActivity extends Activity {
                 App.getContext(),
                 android.R.layout.simple_list_item_1,
                 messages_list);
-
         messagesView.setAdapter(arrayAdapter);
-        //conversation.resetMessages();
-
         messagesView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 messages_list.remove(position);
@@ -110,26 +108,13 @@ public class NewMsgActivity extends Activity {
 //
 //        };
 //
-//
-//
 //        Log.v("HAI/NewMsgActivity", "Trying to bind...");
 //        Intent intent = new Intent(this, TCPChatService.class);
 //        bindService(intent, connection, Context.BIND_AUTO_CREATE);
 
-
-
-
 //        DaoSession conversationDaoSession = ((App) getApplicationContext()).getConversationDaoSession();
-        ConversationDao conversationDao = conversationDaoSession.getConversationDao();
-        MessageDao messageDao = messageDaoSession.getMessageDao();
 
-        Conversation conversation;
-        //boolean newConversation = false;
-        //if (conversationDao.load(String.valueOf(recipient.getText())) != null ) {
-            Log.v("ConversationDao","not null");
-            conversation = conversationDao.load(String.valueOf(recipient.getText()));
-        //} else  { Log.v("ConversationDao", "null: new Conversation");
-        //    conversation = new Conversation(); newConversation = true; }
+        Conversation conversation = databaseManager.getConversationByContactId(contactId);
 
         List<Message> messages = conversation.getMessages();
         Message message = new Message();
@@ -146,28 +131,18 @@ public class NewMsgActivity extends Activity {
             Log.v("Message sent", String.valueOf(newMessageField.getText()));
         }
 
-        conversation.setContactId(message.getRecipient());
-        conversation.setContact(contactDaoSession.getContactDao().load(conversation.getContactId()));
+        conversation.setContactId(contactId);
         conversation.setRecipient(message.getRecipient());
+        message.setConversationId(conversation.getId());
 
-        message.setConversationId(conversation.getContactId());
-        messageDao.insert(message);
-        messageDao.update(message); // MESSAGE does not have a single-column primary key
-        messages.add(message);
+        databaseManager.insertOrUpdateMessage(message);
+        messages.add(message); // czy nie trzeba dodac wiadomosci bezposrednio?
+        databaseManager.insertOrUpdateConversation(conversation);
 
-
-        //if (newConversation) {
-            conversationDao.insertOrReplace(conversation);
-            conversationDao.update(conversation);
-        //}
-
-        Log.v("ConversationDao rows", Integer.toString(conversationDao.getDatabase()
-                .rawQuery("SELECT * FROM " + conversationDao.getTablename(), null).getCount()));
-
-        //conversation.resetMessages();
+        //Log.v("ConversationDao rows", Integer.toString(conversationDao.getDatabase()
+        //        .rawQuery("SELECT * FROM " + conversationDao.getTablename(), null).getCount()));
 
         arrayAdapter.notifyDataSetChanged();
-        // ----Set autoscroll of listview when a new message arrives----//
         messagesView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
         messagesView.setStackFromBottom(true);
 
@@ -175,6 +150,41 @@ public class NewMsgActivity extends Activity {
 //            Toast.makeText(NewMsgActivity.this, "chat service null", Toast.LENGTH_LONG).show();
         //chatService.sendMessage(message.getRecipient(), message.getContent());
 
+    }
+
+    /**
+     * Called after your activity has been stopped, prior to it being started again.
+     * Always followed by onStart()
+     */
+    @Override
+    protected void onRestart() {
+        if (databaseManager == null)
+            databaseManager = new DatabaseManager(this);
+
+        super.onRestart();
+    }
+
+    /**
+     * Called after onRestoreInstanceState(Bundle), onRestart(), or onPause(), for your activity
+     * to start interacting with the user.
+     */
+    @Override
+    protected void onResume() {
+        // init database manager
+        databaseManager = DatabaseManager.getInstance(this);
+
+        super.onResume();
+    }
+
+    /**
+     * Called when you are no longer visible to the user.
+     */
+    @Override
+    protected void onStop() {
+        if (databaseManager != null)
+            databaseManager.closeDbConnections();
+
+        super.onStop();
     }
 
 }

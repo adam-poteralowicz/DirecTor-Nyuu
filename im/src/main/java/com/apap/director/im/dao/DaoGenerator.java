@@ -33,7 +33,7 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
 
         /* properties */
         Property contactIdForConversation = conversation.addLongProperty("contactId").notNull().getProperty();
-        Property conversationIdForContact = contact.addLongProperty("conversationId").notNull().getProperty();
+        Property conversationIdForContact = contact.addLongProperty("conversationId").getProperty();
         Property conversationIdForMessage = message.addLongProperty("conversationId").notNull().getProperty();
 
         /* relationships between entities */
