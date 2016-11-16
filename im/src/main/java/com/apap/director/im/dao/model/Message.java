@@ -9,24 +9,34 @@ import org.greenrobot.greendao.annotation.*;
  */
 @Entity
 public class Message {
-    private String sender;
-    private String recipient;
-    private String content;
-    private java.util.Date date;
 
-    @Id
-    private String conversationId;
+    @Id(autoincrement = true)
+    private Long id;
+
+    @NotNull
+    private String sender;
+
+    @NotNull
+    private String recipient;
+
+    @NotNull
+    private String content;
+
+    @NotNull
+    private java.util.Date date;
+    private long conversationId;
 
     @Generated
     public Message() {
     }
 
-    public Message(String conversationId) {
-        this.conversationId = conversationId;
+    public Message(Long id) {
+        this.id = id;
     }
 
     @Generated
-    public Message(String sender, String recipient, String content, java.util.Date date, String conversationId) {
+    public Message(Long id, String sender, String recipient, String content, java.util.Date date, long conversationId) {
+        this.id = id;
         this.sender = sender;
         this.recipient = recipient;
         this.content = content;
@@ -34,43 +44,59 @@ public class Message {
         this.conversationId = conversationId;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @NotNull
     public String getSender() {
         return sender;
     }
 
-    public void setSender(String sender) {
+    /** Not-null value; ensure this value is available before it is saved to the database. */
+    public void setSender(@NotNull String sender) {
         this.sender = sender;
     }
 
+    @NotNull
     public String getRecipient() {
         return recipient;
     }
 
-    public void setRecipient(String recipient) {
+    /** Not-null value; ensure this value is available before it is saved to the database. */
+    public void setRecipient(@NotNull String recipient) {
         this.recipient = recipient;
     }
 
+    @NotNull
     public String getContent() {
         return content;
     }
 
-    public void setContent(String content) {
+    /** Not-null value; ensure this value is available before it is saved to the database. */
+    public void setContent(@NotNull String content) {
         this.content = content;
     }
 
+    @NotNull
     public java.util.Date getDate() {
         return date;
     }
 
-    public void setDate(java.util.Date date) {
+    /** Not-null value; ensure this value is available before it is saved to the database. */
+    public void setDate(@NotNull java.util.Date date) {
         this.date = date;
     }
 
-    public String getConversationId() {
+    public long getConversationId() {
         return conversationId;
     }
 
-    public void setConversationId(String conversationId) {
+    public void setConversationId(long conversationId) {
         this.conversationId = conversationId;
     }
 
