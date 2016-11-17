@@ -129,7 +129,7 @@ public class NewMsgActivity extends Activity {
         message.setConversationId(conversation.getId());
 
         databaseManager.insertOrUpdateMessage(message);
-        messages.add(message); // czy nie trzeba dodac wiadomosci bezposrednio?
+        messages.add(message);
         databaseManager.insertOrUpdateConversation(conversation);
 
         arrayAdapter.notifyDataSetChanged();

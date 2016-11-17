@@ -2,6 +2,8 @@ package com.apap.director.client.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -31,9 +33,17 @@ public class LoginActivity extends Activity {
         serverField = (EditText) findViewById(R.id.server);
         serverField.setHint("Server");
         ShimmerTextView shimmerTextView = (ShimmerTextView) findViewById(R.id.shimmer_tv);
-
+        shimmerTextView.setTextColor(new ColorStateList(
+                new int[][]{
+                        new int[]{}
+                },
+                new int[] {
+                        Color.argb(255, 102, 102, 255)
+                }
+        ));
         shimmer = new Shimmer();
         shimmer.start(shimmerTextView);
+
     }
 
     public void onClick(View view) {
