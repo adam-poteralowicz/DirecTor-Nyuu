@@ -3,6 +3,7 @@ package com.apap.director.client.manager;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.apap.director.im.dao.model.Contact;
@@ -42,7 +43,7 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
      * The Android Activity reference for access to DatabaseManager.
      */
     private Context context;
-    private DaoMaster.DevOpenHelper mHelper;
+    private DaoMaster.OpenHelper mHelper;
     private SQLiteDatabase database;
     private DaoMaster daoMaster;
     private DaoSession daoSession;
@@ -56,7 +57,7 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
      */
     public DatabaseManager(final Context context) {
         this.context = context;
-        mHelper = new DaoMaster.DevOpenHelper(this.context, "sample-database", null);
+        mHelper = new DaoMaster.DevOpenHelper(context, "sample-database", null);
         completedOperations = new CopyOnWriteArrayList<AsyncOperation>();
     }
 
@@ -87,6 +88,8 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
      * Query for readable DB
      */
     public void openReadableDb() throws SQLiteException {
+        if (mHelper == null)
+            mHelper = new DaoMaster.DevOpenHelper(this.context, "sample-database", null);
         database = mHelper.getReadableDatabase();
         daoMaster = new DaoMaster(database);
         daoSession = daoMaster.newSession();
@@ -98,6 +101,8 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
      * Query for writable DB
      */
     public void openWritableDb() throws SQLiteException {
+        if (mHelper == null)
+            mHelper = new DaoMaster.DevOpenHelper(this.context, "sample-database", null);
         database = mHelper.getWritableDatabase();
         daoMaster = new DaoMaster(database);
         daoSession = daoMaster.newSession();

@@ -31,6 +31,8 @@ public class ContactsFragment extends Fragment {
     public AuthUserActivity aua;
     private IDatabaseManager databaseManager;
     private ArrayList<Contact> contactList;
+    private ArrayAdapter<Contact> arrayAdapter;
+    private ListView contactsListView;
     Intent intent;
 
     @Override
@@ -47,13 +49,13 @@ public class ContactsFragment extends Fragment {
 
         ((App) getActivity().getApplication()).getDaoComponent().inject(this);
         super.onActivityCreated(savedInstanceState);
-        final ListView contactsListView = (ListView) getActivity().findViewById(R.id.contactsView);
+        contactsListView = (ListView) getActivity().findViewById(R.id.contactsView);
 
         // init database manager
         databaseManager = new DatabaseManager(getActivity());
 
         contactList = new ArrayList<Contact>();
-        ArrayAdapter<Contact> arrayAdapter = new ArrayAdapter<Contact>(
+        arrayAdapter = new ArrayAdapter<Contact>(
                 App.getContext(),
                 android.R.layout.simple_list_item_1,
                 contactList);
@@ -67,6 +69,32 @@ public class ContactsFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+        refreshContactList();
+    }
+
+    /**
+     * Display all the users from the DB into the listView
+     */
+    private void refreshContactList() {
+        contactList = DatabaseManager.getInstance(getActivity()).listContacts();
+        if (contactList != null) {
+            if (arrayAdapter == null) {
+                arrayAdapter = new ArrayAdapter<Contact>(
+                        App.getContext(),
+                        android.R.layout.simple_list_item_1,
+                        contactList);
+                contactsListView.setAdapter(arrayAdapter);
+                if (contactList.isEmpty())
+                    ;
+            } else {
+                contactsListView.setAdapter(null);
+                arrayAdapter.clear();
+                arrayAdapter.addAll(contactList);
+                arrayAdapter.notifyDataSetChanged();
+                contactsListView.setAdapter(arrayAdapter);
+            }
+        }
     }
 
 
