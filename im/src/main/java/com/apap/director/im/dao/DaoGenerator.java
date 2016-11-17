@@ -65,7 +65,6 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
     private static Entity addConversation(Schema schema) {
         Entity conversation = schema.addEntity("Conversation");
         conversation.addIdProperty().primaryKey().autoincrement();
-        conversation.addStringProperty("sender").notNull();
         conversation.addStringProperty("recipient").notNull();
         return conversation;
     }
@@ -78,7 +77,7 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
     private static Entity addMessage(Schema schema) {
         Entity message = schema.addEntity("Message");
         message.addIdProperty().primaryKey().autoincrement();
-        message.addStringProperty("sender").notNull();
+        message.addStringProperty("sender");
         message.addStringProperty("recipient").notNull();
         message.addStringProperty("content").notNull();
         message.addDateProperty("date").notNull();

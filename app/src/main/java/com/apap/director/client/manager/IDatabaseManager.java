@@ -92,7 +92,7 @@ public interface IDatabaseManager {
     /**
      * Delete a conversation by sender and recipient
      */
-    void deleteConversationBySenderAndRecipient(String sender, String recipient);
+    void deleteConversationByRecipient(String recipient);
 
     /**
      * Insert or update a message object into the DB

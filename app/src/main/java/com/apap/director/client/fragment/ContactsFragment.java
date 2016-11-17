@@ -17,14 +17,9 @@ import com.apap.director.client.activity.SingleContactActivity;
 import com.apap.director.client.manager.DatabaseManager;
 import com.apap.director.client.manager.IDatabaseManager;
 import com.apap.director.im.dao.model.Contact;
-import com.apap.director.im.dao.model.ContactDao;
-import com.apap.director.im.dao.model.DaoSession;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 
 public class ContactsFragment extends Fragment {
 

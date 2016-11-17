@@ -12,8 +12,6 @@ public class Message {
 
     @Id(autoincrement = true)
     private Long id;
-
-    @NotNull
     private String sender;
 
     @NotNull
@@ -52,13 +50,11 @@ public class Message {
         this.id = id;
     }
 
-    @NotNull
     public String getSender() {
         return sender;
     }
 
-    /** Not-null value; ensure this value is available before it is saved to the database. */
-    public void setSender(@NotNull String sender) {
+    public void setSender(String sender) {
         this.sender = sender;
     }
 

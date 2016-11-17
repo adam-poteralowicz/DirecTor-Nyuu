@@ -4,22 +4,20 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.manager.DatabaseManager;
 import com.apap.director.client.manager.IDatabaseManager;
-import com.apap.director.im.dao.model.ContactDao;
 import com.apap.director.im.dao.model.Conversation;
-import com.apap.director.im.dao.model.ConversationDao;
-import com.apap.director.im.dao.model.DaoSession;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 public class SingleContactActivity extends Activity {
 

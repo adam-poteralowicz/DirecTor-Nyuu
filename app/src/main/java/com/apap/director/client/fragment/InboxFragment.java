@@ -17,14 +17,8 @@ import com.apap.director.client.activity.NewMsgActivity;
 import com.apap.director.client.manager.DatabaseManager;
 import com.apap.director.client.manager.IDatabaseManager;
 import com.apap.director.im.dao.model.Conversation;
-import com.apap.director.im.dao.model.ConversationDao;
-import com.apap.director.im.dao.model.DaoSession;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 public class InboxFragment extends Fragment {
 
@@ -72,8 +66,7 @@ public class InboxFragment extends Fragment {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 //TODO: Lepiej kasowac konwersacje po id
-                databaseManager.deleteConversationBySenderAndRecipient(conversationList.get(position).getSender(),
-                        conversationList.get(position).getRecipient());
+                databaseManager.deleteConversationByRecipient(conversationList.get(position).getRecipient());
                 arrayAdapter.notifyDataSetChanged();
                 onActivityCreated(savedInstanceState);
 

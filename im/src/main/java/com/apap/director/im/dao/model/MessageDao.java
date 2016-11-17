@@ -49,7 +49,7 @@ public class MessageDao extends AbstractDao<Message, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"MESSAGE\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
-                "\"SENDER\" TEXT NOT NULL ," + // 1: sender
+                "\"SENDER\" TEXT," + // 1: sender
                 "\"RECIPIENT\" TEXT NOT NULL ," + // 2: recipient
                 "\"CONTENT\" TEXT NOT NULL ," + // 3: content
                 "\"DATE\" INTEGER NOT NULL ," + // 4: date
@@ -70,7 +70,11 @@ public class MessageDao extends AbstractDao<Message, Long> {
         if (id != null) {
             stmt.bindLong(1, id);
         }
-        stmt.bindString(2, entity.getSender());
+ 
+        String sender = entity.getSender();
+        if (sender != null) {
+            stmt.bindString(2, sender);
+        }
         stmt.bindString(3, entity.getRecipient());
         stmt.bindString(4, entity.getContent());
         stmt.bindLong(5, entity.getDate().getTime());
@@ -85,7 +89,11 @@ public class MessageDao extends AbstractDao<Message, Long> {
         if (id != null) {
             stmt.bindLong(1, id);
         }
-        stmt.bindString(2, entity.getSender());
+ 
+        String sender = entity.getSender();
+        if (sender != null) {
+            stmt.bindString(2, sender);
+        }
         stmt.bindString(3, entity.getRecipient());
         stmt.bindString(4, entity.getContent());
         stmt.bindLong(5, entity.getDate().getTime());
@@ -101,7 +109,7 @@ public class MessageDao extends AbstractDao<Message, Long> {
     public Message readEntity(Cursor cursor, int offset) {
         Message entity = new Message( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.getString(offset + 1), // sender
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // sender
             cursor.getString(offset + 2), // recipient
             cursor.getString(offset + 3), // content
             new java.util.Date(cursor.getLong(offset + 4)), // date
@@ -113,7 +121,7 @@ public class MessageDao extends AbstractDao<Message, Long> {
     @Override
     public void readEntity(Cursor cursor, Message entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setSender(cursor.getString(offset + 1));
+        entity.setSender(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setRecipient(cursor.getString(offset + 2));
         entity.setContent(cursor.getString(offset + 3));
         entity.setDate(new java.util.Date(cursor.getLong(offset + 4)));

@@ -3,7 +3,6 @@ package com.apap.director.client.manager;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.apap.director.im.dao.model.Contact;
@@ -17,7 +16,6 @@ import com.apap.director.im.dao.model.Message;
 import org.greenrobot.greendao.async.AsyncOperation;
 import org.greenrobot.greendao.async.AsyncOperationListener;
 import org.greenrobot.greendao.async.AsyncSession;
-import org.greenrobot.greendao.database.Database;
 import org.greenrobot.greendao.query.QueryBuilder;
 import org.greenrobot.greendao.query.WhereCondition;
 
@@ -292,12 +290,11 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
     }
 
     @Override
-    public synchronized void deleteConversationBySenderAndRecipient(String sender, String recipient) {
+    public synchronized void deleteConversationByRecipient(String recipient) {
         try {
             openWritableDb();
             ConversationDao dao = daoSession.getConversationDao();
-            WhereCondition condition = dao.queryBuilder().and(ConversationDao.Properties.Sender.eq(sender),
-                    ConversationDao.Properties.Recipient.eq(recipient));
+            WhereCondition condition = ConversationDao.Properties.Recipient.eq(recipient);
             QueryBuilder<Conversation> queryBuilder = dao.queryBuilder().where(condition);
             dao.deleteInTx(queryBuilder.list());
             daoSession.clear();

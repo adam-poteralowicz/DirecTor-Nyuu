@@ -11,17 +11,10 @@ import com.apap.director.client.R;
 import com.apap.director.client.manager.DatabaseManager;
 import com.apap.director.client.manager.IDatabaseManager;
 import com.apap.director.im.dao.model.Contact;
-import com.apap.director.im.dao.model.ContactDao;
-import com.apap.director.im.dao.model.DaoSession;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 public class AddContactActivity extends Activity {
     private IDatabaseManager databaseManager;
     EditText newContactName;
-
-    //@Inject @Named("contactDao") DaoSession daoSession;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

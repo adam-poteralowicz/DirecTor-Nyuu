@@ -18,9 +18,6 @@ public class Conversation {
     private Long id;
 
     @NotNull
-    private String sender;
-
-    @NotNull
     private String recipient;
     private long contactId;
 
@@ -52,9 +49,8 @@ public class Conversation {
     }
 
     @Generated
-    public Conversation(Long id, String sender, String recipient, long contactId) {
+    public Conversation(Long id, String recipient, long contactId) {
         this.id = id;
-        this.sender = sender;
         this.recipient = recipient;
         this.contactId = contactId;
     }
@@ -72,16 +68,6 @@ public class Conversation {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    @NotNull
-    public String getSender() {
-        return sender;
-    }
-
-    /** Not-null value; ensure this value is available before it is saved to the database. */
-    public void setSender(@NotNull String sender) {
-        this.sender = sender;
     }
 
     @NotNull

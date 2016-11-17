@@ -1,35 +1,26 @@
 package com.apap.director.client.activity;
 
 import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.manager.DatabaseManager;
 import com.apap.director.client.manager.IDatabaseManager;
-import com.apap.director.im.dao.model.MessageDao;
-import com.apap.director.im.domain.chat.service.TCPChatService;
-import com.apap.director.im.util.SimpleBinder;
-
 import com.apap.director.im.dao.model.Conversation;
-import com.apap.director.im.dao.model.ConversationDao;
-import com.apap.director.im.dao.model.DaoSession;
 import com.apap.director.im.dao.model.Message;
+import com.apap.director.im.domain.chat.service.TCPChatService;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 public class NewMsgActivity extends Activity {
     EditText newMessageField;
@@ -39,6 +30,7 @@ public class NewMsgActivity extends Activity {
     ArrayAdapter<String> arrayAdapter;
     private IDatabaseManager databaseManager;
     private Long contactId;
+    private List myMessages;
 
     TCPChatService chatService;
 
@@ -61,29 +53,30 @@ public class NewMsgActivity extends Activity {
 
         contactId = databaseManager.getContactByName(String.valueOf(recipient.getText())).getId();
         final Conversation conversation = databaseManager.getConversationByContactId(contactId);
+        if (conversation.getMessages() != null)
+            myMessages = conversation.getMessages();
 
-        messages_list = new ArrayList<String>();
-        if (conversation.getMessages().size() != 0) {
-            Log.v("Conversation messages #", Integer.toString(conversation.getMessages().size()));
-            for (int i = 0; i < conversation.getMessages().size(); i++) {
-                messages_list.add(conversation.getMessages().get(i).getContent());
+            messages_list = new ArrayList<String>();
+            if (myMessages != null) {
+                Log.v("Conversation messages #", Integer.toString(conversation.getMessages().size()));
+                for (int i = 0; i < conversation.getMessages().size(); i++) {
+                    messages_list.add(conversation.getMessages().get(i).getContent());
+                }
             }
-        }
 
-        arrayAdapter = new ArrayAdapter<String>(
-                App.getContext(),
-                android.R.layout.simple_list_item_1,
-                messages_list);
-        messagesView.setAdapter(arrayAdapter);
-        messagesView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                messages_list.remove(position);
-                conversation.getMessages().remove(position);
-                arrayAdapter.notifyDataSetChanged();
-                return true;
-            }
-        });
-
+            arrayAdapter = new ArrayAdapter<String>(
+                    App.getContext(),
+                    android.R.layout.simple_list_item_1,
+                    messages_list);
+            messagesView.setAdapter(arrayAdapter);
+            messagesView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    messages_list.remove(position);
+                    conversation.getMessages().remove(position);
+                    arrayAdapter.notifyDataSetChanged();
+                    return true;
+                }
+            });
     }
 
     public void onClick(View view) {
@@ -138,9 +131,6 @@ public class NewMsgActivity extends Activity {
         databaseManager.insertOrUpdateMessage(message);
         messages.add(message); // czy nie trzeba dodac wiadomosci bezposrednio?
         databaseManager.insertOrUpdateConversation(conversation);
-
-        //Log.v("ConversationDao rows", Integer.toString(conversationDao.getDatabase()
-        //        .rawQuery("SELECT * FROM " + conversationDao.getTablename(), null).getCount()));
 
         arrayAdapter.notifyDataSetChanged();
         messagesView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);

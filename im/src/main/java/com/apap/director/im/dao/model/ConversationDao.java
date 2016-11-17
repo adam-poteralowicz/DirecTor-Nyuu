@@ -27,9 +27,8 @@ public class ConversationDao extends AbstractDao<Conversation, Long> {
      */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
-        public final static Property Sender = new Property(1, String.class, "sender", false, "SENDER");
-        public final static Property Recipient = new Property(2, String.class, "recipient", false, "RECIPIENT");
-        public final static Property ContactId = new Property(3, long.class, "contactId", false, "CONTACT_ID");
+        public final static Property Recipient = new Property(1, String.class, "recipient", false, "RECIPIENT");
+        public final static Property ContactId = new Property(2, long.class, "contactId", false, "CONTACT_ID");
     }
 
     private DaoSession daoSession;
@@ -49,9 +48,8 @@ public class ConversationDao extends AbstractDao<Conversation, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"CONVERSATION\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
-                "\"SENDER\" TEXT NOT NULL ," + // 1: sender
-                "\"RECIPIENT\" TEXT NOT NULL ," + // 2: recipient
-                "\"CONTACT_ID\" INTEGER NOT NULL );"); // 3: contactId
+                "\"RECIPIENT\" TEXT NOT NULL ," + // 1: recipient
+                "\"CONTACT_ID\" INTEGER NOT NULL );"); // 2: contactId
     }
 
     /** Drops the underlying database table. */
@@ -68,9 +66,8 @@ public class ConversationDao extends AbstractDao<Conversation, Long> {
         if (id != null) {
             stmt.bindLong(1, id);
         }
-        stmt.bindString(2, entity.getSender());
-        stmt.bindString(3, entity.getRecipient());
-        stmt.bindLong(4, entity.getContactId());
+        stmt.bindString(2, entity.getRecipient());
+        stmt.bindLong(3, entity.getContactId());
     }
 
     @Override
@@ -81,9 +78,8 @@ public class ConversationDao extends AbstractDao<Conversation, Long> {
         if (id != null) {
             stmt.bindLong(1, id);
         }
-        stmt.bindString(2, entity.getSender());
-        stmt.bindString(3, entity.getRecipient());
-        stmt.bindLong(4, entity.getContactId());
+        stmt.bindString(2, entity.getRecipient());
+        stmt.bindLong(3, entity.getContactId());
     }
 
     @Override
@@ -101,9 +97,8 @@ public class ConversationDao extends AbstractDao<Conversation, Long> {
     public Conversation readEntity(Cursor cursor, int offset) {
         Conversation entity = new Conversation( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.getString(offset + 1), // sender
-            cursor.getString(offset + 2), // recipient
-            cursor.getLong(offset + 3) // contactId
+            cursor.getString(offset + 1), // recipient
+            cursor.getLong(offset + 2) // contactId
         );
         return entity;
     }
@@ -111,9 +106,8 @@ public class ConversationDao extends AbstractDao<Conversation, Long> {
     @Override
     public void readEntity(Cursor cursor, Conversation entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setSender(cursor.getString(offset + 1));
-        entity.setRecipient(cursor.getString(offset + 2));
-        entity.setContactId(cursor.getLong(offset + 3));
+        entity.setRecipient(cursor.getString(offset + 1));
+        entity.setContactId(cursor.getLong(offset + 2));
      }
     
     @Override

@@ -1,27 +1,15 @@
 package com.apap.director.client.activity;
 
 import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
-import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.im.domain.chat.service.TCPChatService;
-import com.apap.director.im.util.SimpleBinder;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
-
-import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.XMPPException;
-
-import java.io.IOException;
 
 public class LoginActivity extends Activity {
 
