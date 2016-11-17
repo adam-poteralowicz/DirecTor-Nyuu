@@ -95,6 +95,13 @@ public interface IDatabaseManager {
     void deleteConversationByRecipient(String recipient);
 
     /**
+     * List all the contacts from the DB
+     *
+     * @return list of contacts
+     */
+    ArrayList<Conversation> listConversations();
+
+    /**
      * Insert or update a message object into the DB
      *
      * @param message to be inserted/updated

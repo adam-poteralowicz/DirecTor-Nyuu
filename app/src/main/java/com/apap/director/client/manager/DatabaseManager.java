@@ -304,6 +304,24 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
     }
 
     @Override
+    public synchronized ArrayList<Conversation> listConversations() {
+        List<Conversation> conversations = null;
+        try {
+            openReadableDb();
+            ConversationDao conversationDao = daoSession.getConversationDao();
+            conversations = conversationDao.loadAll();
+
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (conversations != null) {
+            return new ArrayList<>(conversations);
+        }
+        return null;
+    }
+
+    @Override
     public synchronized void insertOrUpdateMessage(Message message) {
         try {
             if (message != null) {

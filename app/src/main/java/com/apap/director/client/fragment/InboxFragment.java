@@ -43,7 +43,8 @@ public class InboxFragment extends Fragment {
         // init database manager
         databaseManager = new DatabaseManager(getActivity());
 
-        conversationList = new ArrayList<Conversation>();
+        //conversationList = new ArrayList<Conversation>();
+        conversationList = databaseManager.listConversations();
         final ArrayAdapter<Conversation> arrayAdapter = new ArrayAdapter<Conversation>(
                 App.getContext(),
                 android.R.layout.simple_list_item_1,
