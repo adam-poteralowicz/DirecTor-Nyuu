@@ -12,6 +12,7 @@ import com.apap.director.im.dao.model.ConversationDao;
 import com.apap.director.im.dao.model.DaoMaster;
 import com.apap.director.im.dao.model.DaoSession;
 import com.apap.director.im.dao.model.Message;
+import com.apap.director.im.dao.model.MessageDao;
 
 import org.greenrobot.greendao.async.AsyncOperation;
 import org.greenrobot.greendao.async.AsyncOperationListener;
@@ -343,6 +344,18 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
                 assertWaitForCompletion1Sec();
                 daoSession.clear();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public synchronized void deleteMessageById(Long messageId) {
+        try {
+            openWritableDb();
+            MessageDao messageDao = daoSession.getMessageDao();
+            messageDao.deleteByKey(messageId);
+            daoSession.clear();
         } catch (Exception e) {
             e.printStackTrace();
         }

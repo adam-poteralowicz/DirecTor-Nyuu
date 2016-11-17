@@ -30,7 +30,7 @@ public class NewMsgActivity extends Activity {
     ArrayAdapter<String> arrayAdapter;
     private IDatabaseManager databaseManager;
     private Long contactId;
-    private List myMessages;
+    private List<Message> myMessages;
 
     TCPChatService chatService;
 
@@ -71,8 +71,10 @@ public class NewMsgActivity extends Activity {
             messagesView.setAdapter(arrayAdapter);
             messagesView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                 public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    Long messageId = myMessages.get(position).getId();
+                    //databaseManager.deleteMessageById(conversation, msgid);
+                    databaseManager.deleteMessageById(messageId);
                     messages_list.remove(position);
-                    conversation.getMessages().remove(position);
                     arrayAdapter.notifyDataSetChanged();
                     return true;
                 }

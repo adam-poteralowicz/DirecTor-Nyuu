@@ -90,7 +90,7 @@ public interface IDatabaseManager {
     Conversation insertOrUpdateConversation(Conversation conversation);
 
     /**
-     * Delete a conversation by sender and recipient
+     * Delete a conversation by recipient
      */
     void deleteConversationByRecipient(String recipient);
 
@@ -114,6 +114,11 @@ public interface IDatabaseManager {
      * @param messages - list of objects
      */
     void bulkInsertMessages(Set<Message> messages);
+
+    /**
+     * Delete a message by its id
+     */
+    void deleteMessageById(Long id);
 
 
 }
