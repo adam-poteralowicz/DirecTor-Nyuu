@@ -12,7 +12,8 @@
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="0dp"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="0dp"/>
+            android:layout_marginTop="0dp"
+            android:onClick="uploadAvatar"/>
 
     <ListView
             android:layout_width="match_parent"

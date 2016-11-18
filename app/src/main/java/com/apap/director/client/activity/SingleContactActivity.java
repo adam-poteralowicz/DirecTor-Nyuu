@@ -2,10 +2,17 @@ package com.apap.director.client.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +21,7 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.manager.DatabaseManager;
 import com.apap.director.client.manager.IDatabaseManager;
+import com.apap.director.im.dao.model.Contact;
 import com.apap.director.im.dao.model.Conversation;
 
 import java.util.ArrayList;
@@ -25,7 +33,9 @@ public class SingleContactActivity extends Activity {
     List<String> myOptionsList = null;
     TextView contactNameView;
     ListView options;
+    ImageView imageView;
     Intent intent;
+    String contactNameFromIntent;
 
     public void onCreate(Bundle savedInstanceState) {
         ((App) getApplication()).getDaoComponent().inject(this);
@@ -35,16 +45,17 @@ public class SingleContactActivity extends Activity {
         // init database manager
         databaseManager = new DatabaseManager(this);
 
-        final String contactNameFromIntent = getIntent().getStringExtra("contactName");
+        imageView = (ImageView) findViewById(R.id.imageView);
+        contactNameFromIntent = getIntent().getStringExtra("contactName");
         contactNameView = (TextView) findViewById(R.id.contactName);
         contactNameView.setText(contactNameFromIntent);
-
         options = (ListView) findViewById(R.id.optionsList);
-
         myOptionsList = new ArrayList<String>();
         myOptionsList.add("Send message");
         myOptionsList.add("Delete from contacts");
         myOptionsList.add("Return");
+
+        checkIfAvatarExists();
 
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
                 App.getContext(),
@@ -135,4 +146,49 @@ public class SingleContactActivity extends Activity {
     }
 
 
+    public void uploadAvatar(View view) {
+        if (view.getId() == R.id.imageView) {
+            Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+            photoPickerIntent.setType("image/*");
+            startActivityForResult(photoPickerIntent, 1);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
+            Uri pickedImage = data.getData();
+
+            String[] filePath = { MediaStore.Images.Media.DATA };
+            Cursor cursor = getContentResolver().query(pickedImage, filePath, null, null, null);
+            assert cursor != null;
+            cursor.moveToFirst();
+            String imagePath = cursor.getString(cursor.getColumnIndex(filePath[0]));
+            Contact contact = databaseManager.getContactByName(contactNameFromIntent);
+            contact.setImage(imagePath);
+            databaseManager.updateContact(contact);
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+
+            cursor.close();
+
+            ImageView imageView = (ImageView) findViewById(R.id.imageView);
+            imageView.setImageBitmap(bitmap);
+        }
+    }
+
+    public void checkIfAvatarExists() {
+        if (databaseManager.getContactByName(contactNameFromIntent).getImage() != null) {
+            String imagePath = databaseManager.getContactByName(contactNameFromIntent).getImage();
+            Log.v("Image path: ", imagePath);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+            imageView.setImageBitmap(bitmap);
+        }
+    }
 }

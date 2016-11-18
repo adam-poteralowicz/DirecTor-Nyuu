@@ -18,6 +18,7 @@ public class Contact {
 
     @NotNull
     private String name;
+    private String image;
     private Long conversationId;
 
     /** Used to resolve relations */
@@ -43,9 +44,10 @@ public class Contact {
     }
 
     @Generated
-    public Contact(Long id, String name, Long conversationId) {
+    public Contact(Long id, String name, String image, Long conversationId) {
         this.id = id;
         this.name = name;
+        this.image = image;
         this.conversationId = conversationId;
     }
 
@@ -72,6 +74,14 @@ public class Contact {
     /** Not-null value; ensure this value is available before it is saved to the database. */
     public void setName(@NotNull String name) {
         this.name = name;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public Long getConversationId() {

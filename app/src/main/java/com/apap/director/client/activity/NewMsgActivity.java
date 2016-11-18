@@ -72,7 +72,6 @@ public class NewMsgActivity extends Activity {
             messagesView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                 public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                     Long messageId = myMessages.get(position).getId();
-                    //databaseManager.deleteMessageById(conversation, msgid);
                     databaseManager.deleteMessageById(messageId);
                     messages_list.remove(position);
                     arrayAdapter.notifyDataSetChanged();

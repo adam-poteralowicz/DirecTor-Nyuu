@@ -54,6 +54,7 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
         Entity contact = schema.addEntity("Contact");
         contact.addIdProperty().primaryKey().autoincrement();
         contact.addStringProperty("name").notNull();
+        contact.addStringProperty("image");
         return contact;
     }
 
