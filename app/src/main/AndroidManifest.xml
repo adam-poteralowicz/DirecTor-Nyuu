@@ -21,6 +21,8 @@
         </activity>
 
         <service android:name="com.apap.director.im.domain.chat.service.TCPChatService"></service>
+        <!-- Used for transferring files  after a successful connection -->
+        <service android:enabled="true" android:name=".wifi.FileTransferService" />
 
         <activity android:name=".activity.AuthUserActivity"></activity>
         <activity android:name=".activity.ContactsActivity"></activity>
@@ -33,5 +35,11 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <uses-feature android:name="android.hardware.wifi.direct" android:required="true"/>
 
 </manifest>
