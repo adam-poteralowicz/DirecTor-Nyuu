@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -66,6 +69,7 @@ public class ContactsFragment extends Fragment {
         });
 
         refreshContactList();
+        setHasOptionsMenu(true); // ActionBar enabled
     }
 
     /**
@@ -92,5 +96,23 @@ public class ContactsFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.migration_items, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.import_db:
+                //Do whatever you want to do
+                return true;
+            case R.id.export_db:
+                //Do whatever you want to do
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
 }
