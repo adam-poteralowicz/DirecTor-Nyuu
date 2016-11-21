@@ -75,6 +75,7 @@ public class SingleContactActivity extends Activity {
                         if (databaseManager.getConversationByContactId(contactId) == null) {
                             Conversation conversation = new Conversation();
                             conversation.setRecipient(contactNameFromIntent);
+                            conversation.setContactId(contactId);
                             databaseManager.insertOrUpdateConversation(conversation);
                         }
 

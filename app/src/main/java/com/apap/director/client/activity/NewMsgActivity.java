@@ -51,12 +51,14 @@ public class NewMsgActivity extends Activity {
         // init database manager
         databaseManager = new DatabaseManager(this);
 
+        messages_list = new ArrayList<String>();
         contactId = databaseManager.getContactByName(String.valueOf(recipient.getText())).getId();
-        final Conversation conversation = databaseManager.getConversationByContactId(contactId);
-        if (conversation.getMessages() != null)
-            myMessages = conversation.getMessages();
+            final Conversation conversation = databaseManager.getConversationByContactId(contactId);
+            if (conversation == null)
+                Log.d("conversation", "null");
+            if (conversation.getMessages() != null)
+                myMessages = conversation.getMessages();
 
-            messages_list = new ArrayList<String>();
             if (myMessages != null) {
                 Log.v("Conversation messages #", Integer.toString(conversation.getMessages().size()));
                 for (int i = 0; i < conversation.getMessages().size(); i++) {
@@ -78,6 +80,7 @@ public class NewMsgActivity extends Activity {
                     return true;
                 }
             });
+
     }
 
     public void onClick(View view) {
@@ -109,7 +112,6 @@ public class NewMsgActivity extends Activity {
 //        DaoSession conversationDaoSession = ((App) getApplicationContext()).getConversationDaoSession();
 
         Conversation conversation = databaseManager.getConversationByContactId(contactId);
-
         List<Message> messages = conversation.getMessages();
         Message message = new Message();
         message.setRecipient(String.valueOf(recipient.getText()));
@@ -129,8 +131,8 @@ public class NewMsgActivity extends Activity {
         conversation.setRecipient(message.getRecipient());
         message.setConversationId(conversation.getId());
 
-        databaseManager.insertOrUpdateMessage(message);
         messages.add(message);
+        databaseManager.insertOrUpdateMessage(message);
         databaseManager.insertOrUpdateConversation(conversation);
 
         arrayAdapter.notifyDataSetChanged();

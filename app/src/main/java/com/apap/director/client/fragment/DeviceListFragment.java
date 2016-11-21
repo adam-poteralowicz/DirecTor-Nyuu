@@ -17,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.apap.director.client.R;
 import com.apap.director.client.activity.WiFiDirectActivity;
 
 import java.util.ArrayList;

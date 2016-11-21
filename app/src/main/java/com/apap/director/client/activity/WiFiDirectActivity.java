@@ -20,6 +20,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+
+import com.apap.director.client.R;
 import com.apap.director.client.fragment.DeviceDetailFragment;
 import com.apap.director.client.fragment.DeviceListFragment;
 import com.apap.director.client.wifi.WiFiDirectBroadcastReceiver;
@@ -52,7 +54,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.add_contact_view);
 
         // add necessary intent values to be matched.
 
@@ -85,7 +87,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
      */
     public void resetData() {
         DeviceListFragment fragmentList = (DeviceListFragment) getFragmentManager()
-                .findFragmentById(R.id.frag_list);
+                .findFragmentById(R.id.frag_detail);
         DeviceDetailFragment fragmentDetails = (DeviceDetailFragment) getFragmentManager()
                 .findFragmentById(R.id.frag_detail);
         if (fragmentList != null) {
@@ -130,7 +132,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
                     return true;
                 }
                 final DeviceListFragment fragment = (DeviceListFragment) getFragmentManager()
-                        .findFragmentById(R.id.frag_list);
+                        .findFragmentById(R.id.frag_detail);
                 fragment.onInitiateDiscovery();
                 manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
 
@@ -222,7 +224,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
          */
         if (manager != null) {
             final DeviceListFragment fragment = (DeviceListFragment) getFragmentManager()
-                    .findFragmentById(R.id.frag_list);
+                    .findFragmentById(R.id.frag_detail);
             if (fragment.getDevice() == null
                     || fragment.getDevice().status == WifiP2pDevice.CONNECTED) {
                 disconnect();

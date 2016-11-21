@@ -9,10 +9,10 @@
             android:layout_height="wrap_content"
             android:id="@+id/newContactName"
             android:layout_marginLeft="75dp"
-            android:layout_marginTop="130dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginRight="75dp"/>
+        android:layout_marginRight="75dp"
+        android:layout_above="@+id/addContactButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="25dp" />
 
     <Button
             android:layout_width="wrap_content"
@@ -21,7 +21,26 @@
             android:id="@+id/addContactButton"
         android:clickable="true"
             android:onClick="onClick"
+        android:layout_marginBottom="44dp"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="81dp" />
+        android:layout_centerHorizontal="true" />
+
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:name="com.apap.director.client.fragment.DeviceDetailFragment"
+        android:layout_alignEnd="@+id/newContactName"
+        android:id="@+id/frag_detail"
+        android:layout_alignStart="@+id/newContactName"
+        android:layout_above="@+id/newContactName" />
+
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="com.apap.director.client.fragment.DeviceListFragment"
+        android:layout_above="@+id/frag_detail"
+        android:layout_alignEnd="@+id/frag_detail"
+        android:id="@+id/frag_list"
+        android:layout_alignStart="@+id/frag_detail"
+        android:layout_alignParentTop="true" />
 </RelativeLayout>
