@@ -10,7 +10,7 @@ import org.jivesoftware.smack.chat.ChatManagerListener;
 import javax.inject.Inject;
 
 public class ChatEventListener implements ChatManagerListener {
-
+    
     MessageEventListener listener = new MessageEventListener();
 
     public void chatCreated(Chat chat, boolean isLocal) {
