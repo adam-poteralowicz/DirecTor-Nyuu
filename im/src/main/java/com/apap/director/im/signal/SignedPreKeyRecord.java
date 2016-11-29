@@ -6,7 +6,7 @@ import org.greenrobot.greendao.annotation.Entity;
 @Entity
 public class SignedPreKeyRecord {
 
-    private int id;
+    private int signedPreKeyId;
     private byte[] serialized;
 
 }

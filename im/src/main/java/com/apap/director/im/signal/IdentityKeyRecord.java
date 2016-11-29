@@ -6,8 +6,9 @@ import org.greenrobot.greendao.annotation.Entity;
 @Entity
 public class IdentityKeyRecord {
 
-    private int id;
+    private int identityKeyId;
     private String name;
     private byte[] serialized;
+
 
 }
