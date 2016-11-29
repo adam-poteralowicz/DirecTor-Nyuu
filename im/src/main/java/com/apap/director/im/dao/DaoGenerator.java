@@ -97,6 +97,7 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
     private static Entity addIdentityKey(Schema schema) {
         Entity identityKey = schema.addEntity("IdentityKey");
         identityKey.addIdProperty().primaryKey().autoincrement();
+        identityKey.addIntProperty("identityKeyId");
         identityKey.addStringProperty("name");
         identityKey.addByteArrayProperty("serialized");
         return identityKey;
@@ -110,6 +111,7 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
     private static Entity addPreKey(Schema schema) {
         Entity preKey = schema.addEntity("PreKey");
         preKey.addIdProperty().primaryKey().autoincrement();
+        preKey.addIntProperty("preKeyId");
         preKey.addByteArrayProperty("serialized");
         return preKey;
     }
@@ -120,7 +122,7 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
      * @Return Session entity
      */
     private static Entity addSession(Schema schema) {
-        Entity session = schema.addEntity("session");
+        Entity session = schema.addEntity("Session");
         session.addIdProperty().primaryKey().autoincrement();
         session.addStringProperty("name");
         session.addByteArrayProperty("serialized");
@@ -133,8 +135,9 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
      * @Return SignedPreKey entity
      */
     private static Entity addSignedPreKey(Schema schema) {
-        Entity signedPreKey = schema.addEntity("signedPreKey");
+        Entity signedPreKey = schema.addEntity("SignedPreKey");
         signedPreKey.addIdProperty().primaryKey().autoincrement();
+        signedPreKey.addIntProperty("signedPreKeyId");
         signedPreKey.addByteArrayProperty("serialized");
         return signedPreKey;
     }
