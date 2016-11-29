@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 
 android {
+
     compileSdkVersion 24
     buildToolsVersion "24.0.3"
 
@@ -23,6 +24,7 @@ android {
 
 apply plugin: 'com.neenbedankt.android-apt'
 
+
 dependencies {
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -34,10 +36,17 @@ dependencies {
     compile 'org.igniterealtime.smack:smack-android:4.1.8'
     compile 'org.igniterealtime.smack:smack-im:4.1.8'
     compile 'org.igniterealtime.smack:smack-tcp:4.1.8'
+    compile 'com.github.NaikSoftware:StompProtocolAndroid:1.1.2'
 
     compile 'org.greenrobot:greendao:3.2.0'
     compile 'org.greenrobot:greendao-generator:3.2.0'
     compile 'org.whispersystems:signal-protocol-android:2.3.0'
+
+    compile (
+            [group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.4.1'],
+            [group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.4.1'],
+            [group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.4.1']
+    )
 
 
     compile 'com.google.dagger:dagger:2.2'
