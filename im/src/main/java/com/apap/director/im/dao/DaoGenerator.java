@@ -30,6 +30,10 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
         Entity contact = addContact(schema);
         Entity conversation = addConversation(schema);
         Entity message = addMessage(schema);
+        Entity identityKeyRecord = addIdentityKey(schema);
+        Entity preKeyRecord = addPreKey(schema);
+        Entity sessionRecord = addSession(schema);
+        Entity signedPreKeyRecord = addSignedPreKey(schema);
 
         /* properties */
         Property contactIdForConversation = conversation.addLongProperty("contactId").notNull().getProperty();
@@ -83,5 +87,55 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
         message.addStringProperty("content").notNull();
         message.addDateProperty("date").notNull();
         return message;
+    }
+
+    /**
+     * Create identityKey's Properties
+     *
+     * @Return IdentityKey entity
+     */
+    private static Entity addIdentityKey(Schema schema) {
+        Entity identityKey = schema.addEntity("IdentityKey");
+        identityKey.addIdProperty().primaryKey().autoincrement();
+        identityKey.addStringProperty("name");
+        identityKey.addByteArrayProperty("serialized");
+        return identityKey;
+    }
+
+    /**
+     * Create preKey's Properties
+     *
+     * @Return PreKey entity
+     */
+    private static Entity addPreKey(Schema schema) {
+        Entity preKey = schema.addEntity("PreKey");
+        preKey.addIdProperty().primaryKey().autoincrement();
+        preKey.addByteArrayProperty("serialized");
+        return preKey;
+    }
+
+    /**
+     * Create session's Properties
+     *
+     * @Return Session entity
+     */
+    private static Entity addSession(Schema schema) {
+        Entity session = schema.addEntity("session");
+        session.addIdProperty().primaryKey().autoincrement();
+        session.addStringProperty("name");
+        session.addByteArrayProperty("serialized");
+        return session;
+    }
+
+    /**
+     * Create signedPreKey's Properties
+     *
+     * @Return SignedPreKey entity
+     */
+    private static Entity addSignedPreKey(Schema schema) {
+        Entity signedPreKey = schema.addEntity("signedPreKey");
+        signedPreKey.addIdProperty().primaryKey().autoincrement();
+        signedPreKey.addByteArrayProperty("serialized");
+        return signedPreKey;
     }
 }
