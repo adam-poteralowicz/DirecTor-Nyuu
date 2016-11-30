@@ -12,10 +12,10 @@ import android.widget.TextView;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.client.manager.DatabaseManager;
-import com.apap.director.client.manager.IDatabaseManager;
-import com.apap.director.im.dao.model.Conversation;
-import com.apap.director.im.dao.model.Message;
+import com.apap.director.director_db.manager.DatabaseManager;
+import com.apap.director.director_db.manager.IDatabaseManager;
+import com.apap.director.director_db.dao.model.Conversation;
+import com.apap.director.director_db.dao.model.Message;
 import com.apap.director.im.domain.chat.service.TCPChatService;
 
 import java.util.ArrayList;

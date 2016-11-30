@@ -16,6 +16,8 @@ import java.io.IOException;
 public class DirectorIdentityKeyStore implements IdentityKeyStore {
 
     private Context context;
+
+
     public static String IDENTITY_PREF = "com.apap.director.identity.pref";
     public static String KEY_PAIR = "key_pair";
     public static String LOCAL_ID = "local_id";

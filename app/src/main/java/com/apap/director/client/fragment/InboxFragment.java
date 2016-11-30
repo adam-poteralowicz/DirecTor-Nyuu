@@ -3,6 +3,7 @@ package com.apap.director.client.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +15,9 @@ import android.widget.Toast;
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.activity.NewMsgActivity;
-import com.apap.director.client.manager.DatabaseManager;
-import com.apap.director.client.manager.IDatabaseManager;
-import com.apap.director.im.dao.model.Conversation;
+import com.apap.director.director_db.manager.DatabaseManager;
+import com.apap.director.director_db.manager.IDatabaseManager;
+import com.apap.director.director_db.dao.model.Conversation;
 
 import java.util.ArrayList;
 
@@ -40,6 +41,8 @@ public class InboxFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         ListView msgListView = (ListView) getActivity().findViewById(R.id.msgList);
 
+        if(msgListView == null) Log.i("MSG LIST", "null");
+
         // init database manager
         databaseManager = new DatabaseManager(getActivity());
 
@@ -49,6 +52,9 @@ public class InboxFragment extends Fragment {
                 App.getContext(),
                 android.R.layout.simple_list_item_1,
                 conversationList);
+
+        if(arrayAdapter == null) Log.i("ARRAY ADAPTER", "null");
+
         msgListView.setAdapter(arrayAdapter);
 
         intent = new Intent(App.getContext(), NewMsgActivity.class);

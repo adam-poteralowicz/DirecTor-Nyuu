@@ -8,8 +8,8 @@ import android.view.View;
 
 import com.apap.director.client.R;
 import com.apap.director.client.adapter.DirecTorPagerAdapter;
-import com.apap.director.client.manager.DatabaseManager;
-import com.apap.director.client.manager.IDatabaseManager;
+import com.apap.director.director_db.manager.DatabaseManager;
+import com.apap.director.director_db.manager.IDatabaseManager;
 
 public class AuthUserActivity extends FragmentActivity {
     DirecTorPagerAdapter direcTorPagerAdapter;

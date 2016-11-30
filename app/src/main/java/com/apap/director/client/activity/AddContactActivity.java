@@ -1,6 +1,5 @@
 package com.apap.director.client.activity;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,7 +9,6 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -24,10 +22,10 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.fragment.DeviceDetailFragment;
 import com.apap.director.client.fragment.DeviceListFragment;
-import com.apap.director.client.manager.DatabaseManager;
-import com.apap.director.client.manager.IDatabaseManager;
+import com.apap.director.director_db.manager.DatabaseManager;
+import com.apap.director.director_db.manager.IDatabaseManager;
 import com.apap.director.client.wifi.WiFiDirectBroadcastReceiver;
-import com.apap.director.im.dao.model.Contact;
+import com.apap.director.director_db.dao.model.Contact;
 
 public class AddContactActivity extends AppCompatActivity implements WifiP2pManager.ChannelListener, DeviceListFragment.DeviceActionListener {
     private IDatabaseManager databaseManager;
