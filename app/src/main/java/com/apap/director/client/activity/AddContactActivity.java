@@ -62,7 +62,7 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
         newContactName = (EditText) findViewById(R.id.newContactName);
         newContactName.setHint("CONTACT NAME");
 
-        ((App) getApplication()).getDaoComponent().inject(this);
+//        ((App) getApplication()).getDaoComponent().inject(this);
 
         // init database manager
         databaseManager = new DatabaseManager(this);

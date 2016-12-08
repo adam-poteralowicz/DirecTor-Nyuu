@@ -38,7 +38,7 @@ public class SingleContactActivity extends Activity {
     String contactNameFromIntent;
 
     public void onCreate(Bundle savedInstanceState) {
-        ((App) getApplication()).getDaoComponent().inject(this);
+//        ((App) getApplication()).getDaoComponent().inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.single_contact_view);
 

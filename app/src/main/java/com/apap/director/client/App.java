@@ -23,21 +23,21 @@ public class App extends Application {
             super.onCreate();
             mContext = App.this;
 
-            daoComponent = DaggerDaoComponent.builder()
-                    .daoModule(new DaoModule(this))
-                    .build();
-
-            chatComponent = DaggerChatComponent.builder()
-                    .connectionModule(new ConnectionModule())
-                    .chatModule(new ChatModule())
-                    .messageModule(new MessageModule())
-                    .build();
+//            daoComponent = DaggerDaoComponent.builder()
+//                    .daoModule(new DaoModule(this))
+//                    .build();
+//
+//            chatComponent = DaggerChatComponent.builder()
+//                    .connectionModule(new ConnectionModule())
+//                    .chatModule(new ChatModule())
+//                    .messageModule(new MessageModule())
+//                    .build();
         }
 
-        public ChatComponent getChatComponent() {
-            return chatComponent;
-        }
-        public DaoComponent getDaoComponent() { return daoComponent; }
+//        public ChatComponent getChatComponent() {
+//            return chatComponent;
+//        }
+//        public DaoComponent getDaoComponent() { return daoComponent; }
         public static Context getContext(){
             return mContext;
         }

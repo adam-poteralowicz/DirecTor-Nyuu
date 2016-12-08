@@ -42,7 +42,7 @@ public class ContactsFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
 
-        ((App) getActivity().getApplication()).getDaoComponent().inject(this);
+//        ((App) getActivity().getApplication()).getDaoComponent().inject(this);
         super.onActivityCreated(savedInstanceState);
         contactsListView = (ListView) getActivity().findViewById(R.id.contactsView);
 

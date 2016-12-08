@@ -20,7 +20,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name="com.apap.director.im.domain.chat.service.TCPChatService"></service>
+        <service android:name="com.apap.director.im.domain.websocket.service.StompService"></service>
         <!-- Used for transferring files  after a successful connection -->
         <service android:enabled="true" android:name=".wifi.FileTransferService" />
 

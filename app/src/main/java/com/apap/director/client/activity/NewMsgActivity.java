@@ -35,7 +35,7 @@ public class NewMsgActivity extends Activity {
     TCPChatService chatService;
 
     public void onCreate(Bundle savedInstanceState) {
-        ((App) getApplication()).getDaoComponent().inject(this);
+//        ((App) getApplication()).getDaoComponent().inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_msg_view);
 

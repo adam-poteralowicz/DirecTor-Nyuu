@@ -37,7 +37,7 @@ public class InboxFragment extends Fragment {
 
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
-        ((App) getActivity().getApplication()).getDaoComponent().inject(this);
+//        ((App) getActivity().getApplication()).getDaoComponent().inject(this);
         super.onActivityCreated(savedInstanceState);
         ListView msgListView = (ListView) getActivity().findViewById(R.id.msgList);
 
