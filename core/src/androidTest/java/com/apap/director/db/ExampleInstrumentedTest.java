@@ -1,4 +1,4 @@
-package com.apap.director.director_db;
+package com.apap.director.db;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

@@ -18,14 +18,13 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.fragment.DeviceDetailFragment;
 import com.apap.director.client.fragment.DeviceListFragment;
-import com.apap.director.director_db.manager.DatabaseManager;
-import com.apap.director.director_db.manager.IDatabaseManager;
+import com.apap.director.db.manager.DatabaseManager;
+import com.apap.director.db.manager.IDatabaseManager;
 import com.apap.director.client.wifi.WiFiDirectBroadcastReceiver;
-import com.apap.director.director_db.dao.model.Contact;
+import com.apap.director.db.dao.model.Contact;
 
 public class AddContactActivity extends AppCompatActivity implements WifiP2pManager.ChannelListener, DeviceListFragment.DeviceActionListener {
     private IDatabaseManager databaseManager;

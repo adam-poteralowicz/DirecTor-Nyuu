@@ -2,7 +2,7 @@ package com.apap.director.im.domain.message.event;
 
 import android.util.Log;
 
-import com.apap.director.director_db.dao.model.DaoSession;
+import com.apap.director.db.dao.model.DaoSession;
 
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatMessageListener;

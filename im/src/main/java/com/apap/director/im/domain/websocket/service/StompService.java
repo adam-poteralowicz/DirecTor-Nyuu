@@ -37,23 +37,19 @@ public class StompService extends Service {
     }
 
     public void connect(){
-
         client.connect();
-        Subscription sub = client.topic("/topic/greetings").subscribe(new Action1<StompMessage>(){
-
-            @Override
-            public void call(StompMessage stompMessage) {
-                Log.v("HAI", "Message "+stompMessage.getPayload());
-            }
-        });
-
-        client.send("/hello", "My first STOMP message!").subscribe();
-
+        client.topic("/user/queue").subscribe(new MessageAction(), new ErrorAction());
 
     }
 
     public void disconnect(){
         client.disconnect();
     }
+
+    public void sendMessage(String keyBase64, String text){
+        // TODO: Encode the message and send via stomp client
+    }
+
+
 
 }

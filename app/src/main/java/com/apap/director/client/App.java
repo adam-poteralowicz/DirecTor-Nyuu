@@ -4,13 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.apap.director.client.component.ChatComponent;
-import com.apap.director.client.component.DaggerChatComponent;
-import com.apap.director.client.component.DaggerDaoComponent;
 import com.apap.director.client.component.DaoComponent;
-import com.apap.director.director_db.dao.module.DaoModule;
-import com.apap.director.im.domain.chat.module.ChatModule;
-import com.apap.director.im.domain.connection.module.ConnectionModule;
-import com.apap.director.im.domain.message.module.MessageModule;
 
 public class App extends Application {
 

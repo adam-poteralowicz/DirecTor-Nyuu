@@ -15,9 +15,9 @@ import android.widget.Toast;
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.activity.NewMsgActivity;
-import com.apap.director.director_db.manager.DatabaseManager;
-import com.apap.director.director_db.manager.IDatabaseManager;
-import com.apap.director.director_db.dao.model.Conversation;
+import com.apap.director.db.manager.DatabaseManager;
+import com.apap.director.db.manager.IDatabaseManager;
+import com.apap.director.db.dao.model.Conversation;
 
 import java.util.ArrayList;
 
@@ -49,6 +49,9 @@ public class InboxFragment extends Fragment {
         //conversationList = new ArrayList<Conversation>();
         conversationList = databaseManager.listConversations();
         final ArrayAdapter<Conversation> arrayAdapter = new ArrayAdapter<Conversation>(
+
+                // TODO:  replace App.getContext to this.getContext
+
                 App.getContext(),
                 android.R.layout.simple_list_item_1,
                 conversationList);

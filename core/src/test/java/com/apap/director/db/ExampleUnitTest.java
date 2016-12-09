@@ -1,4 +1,4 @@
-package com.apap.director.director_db;
+package com.apap.director.db;
 
 import org.junit.Test;
 

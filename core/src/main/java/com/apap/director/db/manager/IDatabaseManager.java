@@ -1,12 +1,12 @@
-package com.apap.director.director_db.manager;
+package com.apap.director.db.manager;
 
-import com.apap.director.director_db.dao.model.Contact;
-import com.apap.director.director_db.dao.model.Conversation;
-import com.apap.director.director_db.dao.model.IdentityKey;
-import com.apap.director.director_db.dao.model.Message;
-import com.apap.director.director_db.dao.model.PreKey;
-import com.apap.director.director_db.dao.model.Session;
-import com.apap.director.director_db.dao.model.SignedPreKey;
+import com.apap.director.db.dao.model.Contact;
+import com.apap.director.db.dao.model.Conversation;
+import com.apap.director.db.dao.model.IdentityKey;
+import com.apap.director.db.dao.model.Message;
+import com.apap.director.db.dao.model.PreKey;
+import com.apap.director.db.dao.model.Session;
+import com.apap.director.db.dao.model.SignedPreKey;
 
 import java.util.ArrayList;
 import java.util.Set;

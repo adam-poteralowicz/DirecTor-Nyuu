@@ -1,4 +1,4 @@
-package com.apap.director.director_db.dao.model;
+package com.apap.director.db.dao.model;
 
 import java.util.Map;
 

@@ -1,10 +1,10 @@
-package com.apap.director.director_db.dao.module;
+package com.apap.director.db.dao.module;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.apap.director.director_db.dao.model.DaoMaster;
-import com.apap.director.director_db.dao.model.DaoSession;
+import com.apap.director.db.dao.model.DaoMaster;
+import com.apap.director.db.dao.model.DaoSession;
 
 import javax.inject.Named;
 import javax.inject.Singleton;

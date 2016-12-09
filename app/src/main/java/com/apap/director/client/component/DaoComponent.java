@@ -5,7 +5,7 @@ import com.apap.director.client.activity.NewMsgActivity;
 import com.apap.director.client.activity.SingleContactActivity;
 import com.apap.director.client.fragment.ContactsFragment;
 import com.apap.director.client.fragment.InboxFragment;
-import com.apap.director.director_db.dao.module.DaoModule;
+import com.apap.director.db.dao.module.DaoModule;
 
 import javax.inject.Singleton;
 

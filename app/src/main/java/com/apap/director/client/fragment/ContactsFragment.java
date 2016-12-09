@@ -14,9 +14,9 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.activity.AuthUserActivity;
 import com.apap.director.client.activity.SingleContactActivity;
-import com.apap.director.director_db.manager.DatabaseManager;
-import com.apap.director.director_db.manager.IDatabaseManager;
-import com.apap.director.director_db.dao.model.Contact;
+import com.apap.director.db.manager.DatabaseManager;
+import com.apap.director.db.manager.IDatabaseManager;
+import com.apap.director.db.dao.model.Contact;
 
 import java.util.ArrayList;
 

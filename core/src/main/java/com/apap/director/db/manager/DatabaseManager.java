@@ -1,26 +1,26 @@
-package com.apap.director.director_db.manager;
+package com.apap.director.db.manager;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
-import com.apap.director.director_db.dao.model.Contact;
-import com.apap.director.director_db.dao.model.ContactDao;
-import com.apap.director.director_db.dao.model.Conversation;
-import com.apap.director.director_db.dao.model.ConversationDao;
-import com.apap.director.director_db.dao.model.DaoMaster;
-import com.apap.director.director_db.dao.model.DaoSession;
-import com.apap.director.director_db.dao.model.IdentityKey;
-import com.apap.director.director_db.dao.model.IdentityKeyDao;
-import com.apap.director.director_db.dao.model.Message;
-import com.apap.director.director_db.dao.model.MessageDao;
-import com.apap.director.director_db.dao.model.PreKey;
-import com.apap.director.director_db.dao.model.PreKeyDao;
-import com.apap.director.director_db.dao.model.Session;
-import com.apap.director.director_db.dao.model.SessionDao;
-import com.apap.director.director_db.dao.model.SignedPreKey;
-import com.apap.director.director_db.dao.model.SignedPreKeyDao;
+import com.apap.director.db.dao.model.Contact;
+import com.apap.director.db.dao.model.ContactDao;
+import com.apap.director.db.dao.model.Conversation;
+import com.apap.director.db.dao.model.ConversationDao;
+import com.apap.director.db.dao.model.DaoMaster;
+import com.apap.director.db.dao.model.DaoSession;
+import com.apap.director.db.dao.model.IdentityKey;
+import com.apap.director.db.dao.model.IdentityKeyDao;
+import com.apap.director.db.dao.model.Message;
+import com.apap.director.db.dao.model.MessageDao;
+import com.apap.director.db.dao.model.PreKey;
+import com.apap.director.db.dao.model.PreKeyDao;
+import com.apap.director.db.dao.model.Session;
+import com.apap.director.db.dao.model.SessionDao;
+import com.apap.director.db.dao.model.SignedPreKey;
+import com.apap.director.db.dao.model.SignedPreKeyDao;
 
 import org.greenrobot.greendao.async.AsyncOperation;
 import org.greenrobot.greendao.async.AsyncOperationListener;

@@ -1,4 +1,4 @@
-package com.apap.director.director_db.dao;
+package com.apap.director.db.dao;
 
 import org.greenrobot.greendao.generator.Entity;
 import org.greenrobot.greendao.generator.Property;
@@ -16,7 +16,7 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
 
     public static void main(String[] args) throws Exception {
 
-        Schema schema = new Schema(1, "com.apap.director.director_db.dao.model");
+        Schema schema = new Schema(1, "com.apap.director.db.dao.model");
         addTables(schema);
         new DaoGenerator().generateAll(schema, OUT_DIR);
     }
