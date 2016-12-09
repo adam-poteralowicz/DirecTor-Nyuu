@@ -70,14 +70,12 @@ public class FileTransferService extends IntentService {
             } catch (IOException e) {
                 Log.e(AddContactActivity.TAG, e.getMessage());
             } finally {
-                if (socket != null) {
-                    if (socket.isConnected()) {
-                        try {
-                            socket.close();
-                        } catch (IOException e) {
-                            // Give up
-                            e.printStackTrace();
-                        }
+                if (socket.isConnected()) {
+                    try {
+                        socket.close();
+                    } catch (IOException e) {
+                        // Give up
+                        e.printStackTrace();
                     }
                 }
             }

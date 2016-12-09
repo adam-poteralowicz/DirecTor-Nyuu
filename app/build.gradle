@@ -52,6 +52,9 @@ dependencies {
     // No longer needed in dagger >= 2.1-SNAPSHOT (github.com/google/dagger/issues/95)
     compile 'javax.annotation:jsr250-api:1.0'
 
+    compile 'info.guardianproject.netcipher:netcipher:2.0.0-alpha1'
+    compile 'info.guardianproject.netcipher:netcipher-httpclient:2.0.0-alpha1'
+    compile 'cz.msebera.android:httpclient:4.4.1.2'
 
     compile 'com.romainpiel.shimmer:library:1.4.0@aar'
     compile project(':im')
