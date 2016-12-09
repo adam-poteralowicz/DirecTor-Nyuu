@@ -17,9 +17,6 @@ import com.apap.director.client.R;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.IOException;
 
 import cz.msebera.android.httpclient.client.HttpClient;
@@ -34,7 +31,7 @@ public class LoginActivity extends AppCompatActivity implements Callback<HttpCli
     EditText usernameField, passwordField, serverField, portField;
     Shimmer shimmer;
 //    String HS_URL = "http://3zk5ak4bcbfvwgha.onion";
-    String HS_URL = "http://www.wp.pl";
+    String HS_URL = "http://www.google.com";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,6 +73,7 @@ public class LoginActivity extends AppCompatActivity implements Callback<HttpCli
         shimmer.start(shimmerTextView);
 
         getSupportActionBar().show();
+
     }
 
     @Override
@@ -89,9 +87,6 @@ public class LoginActivity extends AppCompatActivity implements Callback<HttpCli
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.tor_conn_on:
-//                Context context = LoginActivity.this;
-//                Intent mServiceIntent = new Intent(context, NetCipherService.class);
-//                context.startService(mServiceIntent);
                 NetCipher.useTor();
                 return true;
             case R.id.tor_conn_off:
@@ -190,6 +185,7 @@ public class LoginActivity extends AppCompatActivity implements Callback<HttpCli
                         .makeText(LoginActivity.this, R.string.msg_timeout,
                                 Toast.LENGTH_LONG)
                         .show();
+                Log.d("onTimeout", String.valueOf(R.string.msg_timeout));
                 finish();
             }
         });
@@ -204,6 +200,7 @@ public class LoginActivity extends AppCompatActivity implements Callback<HttpCli
                         .makeText(LoginActivity.this, R.string.msg_invalid,
                                 Toast.LENGTH_LONG)
                         .show();
+                Log.d("onInvalid", String.valueOf(R.string.msg_invalid));
                 finish();
             }
         });
