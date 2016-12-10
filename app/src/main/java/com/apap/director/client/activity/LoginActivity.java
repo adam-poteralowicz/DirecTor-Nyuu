@@ -10,7 +10,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.apap.director.client.R;
@@ -28,7 +27,6 @@ import info.guardianproject.netcipher.client.StrongHttpClientBuilder;
 
 public class LoginActivity extends AppCompatActivity implements Callback<HttpClient> {
 
-    EditText usernameField, passwordField, serverField, portField;
     Shimmer shimmer;
 //    String HS_URL = "http://3zk5ak4bcbfvwgha.onion";
     String HS_URL = "http://www.wp.pl/static.html";
@@ -54,12 +52,6 @@ public class LoginActivity extends AppCompatActivity implements Callback<HttpCli
             finish();
         }
 
-        usernameField = (EditText) findViewById(R.id.username);
-        usernameField.setHint("Username");
-        passwordField = (EditText) findViewById(R.id.password);
-        passwordField.setHint("Password");
-        serverField = (EditText) findViewById(R.id.server);
-        serverField.setHint("Server");
         ShimmerTextView shimmerTextView = (ShimmerTextView) findViewById(R.id.shimmer_tv);
         shimmerTextView.setTextColor(new ColorStateList(
                 new int[][]{
