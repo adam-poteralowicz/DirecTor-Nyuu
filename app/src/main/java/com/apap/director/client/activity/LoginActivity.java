@@ -31,7 +31,7 @@ public class LoginActivity extends AppCompatActivity implements Callback<HttpCli
     EditText usernameField, passwordField, serverField, portField;
     Shimmer shimmer;
 //    String HS_URL = "http://3zk5ak4bcbfvwgha.onion";
-    String HS_URL = "http://www.google.com";
+    String HS_URL = "http://www.wp.pl/static.html";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

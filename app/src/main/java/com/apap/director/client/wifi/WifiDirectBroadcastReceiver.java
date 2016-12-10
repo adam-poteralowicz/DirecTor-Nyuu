@@ -55,7 +55,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             // callback on PeerListListener.onPeersAvailable()
             if (manager != null) {
                 manager.requestPeers(channel, (WifiP2pManager.PeerListListener) activity.getFragmentManager()
-                        .findFragmentById(R.id.frag_detail));
+                        .findFragmentById(R.id.frag_list));
             }
             Log.d(AddContactActivity.TAG, "P2P peers changed");
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
