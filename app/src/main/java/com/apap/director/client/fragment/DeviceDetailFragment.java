@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.apap.director.client.R;
 import com.apap.director.client.activity.AddContactActivity;
 import com.apap.director.client.wifi.FileTransferService;
+import com.apap.director.client.wifi.WifiUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -36,6 +37,10 @@ import java.net.Socket;
  * i.e. setting up network connection and transferring data.
  */
 public class DeviceDetailFragment extends Fragment implements ConnectionInfoListener {
+
+    public static final String IP_SERVER = "192.168.49.1";
+    public static int PORT = 8988;
+    private static boolean server_running = false;
 
     protected static final int CHOOSE_FILE_RESULT_CODE = 20;
     private View mContentView = null;
@@ -63,15 +68,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
                     progressDialog.dismiss();
                 }
                 progressDialog = ProgressDialog.show(getActivity(), "Press back to cancel",
-                        "Connecting to :" + device.deviceAddress, true, true
-//                        new DialogInterface.OnCancelListener() {
-//
-//                            @Override
-//                            public void onCancel(DialogInterface dialog) {
-//                                ((DeviceActionListener) getActivity()).cancelDisconnect();
-//                            }
-//                        }
-                );
+                        "Connecting to :" + device.deviceAddress, true, true);
                 ((DeviceListFragment.DeviceActionListener) getActivity()).connect(config);
 
             }
@@ -105,6 +102,10 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
+        String localIP = WifiUtils.getLocalIPAddress();
+        String client_mac_fixed = new String(device.deviceAddress).replace("99", "19");
+        String clientIP = WifiUtils.getIPFromMac(client_mac_fixed);
+
         // User has picked an image. Transfer it to group owner i.e peer using
         // FileTransferService.
         Uri uri = data.getData();
@@ -114,9 +115,18 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         Intent serviceIntent = new Intent(getActivity(), FileTransferService.class);
         serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
         serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH, uri.toString());
-        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
-                info.groupOwnerAddress.getHostAddress());
-        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, 8988);
+
+        if (localIP.equals(IP_SERVER)) {
+            serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS, clientIP);
+        } else {
+            serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS, IP_SERVER);
+        }
+
+        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, PORT);
+
+//        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
+//                info.groupOwnerAddress.getHostAddress());
+//        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, 8988);
         getActivity().startService(serviceIntent);
     }
 
@@ -142,7 +152,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         // server. The file server is single threaded, single connection server
         // socket.
         if (info.groupFormed && info.isGroupOwner) {
-            new FileServerAsyncTask(getActivity())
+            new FileServerAsyncTask(getActivity(), mContentView.findViewById(R.id.status_text))
                     .execute();
         } else if (info.groupFormed) {
             // The other device acts as the client. In this case, we enable the
@@ -201,7 +211,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
          * @param context
          *
          */
-        public FileServerAsyncTask(Context context) {
+        public FileServerAsyncTask(Context context, View statusText) {
             this.context = context;
             this.statusText = (TextView) statusText;
         }
@@ -209,7 +219,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         @Override
         protected String doInBackground(Void... params) {
             try {
-                ServerSocket serverSocket = new ServerSocket(8988);
+                ServerSocket serverSocket = new ServerSocket(PORT);
                 Log.d(AddContactActivity.TAG, "Server: Socket opened");
                 Socket client = serverSocket.accept();
                 Log.d(AddContactActivity.TAG, "Server: connection done");

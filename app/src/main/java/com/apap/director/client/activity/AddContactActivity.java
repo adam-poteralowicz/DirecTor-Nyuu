@@ -220,8 +220,8 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
             @Override
             public void onSuccess() {
                 // WiFiDirectBroadcastReceiver will notify us. Ignore for now.
-                new DeviceDetailFragment.FileServerAsyncTask(getApplicationContext())
-                        .execute();
+//                new DeviceDetailFragment.FileServerAsyncTask(getApplicationContext())
+//                        .execute();
             }
 
             @Override
@@ -251,28 +251,6 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
 
         });
     }
-
-    private WifiP2pManager.ConnectionInfoListener connectionInfoListener
-            = new WifiP2pManager.ConnectionInfoListener() {
-
-        @Override
-        public void onConnectionInfoAvailable(WifiP2pInfo info) {
-            try {
-                InetAddress groupOwnerAddress = InetAddress.getByName(info.groupOwnerAddress.getHostAddress());
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-            }
-
-            if (info.groupFormed && info.isGroupOwner) {
-                // Create a server thread and accept incoming connections.
-            } else if (info.groupFormed) {
-                // The other device acts as a client.
-                // Create a client thread that connects to the group owner.
-            }
-
-
-        }
-    };
 
     @Override
     public void onChannelDisconnected() {
