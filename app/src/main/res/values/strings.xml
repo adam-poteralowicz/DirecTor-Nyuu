@@ -21,4 +21,6 @@
     <string name="msg_crash">Exception connecting to hidden service</string>
     <string name="msg_timeout">Orbot not installed or not connected to within 60 seconds</string>
     <string name="msg_invalid">Tor connection is established, but validation failed</string>
+    <string name="nfc_button">NFC</string>
+    <string name="bt_button">Bluetooth</string>
 </resources>

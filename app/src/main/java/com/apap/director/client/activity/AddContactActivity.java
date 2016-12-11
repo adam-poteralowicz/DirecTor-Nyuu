@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -27,6 +28,9 @@ import com.apap.director.director_db.manager.IDatabaseManager;
 import com.apap.director.client.wifi.WiFiDirectBroadcastReceiver;
 import com.apap.director.director_db.dao.model.Contact;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 public class AddContactActivity extends AppCompatActivity implements WifiP2pManager.ChannelListener, DeviceListFragment.DeviceActionListener {
     private IDatabaseManager databaseManager;
     EditText newContactName;
@@ -39,17 +43,12 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
     private WifiP2pManager.Channel channel;
     private BroadcastReceiver receiver = null;
 
-    /**
-     * @param isWifiP2pEnabled the isWifiP2pEnabled to set
-     */
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
         this.isWifiP2pEnabled = isWifiP2pEnabled;
     }
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_contact_view);
-
-        // add necessary intent values to be matched.
 
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
@@ -58,14 +57,14 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
 
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(this, getMainLooper(), null);
+        receiver = new WiFiDirectBroadcastReceiver(manager, channel, this);
 
         newContactName = (EditText) findViewById(R.id.newContactName);
         newContactName.setHint("CONTACT NAME");
-
         ((App) getApplication()).getDaoComponent().inject(this);
 
-        // init database manager
         databaseManager = new DatabaseManager(this);
+        registerReceiver(receiver, intentFilter);
         getSupportActionBar().show();
     }
 
@@ -195,6 +194,12 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
                     }
                 });
                 return true;
+            case R.id.atn_nfc:
+                Toast.makeText(AddContactActivity.this, "Please activate NFC settings and click Back to return", Toast.LENGTH_LONG).show();
+                startActivity(new Intent(Settings.ACTION_NFC_SETTINGS));
+                return true;
+            case R.id.atn_bluetooth:
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -215,6 +220,8 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
             @Override
             public void onSuccess() {
                 // WiFiDirectBroadcastReceiver will notify us. Ignore for now.
+                new DeviceDetailFragment.FileServerAsyncTask(getApplicationContext())
+                        .execute();
             }
 
             @Override
@@ -245,6 +252,28 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
         });
     }
 
+    private WifiP2pManager.ConnectionInfoListener connectionInfoListener
+            = new WifiP2pManager.ConnectionInfoListener() {
+
+        @Override
+        public void onConnectionInfoAvailable(WifiP2pInfo info) {
+            try {
+                InetAddress groupOwnerAddress = InetAddress.getByName(info.groupOwnerAddress.getHostAddress());
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+
+            if (info.groupFormed && info.isGroupOwner) {
+                // Create a server thread and accept incoming connections.
+            } else if (info.groupFormed) {
+                // The other device acts as a client.
+                // Create a client thread that connects to the group owner.
+            }
+
+
+        }
+    };
+
     @Override
     public void onChannelDisconnected() {
         // we will try once more
@@ -255,7 +284,7 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
             manager.initialize(this, getMainLooper(), this);
         } else {
             Toast.makeText(this,
-                    "Severe! Channel is probably lost premanently. Try Disable/Re-Enable P2P.",
+                    "Severe! Channel is probably lost permanently. Try Disable/Re-Enable P2P.",
                     Toast.LENGTH_LONG).show();
         }
     }
