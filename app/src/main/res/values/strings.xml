@@ -23,4 +23,7 @@
     <string name="msg_invalid">Tor connection is established, but validation failed</string>
     <string name="nfc_button">NFC</string>
     <string name="bt_button">Bluetooth</string>
+    <string name="title_alert_dialog">NFC TAG DISCOVERED</string>
+    <string name="write_button_label">Write message</string>
+    <string name="read_button_label">Read message</string>
 </resources>

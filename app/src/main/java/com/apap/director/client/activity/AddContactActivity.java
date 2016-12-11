@@ -1,15 +1,22 @@
 package com.apap.director.client.activity;
 
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentFilter.MalformedMimeTypeException;
+import android.content.pm.PackageManager;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
-import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.nfc.NdefMessage;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -23,22 +30,22 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.fragment.DeviceDetailFragment;
 import com.apap.director.client.fragment.DeviceListFragment;
+import com.apap.director.client.util.NFCUtils;
 import com.apap.director.director_db.manager.DatabaseManager;
 import com.apap.director.director_db.manager.IDatabaseManager;
-import com.apap.director.client.wifi.WiFiDirectBroadcastReceiver;
+import com.apap.director.client.util.keyExchange.WiFiDirectBroadcastReceiver;
 import com.apap.director.director_db.dao.model.Contact;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.util.List;
 
 public class AddContactActivity extends AppCompatActivity implements WifiP2pManager.ChannelListener, DeviceListFragment.DeviceActionListener {
     private IDatabaseManager databaseManager;
     EditText newContactName;
     public static final String TAG = "DirecTor";
+
     private WifiP2pManager manager;
     private boolean isWifiP2pEnabled = false;
     private boolean retryChannel = false;
-
     private final IntentFilter intentFilter = new IntentFilter();
     private WifiP2pManager.Channel channel;
     private BroadcastReceiver receiver = null;
@@ -46,10 +53,29 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
         this.isWifiP2pEnabled = isWifiP2pEnabled;
     }
+
+    public NfcAdapter _nfcAdapter;
+    public Intent _intent;
+    public PendingIntent _pendingIntent;
+    public IntentFilter[] _readIntentFilters, _writeIntentFilters;
+    public boolean nfcEnabled = false;
+    private final String _MIME_TYPE = "text/plain";
+
+    private String publicKey = "myPublicKeyAllBrandNewAndShiny";
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_contact_view);
 
+        newContactName = (EditText) findViewById(R.id.newContactName);
+        newContactName.setHint("CONTACT NAME");
+        ((App) getApplication()).getDaoComponent().inject(this);
+        databaseManager = new DatabaseManager(this);
+        getSupportActionBar().show();
+        initP2P();
+    }
+
+    public void initP2P() {
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
@@ -58,14 +84,106 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(this, getMainLooper(), null);
         receiver = new WiFiDirectBroadcastReceiver(manager, channel, this);
-
-        newContactName = (EditText) findViewById(R.id.newContactName);
-        newContactName.setHint("CONTACT NAME");
-        ((App) getApplication()).getDaoComponent().inject(this);
-
-        databaseManager = new DatabaseManager(this);
         registerReceiver(receiver, intentFilter);
-        getSupportActionBar().show();
+    }
+
+    public void initNFC() {
+        _nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+
+        if (_nfcAdapter == null) {
+            Toast.makeText(this, "This device does not support NFC", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if (_nfcAdapter.isEnabled()) {
+            _pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass())
+                    .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+            IntentFilter ndefDetected = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
+            try {
+                ndefDetected.addDataType(_MIME_TYPE);
+            } catch (MalformedMimeTypeException e) {
+                Log.e(this.toString(), e.getMessage());
+            }
+
+            _readIntentFilters = new IntentFilter[] { ndefDetected };
+        }
+    }
+
+    // Exchange public key with another user
+    private void _enableNdefExchangeMode()
+    {
+        String stringMessage = " " + publicKey;
+        NdefMessage message = NFCUtils.getNewMessage(_MIME_TYPE, stringMessage.getBytes());
+
+        _nfcAdapter.setNdefPushMessage(message, this);
+        _nfcAdapter.enableForegroundDispatch(this, _pendingIntent, _readIntentFilters, null);
+    }
+
+    private void _enableTagWriteMode() {
+        IntentFilter tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
+
+        _writeIntentFilters = new IntentFilter[] { tagDetected };
+        _nfcAdapter.enableForegroundDispatch(this, _pendingIntent, _writeIntentFilters, null);
+    }
+
+    @Override
+    // on public key response received
+    protected void onNewIntent(Intent intent)
+    {
+        super.onNewIntent(intent);
+
+        _intent = intent;
+
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction()))
+        {
+            _readMessage();
+        }
+
+        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction()))
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(R.string.title_alert_dialog)
+                    .setPositiveButton(R.string.write_button_label,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id)
+                                {
+                                    _writeMessage();
+                                }
+                            })
+                    .setNegativeButton(R.string.read_button_label,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id)
+                                {
+                                    _readMessage();
+                                }
+                            });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+    }
+
+    public NdefMessage _getNdefMessage() {
+
+        return NFCUtils.getNewMessage(_MIME_TYPE, publicKey.getBytes());
+    }
+
+    public void _writeMessage() {
+        Tag detectedTag = _intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+
+        if (NFCUtils.writeMessageToTag(_getNdefMessage(), detectedTag))
+        {
+            Toast.makeText(this, "Successfully sent key to NFC tag", Toast.LENGTH_LONG).show();
+        } else
+        {
+            Toast.makeText(this, "Write failed", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void _readMessage() {
+        List<String> msgs = NFCUtils.getStringsFromNfcIntent(_intent);
+
+        Toast.makeText(this, "Public key : " + msgs.get(0), Toast.LENGTH_LONG).show();
     }
 
     public void onClick(View view) {
@@ -113,6 +231,9 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
         super.onResume();
         receiver = new WiFiDirectBroadcastReceiver(manager, channel, this);
         registerReceiver(receiver, intentFilter);
+
+        _enableNdefExchangeMode();
+        _enableTagWriteMode();
     }
 
     /**
@@ -195,8 +316,16 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
                 });
                 return true;
             case R.id.atn_nfc:
-                Toast.makeText(AddContactActivity.this, "Please activate NFC settings and click Back to return", Toast.LENGTH_LONG).show();
-                startActivity(new Intent(Settings.ACTION_NFC_SETTINGS));
+                PackageManager pm = getPackageManager();
+                if(pm.hasSystemFeature(PackageManager.FEATURE_NFC) && NfcAdapter.getDefaultAdapter(this) != null) {
+                    if (_nfcAdapter.isEnabled()) {
+                        initNFC();
+                    } else {
+                        Toast.makeText(AddContactActivity.this, "Please activate NFC", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(this, "NFC feature not supported", Toast.LENGTH_LONG).show();
+                }
                 return true;
             case R.id.atn_bluetooth:
                 return true;
@@ -219,9 +348,7 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
 
             @Override
             public void onSuccess() {
-                // WiFiDirectBroadcastReceiver will notify us. Ignore for now.
-//                new DeviceDetailFragment.FileServerAsyncTask(getApplicationContext())
-//                        .execute();
+                // WiFiDirectBroadcastReceiver will notify us.
             }
 
             @Override

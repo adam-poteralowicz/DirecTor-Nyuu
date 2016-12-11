@@ -21,8 +21,8 @@ import android.widget.TextView;
 
 import com.apap.director.client.R;
 import com.apap.director.client.activity.AddContactActivity;
-import com.apap.director.client.wifi.FileTransferService;
-import com.apap.director.client.wifi.WifiUtils;
+import com.apap.director.client.util.keyExchange.FileTransferService;
+import com.apap.director.client.util.WifiUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;

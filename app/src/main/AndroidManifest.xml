@@ -1,7 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.apap.director.client">
 
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -20,16 +19,16 @@
             </intent-filter>
         </activity>
 
-        <service android:name="com.apap.director.im.domain.chat.service.TCPChatService"></service>
-        <service android:enabled="true" android:name=".wifi.FileTransferService" />
+        <service android:name="com.apap.director.im.domain.chat.service.TCPChatService" />
+        <service android:enabled="true" android:name=".util.keyExchange.FileTransferService" />
 
-        <activity android:name=".activity.AuthUserActivity"></activity>
-        <activity android:name=".activity.ContactsActivity"></activity>
-        <activity android:name=".activity.InboxActivity"></activity>
-        <activity android:name=".activity.NewMsgActivity"></activity>
-        <activity android:name=".activity.AddContactActivity"></activity>
+        <activity android:name=".activity.AuthUserActivity" />
+        <activity android:name=".activity.ContactsActivity" />
+        <activity android:name=".activity.InboxActivity" />
+        <activity android:name=".activity.NewMsgActivity" />
+        <activity android:name=".activity.AddContactActivity" />
         <activity android:name=".activity.SingleContactActivity"
-            android:configChanges="orientation|screenSize"></activity>
+            android:configChanges="orientation|screenSize" />
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -39,6 +38,7 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.NFC" />
 
     <uses-feature android:name="android.hardware.wifi.direct" android:required="true"/>
     <uses-feature android:name="android.hardware.nfc" android:required="true" />
