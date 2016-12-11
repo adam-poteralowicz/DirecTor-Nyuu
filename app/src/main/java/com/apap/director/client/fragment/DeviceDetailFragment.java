@@ -63,6 +63,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
             public void onClick(View v) {
                 WifiP2pConfig config = new WifiP2pConfig();
                 config.deviceAddress = device.deviceAddress;
+                config.groupOwnerIntent = 0;
                 config.wps.setup = WpsInfo.PBC;
                 if (progressDialog != null && progressDialog.isShowing()) {
                     progressDialog.dismiss();
@@ -103,7 +104,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         String localIP = WifiUtils.getLocalIPAddress();
-        String client_mac_fixed = new String(device.deviceAddress).replace("99", "19");
+        String client_mac_fixed = device.deviceAddress.replace("99", "19");
         String clientIP = WifiUtils.getIPFromMac(client_mac_fixed);
 
         // User has picked an image. Transfer it to group owner i.e peer using
@@ -116,17 +117,16 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
         serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH, uri.toString());
 
-        if (localIP.equals(IP_SERVER)) {
-            serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS, clientIP);
-        } else {
-            serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS, IP_SERVER);
+        if (localIP != null) {
+            if (localIP.equals(IP_SERVER)) {
+                serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS, clientIP);
+            } else {
+                serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS, IP_SERVER);
+            }
         }
 
         serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, PORT);
 
-//        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
-//                info.groupOwnerAddress.getHostAddress());
-//        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, 8988);
         getActivity().startService(serviceIntent);
     }
 
