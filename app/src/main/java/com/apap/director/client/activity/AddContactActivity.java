@@ -73,6 +73,7 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
         databaseManager = new DatabaseManager(this);
         getSupportActionBar().show();
         initP2P();
+        initNFC();
     }
 
     public void initP2P() {
@@ -89,7 +90,13 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
 
     public void initNFC() {
         _nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (_nfcAdapter.isEnabled()) {
+            _pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass())
+                    .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+        }
+    }
 
+    public void useNFC() {
         if (_nfcAdapter == null) {
             Toast.makeText(this, "This device does not support NFC", Toast.LENGTH_LONG).show();
             return;
@@ -112,11 +119,13 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
     // Exchange public key with another user
     private void _enableNdefExchangeMode()
     {
-        String stringMessage = " " + publicKey;
-        NdefMessage message = NFCUtils.getNewMessage(_MIME_TYPE, stringMessage.getBytes());
+        NdefMessage message = NFCUtils.getNewMessage(_MIME_TYPE, publicKey.getBytes());
 
-        _nfcAdapter.setNdefPushMessage(message, this);
-        _nfcAdapter.enableForegroundDispatch(this, _pendingIntent, _readIntentFilters, null);
+        if (_nfcAdapter != null) {
+            // Automatically beams the message when two devices are in close enough proximity.
+            _nfcAdapter.setNdefPushMessage(message, this);
+            _nfcAdapter.enableForegroundDispatch(this, _pendingIntent, _readIntentFilters, null);
+        }
     }
 
     private void _enableTagWriteMode() {
@@ -319,7 +328,8 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
                 PackageManager pm = getPackageManager();
                 if(pm.hasSystemFeature(PackageManager.FEATURE_NFC) && NfcAdapter.getDefaultAdapter(this) != null) {
                     if (_nfcAdapter.isEnabled()) {
-                        initNFC();
+                        Toast.makeText(AddContactActivity.this, "NFC enabled", Toast.LENGTH_LONG).show();
+                        useNFC();
                     } else {
                         Toast.makeText(AddContactActivity.this, "Please activate NFC", Toast.LENGTH_LONG).show();
                     }
