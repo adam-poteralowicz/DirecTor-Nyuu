@@ -112,8 +112,6 @@ public class TCPChatService extends AbstractChatService {
                     chat.sendMessage(message);
                 } catch (SmackException.NotConnectedException e1) {
                     e1.printStackTrace();
-                } catch (SmackException e) {
-                    e.printStackTrace();
                 }
 
                 Log.v("HAI/Async", "Authenticated: "+String.valueOf(connection.isAuthenticated()));

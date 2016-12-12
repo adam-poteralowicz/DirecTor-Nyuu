@@ -2,11 +2,11 @@ package com.apap.director.db.manager;
 
 import com.apap.director.db.dao.model.Contact;
 import com.apap.director.db.dao.model.Conversation;
-import com.apap.director.db.dao.model.IdentityKey;
+import com.apap.director.db.dao.model.DbIdentityKey;
+import com.apap.director.db.dao.model.DbPreKey;
+import com.apap.director.db.dao.model.DbSession;
+import com.apap.director.db.dao.model.DbSignedPreKey;
 import com.apap.director.db.dao.model.Message;
-import com.apap.director.db.dao.model.PreKey;
-import com.apap.director.db.dao.model.Session;
-import com.apap.director.db.dao.model.SignedPreKey;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -127,175 +127,175 @@ public interface IDatabaseManager {
     /**
      * Delete all the identity keys from the DB
      */
-    void deleteIdentityKeys();
+    void deleteDbIdentityKeys();
 
     /**
      * Delete an identity key by its id
      */
-    void deleteIdentityKeyById(Long id);
+    void deleteDbIdentityKeyById(Long id);
 
     /**
-     * Delete an identity key by its identityKeyId
+     * Delete an identity key by its deviceId
      */
-    void deleteIdentityKeyByIdentityKeyId(int keyId);
+    void deleteDbIdentityKeyByDeviceId(int deviceId);
 
     /**
      * Delete an identity key by its name
      */
-    void deleteIdentityKeyByName(String name);
+    void deleteDbIdentityKeyByName(String name);
 
     /**
      * Insert or update an identity key object into the DB
      *
      * @param identityKey to be inserted/updated
      */
-    IdentityKey insertOrUpdateIdentityKey(IdentityKey identityKey);
+    DbIdentityKey insertOrUpdateDbIdentityKey(DbIdentityKey identityKey);
 
     /**
      * List all the identity keys from the DB
      *
      * @return list of identity keys
      */
-    ArrayList<IdentityKey> listIdentityKeys();
+    ArrayList<DbIdentityKey> listDbIdentityKeys();
 
     /**
      * @param id of an identity key we want to fetch
      * @return Return a identity key by its greendao id
      */
-    IdentityKey getIdentityKeyById(Long id);
+    DbIdentityKey getDbIdentityKeyById(Long id);
 
     /**
-     * @param identityKeyId of an identity key we want to fetch
+     * @param deviceId of an identity key we want to fetch
      * @return Return a identity key by its signal id
      */
-    IdentityKey getIdentityKeyByIdentityKeyId(int identityKeyId);
+    DbIdentityKey getDbIdentityKeyByDeviceId(int deviceId);
 
     /**
      * @param name of an identity key we want to fetch
      * @return Return a identity key by its name
      */
-    IdentityKey getIdentityKeyByName(String name);
+    DbIdentityKey getDbIdentityKeyByName(String name);
 
     /**
-     * Delete all the pre keys from the DB
+     * Delete all the db pre keys from the DB
      */
-    void deletePreKeys();
+    void deleteDbPreKeys();
 
     /**
-     * Delete a pre key by its id
+     * Delete a db pre key by its id
      */
-    void deletePreKeyById(Long id);
+    void deleteDbPreKeyById(Long id);
 
     /**
-     * Delete a pre key by its preKeyId
+     * Delete a db pre key by its preKeyId
      */
-    void deletePreKeyByPreKeyId(int keyId);
+    void deleteDbPreKeyByDbPreKeyId(int keyId);
 
     /**
      * Insert or update a pre key object into the DB
      *
-     * @param preKey to be inserted/updated
+     * @param dbPreKey to be inserted/updated
      */
-    PreKey insertOrUpdatePreKey(PreKey preKey);
+    DbPreKey insertOrUpdateDbPreKey(DbPreKey dbPreKey);
 
     /**
-     * List all the pre keys from the DB
+     * List all the db pre keys from the DB
      *
-     * @return list of pre keys
+     * @return list of db pre keys
      */
-    ArrayList<PreKey> listPreKeys();
+    ArrayList<DbPreKey> listDbPreKeys();
 
     /**
-     * @param id of a pre key we want to fetch
-     * @return Return a pre key by its greendao id
+     * @param id of a db pre key we want to fetch
+     * @return Return a db pre key by its greendao id
      */
-    PreKey getPreKeyById(Long id);
+    DbPreKey getDbPreKeyById(Long id);
 
     /**
-     * @param preKeyId of a pre key we want to fetch
-     * @return Return a pre key by its signal id
+     * @param dbPreKeyId of a db pre key we want to fetch
+     * @return Return a db pre key by its signal id
      */
-    PreKey getPreKeyByPreKeyId(int preKeyId);
+    DbPreKey getDbPreKeyByDbPreKeyId(int dbPreKeyId);
 
     /**
-     * Delete all the signed pre keys from the DB
+     * Delete all the db signed pre keys from the DB
      */
-    void deleteSignedPreKeys();
+    void deleteDbSignedPreKeys();
 
     /**
-     * Delete a signed pre key by its id
+     * Delete a db signed pre key by its id
      */
-    void deleteSignedPreKeyById(Long id);
+    void deleteDbSignedPreKeyById(Long id);
 
     /**
-     * Delete a signed pre key by its signedPreKeyId
+     * Delete a db signed pre key by its signedPreKeyId
      */
-    void deleteSignedPreKeyBySignedPreKeyId(int keyId);
+    void deleteDbSignedPreKeyByDbSignedPreKeyId(int keyId);
 
     /**
-     * Insert or update a signed pre key object into the DB
+     * Insert or update a db signed pre key object into the DB
      *
-     * @param signedPreKey to be inserted/updated
+     * @param dbSignedPreKey to be inserted/updated
      */
-    SignedPreKey insertOrUpdateSignedPreKey(SignedPreKey signedPreKey);
+    DbSignedPreKey insertOrUpdateDbSignedPreKey(DbSignedPreKey dbSignedPreKey);
 
     /**
-     * List all the signed pre keys from the DB
+     * List all the db signed pre keys from the DB
      *
-     * @return list of signed pre keys
+     * @return list of db signed pre keys
      */
-    ArrayList<SignedPreKey> listSignedPreKeys();
+    ArrayList<DbSignedPreKey> listDbSignedPreKeys();
 
     /**
-     * @param id of a signed pre key we want to fetch
-     * @return Return a signed pre key by its greendao id
+     * @param id of a db signed pre key we want to fetch
+     * @return Return a db signed pre key by its greendao id
      */
-    SignedPreKey getSignedPreKeyById(Long id);
+    DbSignedPreKey getDbSignedPreKeyById(Long id);
 
     /**
-     * @param signedPreKeyId of a signed pre key we want to fetch
-     * @return Return a signed pre key by its signal id
+     * @param dbSignedPreKeyId of a db signed pre key we want to fetch
+     * @return Return a db signed pre key by its signal id
      */
-    SignedPreKey getSignedPreKeyBySignedPreKeyId(int signedPreKeyId);
+    DbSignedPreKey getDbSignedPreKeyByDbSignedPreKeyId(int dbSignedPreKeyId);
 
     /**
-     * Delete all the sessions from the DB
+     * Delete all the db sessions from the DB
      */
-    void deleteSessions();
+    void deleteDbSessions();
 
     /**
-     * Delete a session by its id
+     * Delete a db session by its id
      */
-    void deleteSessionById(Long id);
+    void deleteDbSessionById(Long id);
 
     /**
-     * Delete a session by its name
+     * Delete a db session by its name
      */
-    void deleteSessionByName(String name);
+    void deleteDbSessionByName(String name);
 
     /**
-     * Insert or update a session object into the DB
+     * Insert or update a db session object into the DB
      *
-     * @param session to be inserted/updated
+     * @param dbSession to be inserted/updated
      */
-    Session insertOrUpdateSession(Session session);
+    DbSession insertOrUpdateDbSession(DbSession dbSession);
 
     /**
-     * List all the sessions from the DB
+     * List all the db sessions from the DB
      *
-     * @return list of sessions
+     * @return list of db sessions
      */
-    ArrayList<Session> listSessions();
+    ArrayList<DbSession> listDbSessions();
 
     /**
-     * @param sessionId of a session we want to fetch
-     * @return Return a session by its id
+     * @param dbSessionId of a db session we want to fetch
+     * @return Return a db session by its id
      */
-    Session getSessionById(Long sessionId);
+    DbSession getDbSessionById(Long dbSessionId);
 
     /**
-     * @param sessionName of a session we want to fetch
+     * @param dbSessionName of a session we want to fetch
      * @return Return a session by its name
      */
-    Session getSessionByName(String sessionName);
+    DbSession getDbSessionByName(String dbSessionName);
 }

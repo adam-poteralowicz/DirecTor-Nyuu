@@ -11,16 +11,16 @@ import com.apap.director.db.dao.model.Conversation;
 import com.apap.director.db.dao.model.ConversationDao;
 import com.apap.director.db.dao.model.DaoMaster;
 import com.apap.director.db.dao.model.DaoSession;
-import com.apap.director.db.dao.model.IdentityKey;
-import com.apap.director.db.dao.model.IdentityKeyDao;
+import com.apap.director.db.dao.model.DbIdentityKey;
+import com.apap.director.db.dao.model.DbIdentityKeyDao;
+import com.apap.director.db.dao.model.DbPreKey;
+import com.apap.director.db.dao.model.DbPreKeyDao;
+import com.apap.director.db.dao.model.DbSession;
+import com.apap.director.db.dao.model.DbSessionDao;
+import com.apap.director.db.dao.model.DbSignedPreKey;
+import com.apap.director.db.dao.model.DbSignedPreKeyDao;
 import com.apap.director.db.dao.model.Message;
 import com.apap.director.db.dao.model.MessageDao;
-import com.apap.director.db.dao.model.PreKey;
-import com.apap.director.db.dao.model.PreKeyDao;
-import com.apap.director.db.dao.model.Session;
-import com.apap.director.db.dao.model.SessionDao;
-import com.apap.director.db.dao.model.SignedPreKey;
-import com.apap.director.db.dao.model.SignedPreKeyDao;
 
 import org.greenrobot.greendao.async.AsyncOperation;
 import org.greenrobot.greendao.async.AsyncOperationListener;
@@ -369,24 +369,24 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
     }
 
     @Override
-    public synchronized void deleteIdentityKeys() {
+    public synchronized void deleteDbIdentityKeys() {
         try {
             openWritableDb();
-            IdentityKeyDao identityKeyDao = daoSession.getIdentityKeyDao();
-            identityKeyDao.deleteAll();
+            DbIdentityKeyDao dbIdentityKeyDao = daoSession.getDbIdentityKeyDao();
+            dbIdentityKeyDao.deleteAll();
             daoSession.clear();
-            Log.d(TAG, "Delete all identity keys from the schema.");
+            Log.d(TAG, "Delete all db identity keys from the schema.");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public synchronized void deleteIdentityKeyById(Long id) {
+    public synchronized void deleteDbIdentityKeyById(Long id) {
         try {
             openWritableDb();
-            IdentityKeyDao identityKeyDao = daoSession.getIdentityKeyDao();
-            identityKeyDao.deleteByKey(id);
+            DbIdentityKeyDao dbIdentityKeyDao = daoSession.getDbIdentityKeyDao();
+            dbIdentityKeyDao.deleteByKey(id);
             daoSession.clear();
         } catch (Exception e) {
             e.printStackTrace();
@@ -394,12 +394,12 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
     }
 
     @Override
-    public synchronized void deleteIdentityKeyByIdentityKeyId(int identityKeyId) {
+    public synchronized void deleteDbIdentityKeyByDeviceId(int deviceId) {
         try {
             openWritableDb();
-            IdentityKeyDao dao = daoSession.getIdentityKeyDao();
-            WhereCondition condition = IdentityKeyDao.Properties.IdentityKeyId.eq(identityKeyId);
-            QueryBuilder<IdentityKey> queryBuilder = dao.queryBuilder().where(condition);
+            DbIdentityKeyDao dao = daoSession.getDbIdentityKeyDao();
+            WhereCondition condition = DbIdentityKeyDao.Properties.DeviceId.eq(deviceId);
+            QueryBuilder<DbIdentityKey> queryBuilder = dao.queryBuilder().where(condition);
             dao.deleteInTx(queryBuilder.list());
             daoSession.clear();
         } catch (Exception e) {
@@ -408,12 +408,12 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
     }
 
     @Override
-    public synchronized void deleteIdentityKeyByName(String name) {
+    public synchronized void deleteDbIdentityKeyByName(String name) {
         try {
             openWritableDb();
-            IdentityKeyDao dao = daoSession.getIdentityKeyDao();
-            WhereCondition condition = IdentityKeyDao.Properties.Name.eq(name);
-            QueryBuilder<IdentityKey> queryBuilder = dao.queryBuilder().where(condition);
+            DbIdentityKeyDao dao = daoSession.getDbIdentityKeyDao();
+            WhereCondition condition = DbIdentityKeyDao.Properties.Name.eq(name);
+            QueryBuilder<DbIdentityKey> queryBuilder = dao.queryBuilder().where(condition);
             dao.deleteInTx(queryBuilder.list());
             daoSession.clear();
         } catch (Exception e) {
@@ -422,111 +422,110 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
     }
 
     @Override
-    public synchronized IdentityKey insertOrUpdateIdentityKey(IdentityKey identityKey) {
+    public synchronized DbIdentityKey insertOrUpdateDbIdentityKey(DbIdentityKey dbIdentityKey) {
         try {
-            if (identityKey != null) {
+            if (dbIdentityKey != null) {
                 openWritableDb();
-                daoSession.insertOrReplace(identityKey);
+                daoSession.insertOrReplace(dbIdentityKey);
                 daoSession.clear();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return identityKey;
+        return dbIdentityKey;
     }
 
     @Override
-    public synchronized ArrayList<IdentityKey> listIdentityKeys() {
-        List<IdentityKey> identityKeys = null;
+    public synchronized ArrayList<DbIdentityKey> listDbIdentityKeys() {
+        List<DbIdentityKey> dbIdentityKeys = null;
         try {
             openReadableDb();
-            IdentityKeyDao identityKeyDao = daoSession.getIdentityKeyDao();
-            identityKeys = identityKeyDao.loadAll();
-
+            DbIdentityKeyDao dbIdentityKeyDao = daoSession.getDbIdentityKeyDao();
+            dbIdentityKeys = dbIdentityKeyDao.loadAll();
             daoSession.clear();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (identityKeys != null) {
-            return new ArrayList<>(identityKeys);
+        if (dbIdentityKeys != null) {
+            return new ArrayList<>(dbIdentityKeys);
         }
         return null;
     }
 
     @Override
-    public synchronized IdentityKey getIdentityKeyById(Long id) {
-        IdentityKey identityKey = null;
+    public synchronized DbIdentityKey getDbIdentityKeyById(Long id) {
+        DbIdentityKey dbIdentityKey = null;
         try {
             openReadableDb();
-            IdentityKeyDao identityKeyDao = daoSession.getIdentityKeyDao();
-            identityKey = identityKeyDao.queryBuilder().where(IdentityKeyDao.Properties.Id.eq(id)).list().get(0);
+            DbIdentityKeyDao dbIdentityKeyDao = daoSession.getDbIdentityKeyDao();
+            dbIdentityKey = dbIdentityKeyDao.queryBuilder().where(DbIdentityKeyDao.Properties.Id.eq(id)).list().get(0);
             daoSession.clear();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return identityKey;
+        return dbIdentityKey;
     }
 
     @Override
-    public synchronized IdentityKey getIdentityKeyByIdentityKeyId(int identityKeyId) {
-        IdentityKey identityKey = null;
+    public synchronized DbIdentityKey getDbIdentityKeyByDeviceId(int deviceId) {
+        DbIdentityKey dbIdentityKey = null;
         try {
             openReadableDb();
-            IdentityKeyDao identityKeyDao = daoSession.getIdentityKeyDao();
-            identityKey = identityKeyDao.queryBuilder().where(IdentityKeyDao.Properties.IdentityKeyId.eq(identityKeyId)).list().get(0);
+            DbIdentityKeyDao identityKeyDao = daoSession.getDbIdentityKeyDao();
+            dbIdentityKey = identityKeyDao.queryBuilder().where(DbIdentityKeyDao.Properties.DeviceId.eq(deviceId)).list().get(0);
             daoSession.clear();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return identityKey;
+        return dbIdentityKey;
     }
 
     @Override
-    public synchronized IdentityKey getIdentityKeyByName(String name) {
-        IdentityKey identityKey = null;
+    public synchronized DbIdentityKey getDbIdentityKeyByName(String name) {
+        DbIdentityKey dbIdentityKey = null;
         try {
             openReadableDb();
-            IdentityKeyDao identityKeyDao = daoSession.getIdentityKeyDao();
-            identityKey = identityKeyDao.queryBuilder().where(IdentityKeyDao.Properties.Name.eq(name)).list().get(0);
+            DbIdentityKeyDao dbIdentityKeyDao = daoSession.getDbIdentityKeyDao();
+            dbIdentityKey = dbIdentityKeyDao.queryBuilder().where(DbIdentityKeyDao.Properties.Name.eq(name)).list().get(0);
             daoSession.clear();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return identityKey;
+        return dbIdentityKey;
     }
 
     @Override
-    public synchronized void deletePreKeys() {
+    public synchronized void deleteDbPreKeys() {
         try {
             openWritableDb();
-            PreKeyDao preKeyDao = daoSession.getPreKeyDao();
-            preKeyDao.deleteAll();
+            DbPreKeyDao dbPreKeyDao = daoSession.getDbPreKeyDao();
+            dbPreKeyDao.deleteAll();
             daoSession.clear();
-            Log.d(TAG, "Delete all pre keys from the schema.");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public synchronized void deletePreKeyById(Long id) {
-        try {
-            openWritableDb();
-            PreKeyDao preKeyDao = daoSession.getPreKeyDao();
-            preKeyDao.deleteByKey(id);
-            daoSession.clear();
+            Log.d(TAG, "Delete all db pre keys from the schema.");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public synchronized void deletePreKeyByPreKeyId(int preKeyId) {
+    public synchronized void deleteDbPreKeyById(Long id) {
         try {
             openWritableDb();
-            PreKeyDao dao = daoSession.getPreKeyDao();
-            WhereCondition condition = PreKeyDao.Properties.PreKeyId.eq(preKeyId);
-            QueryBuilder<PreKey> queryBuilder = dao.queryBuilder().where(condition);
+            DbPreKeyDao dbPreKeyDao = daoSession.getDbPreKeyDao();
+            dbPreKeyDao.deleteByKey(id);
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public synchronized void deleteDbPreKeyByDbPreKeyId(int dbPreKeyId) {
+        try {
+            openWritableDb();
+            DbPreKeyDao dao = daoSession.getDbPreKeyDao();
+            WhereCondition condition = DbPreKeyDao.Properties.DbPreKeyId.eq(dbPreKeyId);
+            QueryBuilder<DbPreKey> queryBuilder = dao.queryBuilder().where(condition);
             dao.deleteInTx(queryBuilder.list());
             daoSession.clear();
         } catch (Exception e) {
@@ -535,97 +534,97 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
     }
 
     @Override
-    public synchronized PreKey insertOrUpdatePreKey(PreKey preKey) {
+    public synchronized DbPreKey insertOrUpdateDbPreKey(DbPreKey dbPreKey) {
         try {
-            if (preKey != null) {
+            if (dbPreKey != null) {
                 openWritableDb();
-                daoSession.insertOrReplace(preKey);
+                daoSession.insertOrReplace(dbPreKey);
                 daoSession.clear();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return preKey;
+        return dbPreKey;
     }
 
     @Override
-    public synchronized ArrayList<PreKey> listPreKeys() {
-        List<PreKey> preKeys = null;
+    public synchronized ArrayList<DbPreKey> listDbPreKeys() {
+        List<DbPreKey> dbPreKeys = null;
         try {
             openReadableDb();
-            PreKeyDao preKeyDao = daoSession.getPreKeyDao();
-            preKeys = preKeyDao.loadAll();
+            DbPreKeyDao dbPreKeyDao = daoSession.getDbPreKeyDao();
+            dbPreKeys = dbPreKeyDao.loadAll();
 
             daoSession.clear();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (preKeys != null) {
-            return new ArrayList<>(preKeys);
+        if (dbPreKeys != null) {
+            return new ArrayList<>(dbPreKeys);
         }
         return null;
     }
 
     @Override
-    public synchronized PreKey getPreKeyById(Long id) {
-        PreKey preKey = null;
+    public synchronized DbPreKey getDbPreKeyById(Long id) {
+        DbPreKey dbPreKey = null;
         try {
             openReadableDb();
-            PreKeyDao preKeyDao = daoSession.getPreKeyDao();
-            preKey = preKeyDao.queryBuilder().where(PreKeyDao.Properties.Id.eq(id)).list().get(0);
+            DbPreKeyDao preKeyDao = daoSession.getDbPreKeyDao();
+            dbPreKey = preKeyDao.queryBuilder().where(DbPreKeyDao.Properties.Id.eq(id)).list().get(0);
             daoSession.clear();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return preKey;
+        return dbPreKey;
     }
 
     @Override
-    public synchronized PreKey getPreKeyByPreKeyId(int preKeyId) {
-        PreKey preKey = null;
+    public synchronized DbPreKey getDbPreKeyByDbPreKeyId(int preKeyId) {
+        DbPreKey dbPreKey = null;
         try {
             openReadableDb();
-            PreKeyDao preKeyDao = daoSession.getPreKeyDao();
-            preKey = preKeyDao.queryBuilder().where(PreKeyDao.Properties.PreKeyId.eq(preKeyId)).list().get(0);
+            DbPreKeyDao preKeyDao = daoSession.getDbPreKeyDao();
+            dbPreKey = preKeyDao.queryBuilder().where(DbPreKeyDao.Properties.DbPreKeyId.eq(preKeyId)).list().get(0);
             daoSession.clear();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return preKey;
+        return dbPreKey;
     }
 
     @Override
-    public synchronized void deleteSignedPreKeys() {
+    public synchronized void deleteDbSignedPreKeys() {
         try {
             openWritableDb();
-            SignedPreKeyDao signedPreKeyDao = daoSession.getSignedPreKeyDao();
-            signedPreKeyDao.deleteAll();
+            DbSignedPreKeyDao dbSignedPreKeyDao = daoSession.getDbSignedPreKeyDao();
+            dbSignedPreKeyDao.deleteAll();
             daoSession.clear();
-            Log.d(TAG, "Delete all signed pre keys from the schema.");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public synchronized void deleteSignedPreKeyById(Long id) {
-        try {
-            openWritableDb();
-            SignedPreKeyDao signedPreKeyDao = daoSession.getSignedPreKeyDao();
-            signedPreKeyDao.deleteByKey(id);
-            daoSession.clear();
+            Log.d(TAG, "Delete all db signed pre keys from the schema.");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public synchronized void deleteSignedPreKeyBySignedPreKeyId(int signedPreKeyId) {
+    public synchronized void deleteDbSignedPreKeyById(Long id) {
         try {
             openWritableDb();
-            SignedPreKeyDao dao = daoSession.getSignedPreKeyDao();
-            WhereCondition condition = SignedPreKeyDao.Properties.SignedPreKeyId.eq(signedPreKeyId);
-            QueryBuilder<SignedPreKey> queryBuilder = dao.queryBuilder().where(condition);
+            DbSignedPreKeyDao dbSignedPreKeyDao = daoSession.getDbSignedPreKeyDao();
+            dbSignedPreKeyDao.deleteByKey(id);
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public synchronized void deleteDbSignedPreKeyByDbSignedPreKeyId(int dbSignedPreKeyId) {
+        try {
+            openWritableDb();
+            DbSignedPreKeyDao dao = daoSession.getDbSignedPreKeyDao();
+            WhereCondition condition = DbSignedPreKeyDao.Properties.DbSignedPreKeyId.eq(dbSignedPreKeyId);
+            QueryBuilder<DbSignedPreKey> queryBuilder = dao.queryBuilder().where(condition);
             dao.deleteInTx(queryBuilder.list());
             daoSession.clear();
         } catch (Exception e) {
@@ -634,97 +633,97 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
     }
 
     @Override
-    public synchronized SignedPreKey insertOrUpdateSignedPreKey(SignedPreKey signedPreKey) {
+    public synchronized DbSignedPreKey insertOrUpdateDbSignedPreKey(DbSignedPreKey dbSignedPreKey) {
         try {
-            if (signedPreKey != null) {
+            if (dbSignedPreKey != null) {
                 openWritableDb();
-                daoSession.insertOrReplace(signedPreKey);
+                daoSession.insertOrReplace(dbSignedPreKey);
                 daoSession.clear();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return signedPreKey;
+        return dbSignedPreKey;
     }
 
     @Override
-    public synchronized ArrayList<SignedPreKey> listSignedPreKeys() {
-        List<SignedPreKey> signedPreKeys = null;
+    public synchronized ArrayList<DbSignedPreKey> listDbSignedPreKeys() {
+        List<DbSignedPreKey> dbSignedPreKeys = null;
         try {
             openReadableDb();
-            SignedPreKeyDao signedPreKeyDao = daoSession.getSignedPreKeyDao();
-            signedPreKeys = signedPreKeyDao.loadAll();
+            DbSignedPreKeyDao dbSignedPreKeyDao = daoSession.getDbSignedPreKeyDao();
+            dbSignedPreKeys = dbSignedPreKeyDao.loadAll();
 
             daoSession.clear();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (signedPreKeys != null) {
-            return new ArrayList<>(signedPreKeys);
+        if (dbSignedPreKeys != null) {
+            return new ArrayList<>(dbSignedPreKeys);
         }
         return null;
     }
 
     @Override
-    public synchronized SignedPreKey getSignedPreKeyById(Long id) {
-        SignedPreKey signedPreKey = null;
+    public synchronized DbSignedPreKey getDbSignedPreKeyById(Long id) {
+        DbSignedPreKey dbSignedPreKey = null;
         try {
             openReadableDb();
-            SignedPreKeyDao signedPreKeyDao = daoSession.getSignedPreKeyDao();
-            signedPreKey = signedPreKeyDao.queryBuilder().where(SignedPreKeyDao.Properties.Id.eq(id)).list().get(0);
+            DbSignedPreKeyDao dbSignedPreKeyDao = daoSession.getDbSignedPreKeyDao();
+            dbSignedPreKey = dbSignedPreKeyDao.queryBuilder().where(DbSignedPreKeyDao.Properties.Id.eq(id)).list().get(0);
             daoSession.clear();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return signedPreKey;
+        return dbSignedPreKey;
     }
 
     @Override
-    public synchronized SignedPreKey getSignedPreKeyBySignedPreKeyId(int signedPreKeyId) {
-        SignedPreKey signedPreKey = null;
+    public synchronized DbSignedPreKey getDbSignedPreKeyByDbSignedPreKeyId(int dbSignedPreKeyId) {
+        DbSignedPreKey dbSignedPreKey = null;
         try {
             openReadableDb();
-            SignedPreKeyDao signedPreKeyDao = daoSession.getSignedPreKeyDao();
-            signedPreKey = signedPreKeyDao.queryBuilder().where(SignedPreKeyDao.Properties.SignedPreKeyId.eq(signedPreKeyId)).list().get(0);
+            DbSignedPreKeyDao dbSignedPreKeyDao = daoSession.getDbSignedPreKeyDao();
+            dbSignedPreKey = dbSignedPreKeyDao.queryBuilder().where(DbSignedPreKeyDao.Properties.DbSignedPreKeyId.eq(dbSignedPreKeyId)).list().get(0);
             daoSession.clear();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return signedPreKey;
+        return dbSignedPreKey;
     }
 
     @Override
-    public synchronized void deleteSessions() {
+    public synchronized void deleteDbSessions() {
         try {
             openWritableDb();
-            SessionDao sessionDao = daoSession.getSessionDao();
-            sessionDao.deleteAll();
+            DbSessionDao dbSessionDao = daoSession.getDbSessionDao();
+            dbSessionDao.deleteAll();
             daoSession.clear();
-            Log.d(TAG, "Delete all sessions from the schema.");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public synchronized void deleteSessionById(Long id) {
-        try {
-            openWritableDb();
-            SessionDao sessionDao = daoSession.getSessionDao();
-            sessionDao.deleteByKey(id);
-            daoSession.clear();
+            Log.d(TAG, "Delete all db sessions from the schema.");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public synchronized void deleteSessionByName(String name) {
+    public synchronized void deleteDbSessionById(Long id) {
         try {
             openWritableDb();
-            SessionDao dao = daoSession.getSessionDao();
-            WhereCondition condition = SessionDao.Properties.Name.eq(name);
-            QueryBuilder<Session> queryBuilder = dao.queryBuilder().where(condition);
+            DbSessionDao dbSessionDao = daoSession.getDbSessionDao();
+            dbSessionDao.deleteByKey(id);
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public synchronized void deleteDbSessionByName(String name) {
+        try {
+            openWritableDb();
+            DbSessionDao dao = daoSession.getDbSessionDao();
+            WhereCondition condition = DbSessionDao.Properties.Name.eq(name);
+            QueryBuilder<DbSession> queryBuilder = dao.queryBuilder().where(condition);
             dao.deleteInTx(queryBuilder.list());
             daoSession.clear();
         } catch (Exception e) {
@@ -733,63 +732,63 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
     }
 
     @Override
-    public synchronized Session insertOrUpdateSession(Session session) {
+    public synchronized DbSession insertOrUpdateDbSession(DbSession dbSession) {
         try {
-            if (session != null) {
+            if (dbSession != null) {
                 openWritableDb();
-                daoSession.insertOrReplace(session);
+                daoSession.insertOrReplace(dbSession);
                 daoSession.clear();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return session;
+        return dbSession;
     }
 
     @Override
-    public synchronized ArrayList<Session> listSessions() {
-        List<Session> sessions = null;
+    public synchronized ArrayList<DbSession> listDbSessions() {
+        List<DbSession> dbSessions = null;
         try {
             openReadableDb();
-            SessionDao sessionDao = daoSession.getSessionDao();
-            sessions = sessionDao.loadAll();
+            DbSessionDao dbSessionDao = daoSession.getDbSessionDao();
+            dbSessions = dbSessionDao.loadAll();
 
             daoSession.clear();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (sessions != null) {
-            return new ArrayList<>(sessions);
+        if (dbSessions != null) {
+            return new ArrayList<>(dbSessions);
         }
         return null;
     }
 
     @Override
-    public synchronized Session getSessionById(Long id) {
-        Session session = null;
+    public synchronized DbSession getDbSessionById(Long id) {
+        DbSession dbSession = null;
         try {
             openReadableDb();
-            SessionDao sessionDao = daoSession.getSessionDao();
-            session = sessionDao.queryBuilder().where(SessionDao.Properties.Id.eq(id)).list().get(0);
+            DbSessionDao dbSessionDao = daoSession.getDbSessionDao();
+            dbSession = dbSessionDao.queryBuilder().where(DbSessionDao.Properties.Id.eq(id)).list().get(0);
             daoSession.clear();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return session;
+        return dbSession;
     }
 
     @Override
-    public synchronized Session getSessionByName(String name) {
-        Session session = null;
+    public synchronized DbSession getDbSessionByName(String name) {
+        DbSession dbSession = null;
         try {
             openReadableDb();
-            SessionDao sessionDao = daoSession.getSessionDao();
-            session = sessionDao.queryBuilder().where(SessionDao.Properties.Name.eq(name)).list().get(0);
+            DbSessionDao dbSessionDao = daoSession.getDbSessionDao();
+            dbSession = dbSessionDao.queryBuilder().where(DbSessionDao.Properties.Name.eq(name)).list().get(0);
             daoSession.clear();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return session;
+        return dbSession;
     }
 }
 

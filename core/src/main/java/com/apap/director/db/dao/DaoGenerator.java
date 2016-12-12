@@ -30,10 +30,10 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
         Entity contact = addContact(schema);
         Entity conversation = addConversation(schema);
         Entity message = addMessage(schema);
-        Entity identityKeyRecord = addIdentityKey(schema);
-        Entity preKeyRecord = addPreKey(schema);
-        Entity sessionRecord = addSession(schema);
-        Entity signedPreKeyRecord = addSignedPreKey(schema);
+        Entity dbIdentityKeyRecord = addDbIdentityKey(schema);
+        Entity dbPreKeyRecord = addDbPreKey(schema);
+        Entity dbSessionRecord = addDbSession(schema);
+        Entity dbSignedPreKeyRecord = addDbSignedPreKey(schema);
 
         /* properties */
         Property contactIdForConversation = conversation.addLongProperty("contactId").notNull().getProperty();
@@ -94,13 +94,13 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
      *
      * @Return IdentityKey entity
      */
-    private static Entity addIdentityKey(Schema schema) {
-        Entity identityKey = schema.addEntity("IdentityKey");
-        identityKey.addIdProperty().primaryKey().autoincrement();
-        identityKey.addIntProperty("identityKeyId");
-        identityKey.addStringProperty("name");
-        identityKey.addByteArrayProperty("serialized");
-        return identityKey;
+    private static Entity addDbIdentityKey(Schema schema) {
+        Entity dbIdentityKey = schema.addEntity("DbIdentityKey");
+        dbIdentityKey.addIdProperty().primaryKey().autoincrement();
+        dbIdentityKey.addIntProperty("deviceId");
+        dbIdentityKey.addStringProperty("name");
+        dbIdentityKey.addByteArrayProperty("key");
+        return dbIdentityKey;
     }
 
     /**
@@ -108,12 +108,13 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
      *
      * @Return PreKey entity
      */
-    private static Entity addPreKey(Schema schema) {
-        Entity preKey = schema.addEntity("PreKey");
-        preKey.addIdProperty().primaryKey().autoincrement();
-        preKey.addIntProperty("preKeyId");
-        preKey.addByteArrayProperty("serialized");
-        return preKey;
+    private static Entity addDbPreKey(Schema schema) {
+        Entity dbPreKey = schema.addEntity("DbPreKey");
+        dbPreKey.addIdProperty().primaryKey().autoincrement();
+        dbPreKey.addIntProperty("dbPreKeyId");
+        dbPreKey.addByteArrayProperty("privateKey");
+        dbPreKey.addByteArrayProperty("publicKey");
+        return dbPreKey;
     }
 
     /**
@@ -121,12 +122,13 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
      *
      * @Return Session entity
      */
-    private static Entity addSession(Schema schema) {
-        Entity session = schema.addEntity("Session");
-        session.addIdProperty().primaryKey().autoincrement();
-        session.addStringProperty("name");
-        session.addByteArrayProperty("serialized");
-        return session;
+    private static Entity addDbSession(Schema schema) {
+        Entity dbSession = schema.addEntity("DbSession");
+        dbSession.addIdProperty().primaryKey().autoincrement();
+        dbSession.addIntProperty("deviceId");
+        dbSession.addStringProperty("name");
+        dbSession.addByteArrayProperty("serialized");
+        return dbSession;
     }
 
     /**
@@ -134,11 +136,13 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
      *
      * @Return SignedPreKey entity
      */
-    private static Entity addSignedPreKey(Schema schema) {
-        Entity signedPreKey = schema.addEntity("SignedPreKey");
-        signedPreKey.addIdProperty().primaryKey().autoincrement();
-        signedPreKey.addIntProperty("signedPreKeyId");
-        signedPreKey.addByteArrayProperty("serialized");
-        return signedPreKey;
+    private static Entity addDbSignedPreKey(Schema schema) {
+        Entity dbSignedPreKey = schema.addEntity("DbSignedPreKey");
+        dbSignedPreKey.addIdProperty().primaryKey().autoincrement();
+        dbSignedPreKey.addIntProperty("dbSignedPreKeyId");
+        dbSignedPreKey.addByteArrayProperty("privateKey");
+        dbSignedPreKey.addByteArrayProperty("publicKey");
+        dbSignedPreKey.addByteArrayProperty("signature");
+        return dbSignedPreKey;
     }
 }

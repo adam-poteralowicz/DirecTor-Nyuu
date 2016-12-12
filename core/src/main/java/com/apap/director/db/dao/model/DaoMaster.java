@@ -52,10 +52,10 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(ContactDao.class);
         registerDaoClass(ConversationDao.class);
         registerDaoClass(MessageDao.class);
-        registerDaoClass(IdentityKeyDao.class);
-        registerDaoClass(PreKeyDao.class);
-        registerDaoClass(SignedPreKeyDao.class);
-        registerDaoClass(SessionDao.class);
+        registerDaoClass(DbIdentityKeyDao.class);
+        registerDaoClass(DbPreKeyDao.class);
+        registerDaoClass(DbSignedPreKeyDao.class);
+        registerDaoClass(DbSessionDao.class);
     }
 
     public DaoSession newSession() {
