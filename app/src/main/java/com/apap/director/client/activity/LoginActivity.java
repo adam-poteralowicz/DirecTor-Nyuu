@@ -64,7 +64,6 @@ public class LoginActivity extends Activity {
             startActivityForResult(selectedIntent, 0002);
 
 
-
             ServiceConnection connection = new ServiceConnection() {
 
 
