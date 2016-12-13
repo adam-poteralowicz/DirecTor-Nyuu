@@ -300,5 +300,10 @@ public interface IDatabaseManager {
     DbSession getDbSessionByName(String dbSessionName);
 
     ArrayList<DbSession> listDbSessionsByName(String name);
+
     ArrayList<DbIdentityKey> listDbIdentityKeysByName(String name);
+
+    void deleteDbSession(DbSession dbSession);
+
+    void deleteDbSessionByDeviceIdAndName(Integer deviceId, String name);
 }
