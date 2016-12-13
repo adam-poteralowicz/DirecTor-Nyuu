@@ -28,6 +28,7 @@ import org.greenrobot.greendao.async.AsyncSession;
 import org.greenrobot.greendao.query.QueryBuilder;
 import org.greenrobot.greendao.query.WhereCondition;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -789,6 +790,38 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
             e.printStackTrace();
         }
         return dbSession;
+    }
+
+    @Override public synchronized ArrayList<DbSession> listDbSessionsByName(String name) {
+        List<DbSession> dbSessions = null;
+        try {
+            openReadableDb();
+            DbSessionDao dbSessionDao = daoSession.getDbSessionDao();
+            dbSessions = dbSessionDao.queryBuilder().where(DbSessionDao.Properties.Name.eq(name)).list();
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (dbSessions != null) {
+            return new ArrayList<>(dbSessions);
+        }
+        return null;
+    }
+
+    @Override public synchronized ArrayList<DbIdentityKey> listDbIdentityKeysByName(String name) {
+        List<DbIdentityKey> dbIdentityKeys = null;
+        try {
+            openReadableDb();
+            DbIdentityKeyDao dbIdentityKeyDao = daoSession.getDbIdentityKeyDao();
+            dbIdentityKeys = dbIdentityKeyDao.queryBuilder().where(DbSessionDao.Properties.Name.eq(name)).list();
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (dbIdentityKeys != null) {
+            return new ArrayList<>(dbIdentityKeys);
+        }
+        return null;
     }
 }
 

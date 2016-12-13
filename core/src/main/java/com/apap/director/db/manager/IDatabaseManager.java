@@ -298,4 +298,7 @@ public interface IDatabaseManager {
      * @return Return a session by its name
      */
     DbSession getDbSessionByName(String dbSessionName);
+
+    ArrayList<DbSession> listDbSessionsByName(String name);
+    ArrayList<DbIdentityKey> listDbIdentityKeysByName(String name);
 }
