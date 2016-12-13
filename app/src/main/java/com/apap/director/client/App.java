@@ -18,37 +18,39 @@ import info.guardianproject.netcipher.proxy.OrbotHelper;
 
 public class App extends Application {
 
-        private static Context mContext;
-        private ChatComponent chatComponent;
-        private DaoComponent daoComponent;
+        private Context mContext;
 
+//    private ChatComponent chatComponent;
+//    private DaoComponent daoComponent;
 
         @Override
         public void onCreate() {
             super.onCreate();
             mContext = App.this;
-
-
-            daoComponent = DaggerDaoComponent.builder()
-                    .daoModule(new DaoModule(this))
-                    .build();
-
-            chatComponent = DaggerChatComponent.builder()
-                    .connectionModule(new ConnectionModule())
-                    .chatModule(new ChatModule())
-                    .messageModule(new MessageModule())
-                    .build();
-
-            OrbotHelper.get(this).init();
-            OrbotHelper.requestStartTor(this);
-            OrbotHelper.get(this).requestStatus(this);
         }
 
-        public ChatComponent getChatComponent() {
-            return chatComponent;
-        }
-        public DaoComponent getDaoComponent() { return daoComponent; }
-        public static Context getContext(){
+
+//            daoComponent = DaggerDaoComponent.builder()
+//                    .daoModule(new DaoModule(this))
+//                    .build();
+//
+//            chatComponent = DaggerChatComponent.builder()
+//                    .connectionModule(new ConnectionModule())
+//                    .chatModule(new ChatModule())
+//                    .messageModule(new MessageModule())
+//                    .build();
+//
+//            OrbotHelper.get(this).init();
+//            OrbotHelper.requestStartTor(this);
+//            OrbotHelper.get(this).requestStatus(this);
+//        }
+//
+//        public ChatComponent getChatComponent() {
+//            return chatComponent;
+//        }
+//        public DaoComponent getDaoComponent() { return daoComponent; }
+
+        public Context getContext(){
             return mContext;
         }
 
