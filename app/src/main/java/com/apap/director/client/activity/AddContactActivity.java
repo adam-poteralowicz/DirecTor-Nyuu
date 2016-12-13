@@ -1,6 +1,7 @@
 package com.apap.director.client.activity;
 
 import android.app.PendingIntent;
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentFilter.MalformedMimeTypeException;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
@@ -30,6 +32,7 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.fragment.DeviceDetailFragment;
 import com.apap.director.client.fragment.DeviceListFragment;
+import com.apap.director.client.util.BTUtils;
 import com.apap.director.client.util.NFCUtils;
 import com.apap.director.director_db.manager.DatabaseManager;
 import com.apap.director.director_db.manager.IDatabaseManager;
@@ -61,7 +64,7 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
     public boolean nfcEnabled = false;
     private final String _MIME_TYPE = "text/plain";
 
-    private String publicKey = "myPublicKeyAllBrandNewAndShiny";
+    private String publicKey = "myUltraAwesomePublicKey";
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -324,20 +327,35 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
                     }
                 });
                 return true;
+
             case R.id.atn_nfc:
                 PackageManager pm = getPackageManager();
                 if(pm.hasSystemFeature(PackageManager.FEATURE_NFC) && NfcAdapter.getDefaultAdapter(this) != null) {
                     if (_nfcAdapter.isEnabled()) {
-                        Toast.makeText(AddContactActivity.this, "NFC enabled", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "NFC enabled", Toast.LENGTH_LONG).show();
                         useNFC();
                     } else {
-                        Toast.makeText(AddContactActivity.this, "Please activate NFC", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "Please activate NFC", Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(this, "NFC feature not supported", Toast.LENGTH_LONG).show();
                 }
                 return true;
+
             case R.id.atn_bluetooth:
+                BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                if (bluetoothAdapter == null) {
+                    Toast.makeText(this, "Bluetooth not supported", Toast.LENGTH_LONG).show();
+                } else {
+                    Intent intent = new Intent();
+                    intent.setAction(Intent.ACTION_SEND);
+                    intent.setType("text/plain");
+                    intent.putExtra("Public_Key", publicKey);
+                    PackageManager pmbt = getPackageManager();
+                    List<ResolveInfo> appsList = pmbt.queryIntentActivities(intent, 0);
+                    intent = BTUtils.selectBluetooth(intent, appsList);
+                    startActivity(intent);
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

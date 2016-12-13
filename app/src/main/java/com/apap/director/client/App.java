@@ -2,9 +2,7 @@ package com.apap.director.client;
 
 import android.app.Application;
 import android.content.Context;
-import android.util.Log;
 
-import com.apap.director.client.activity.LoginActivity;
 import com.apap.director.client.component.ChatComponent;
 import com.apap.director.client.component.DaggerChatComponent;
 import com.apap.director.client.component.DaggerDaoComponent;
@@ -18,39 +16,39 @@ import info.guardianproject.netcipher.proxy.OrbotHelper;
 
 public class App extends Application {
 
-        private Context mContext;
+    private static Context mContext;
 
-//    private ChatComponent chatComponent;
-//    private DaoComponent daoComponent;
+    private ChatComponent chatComponent;
+    private DaoComponent daoComponent;
 
         @Override
         public void onCreate() {
             super.onCreate();
             mContext = App.this;
+
+
+
+            daoComponent = DaggerDaoComponent.builder()
+                    .daoModule(new DaoModule(this))
+                    .build();
+
+            chatComponent = DaggerChatComponent.builder()
+                    .connectionModule(new ConnectionModule())
+                    .chatModule(new ChatModule())
+                    .messageModule(new MessageModule())
+                    .build();
+
+            OrbotHelper.get(this).init();
+            OrbotHelper.requestStartTor(this);
+            OrbotHelper.get(this).requestStatus(this);
         }
 
+        public ChatComponent getChatComponent() {
+            return chatComponent;
+        }
+        public DaoComponent getDaoComponent() { return daoComponent; }
 
-//            daoComponent = DaggerDaoComponent.builder()
-//                    .daoModule(new DaoModule(this))
-//                    .build();
-//
-//            chatComponent = DaggerChatComponent.builder()
-//                    .connectionModule(new ConnectionModule())
-//                    .chatModule(new ChatModule())
-//                    .messageModule(new MessageModule())
-//                    .build();
-//
-//            OrbotHelper.get(this).init();
-//            OrbotHelper.requestStartTor(this);
-//            OrbotHelper.get(this).requestStatus(this);
-//        }
-//
-//        public ChatComponent getChatComponent() {
-//            return chatComponent;
-//        }
-//        public DaoComponent getDaoComponent() { return daoComponent; }
-
-        public Context getContext(){
+        public static Context getContext(){
             return mContext;
         }
 
