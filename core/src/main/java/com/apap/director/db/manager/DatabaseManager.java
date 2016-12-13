@@ -823,5 +823,32 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
         }
         return null;
     }
+
+    @Override public synchronized void deleteDbSession(DbSession dbSession) {
+        try {
+            if (dbSession != null) {
+                openWritableDb();
+                daoSession.delete(dbSession);
+                daoSession.clear();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override public synchronized void deleteDbSessionByDeviceIdAndName(Integer deviceId, String name) {
+        try {
+            openWritableDb();
+            DbSessionDao dao = daoSession.getDbSessionDao();
+            WhereCondition condition1 = DbSessionDao.Properties.Name.eq(name);
+            WhereCondition condition2 = DbSessionDao.Properties.DeviceId.eq(deviceId);
+
+            QueryBuilder<DbSession> queryBuilder = dao.queryBuilder().where(condition1, condition2);
+            dao.deleteInTx(queryBuilder.list());
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
 
