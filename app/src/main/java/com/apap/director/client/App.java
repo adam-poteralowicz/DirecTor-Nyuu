@@ -39,7 +39,7 @@ public class App extends Application {
                     .build();
 
             OrbotHelper.get(this).init();
-            OrbotHelper.requestStartTor(this);
+            //OrbotHelper.requestStartTor(this);
             OrbotHelper.get(this).requestStatus(this);
         }
 

@@ -61,7 +61,7 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
     public Intent _intent;
     public PendingIntent _pendingIntent;
     public IntentFilter[] _readIntentFilters, _writeIntentFilters;
-    public boolean nfcEnabled = false;
+    //public boolean nfcEnabled = false;
     private final String _MIME_TYPE = "text/plain";
 
     private String publicKey = "myUltraAwesomePublicKey";
@@ -207,7 +207,7 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
                 databaseManager.insertContact(contact);
 
                 Intent selectedIntent = new Intent(AddContactActivity.this, AuthUserActivity.class);
-                startActivityForResult(selectedIntent, 0013);
+                startActivityForResult(selectedIntent, 13);
             }
         }
     }
@@ -345,16 +345,9 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
             case R.id.atn_bluetooth:
                 BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
                 if (bluetoothAdapter == null) {
-                    Toast.makeText(this, "Bluetooth not supported", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.bt_not_found, Toast.LENGTH_LONG).show();
                 } else {
-                    Intent intent = new Intent();
-                    intent.setAction(Intent.ACTION_SEND);
-                    intent.setType("text/plain");
-                    intent.putExtra("Public_Key", publicKey);
-                    PackageManager pmbt = getPackageManager();
-                    List<ResolveInfo> appsList = pmbt.queryIntentActivities(intent, 0);
-                    intent = BTUtils.selectBluetooth(intent, appsList);
-                    startActivity(intent);
+                    startActivityForResult(BTUtils.getBluetoothDiscoveryPermissionIntent(), 1);
                 }
                 return true;
             default:
@@ -458,5 +451,22 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
         }
 
     }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == BTUtils.DISCOVER_DURATION && requestCode == 1) {
+
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_SEND);
+            intent.setType("text/plain");
+            intent.putExtra("Public_Key", publicKey);
+            PackageManager pmbt = getPackageManager();
+            List<ResolveInfo> appsList = pmbt.queryIntentActivities(intent, 0);
+            startActivity(BTUtils.selectBluetooth(intent, appsList));
+        }
+
+        else {
+            Toast.makeText(this, R.string.bt_cancelled, Toast.LENGTH_SHORT).show();
+        }
+    };
 
 }

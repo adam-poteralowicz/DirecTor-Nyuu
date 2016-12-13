@@ -1,7 +1,7 @@
 package com.apap.director.client.util;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.util.Log;
 
@@ -14,6 +14,8 @@ import java.util.List;
  */
 
 public class BTUtils {
+    public static final int DISCOVER_DURATION = 300;
+
     public static Intent selectBluetooth(Intent intent, List<ResolveInfo> appsList) {
         if(appsList.size() > 0) {
             String packageName = null;
@@ -35,5 +37,12 @@ public class BTUtils {
             intent.setClassName(packageName, className);
         }
         return intent;
+    }
+
+    public static Intent getBluetoothDiscoveryPermissionIntent() {
+        Intent discoveryIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        discoveryIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, DISCOVER_DURATION );
+
+        return discoveryIntent;
     }
 }
