@@ -24,9 +24,7 @@ public class DbSignedPreKeyDao extends AbstractDao<DbSignedPreKey, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property DbSignedPreKeyId = new Property(1, Integer.class, "dbSignedPreKeyId", false, "DB_SIGNED_PRE_KEY_ID");
-        public final static Property PrivateKey = new Property(2, byte[].class, "privateKey", false, "PRIVATE_KEY");
-        public final static Property PublicKey = new Property(3, byte[].class, "publicKey", false, "PUBLIC_KEY");
-        public final static Property Signature = new Property(4, byte[].class, "signature", false, "SIGNATURE");
+        public final static Property Serialized = new Property(2, byte[].class, "serialized", false, "SERIALIZED");
     }
 
 
@@ -44,9 +42,7 @@ public class DbSignedPreKeyDao extends AbstractDao<DbSignedPreKey, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"DB_SIGNED_PRE_KEY\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"DB_SIGNED_PRE_KEY_ID\" INTEGER," + // 1: dbSignedPreKeyId
-                "\"PRIVATE_KEY\" BLOB," + // 2: privateKey
-                "\"PUBLIC_KEY\" BLOB," + // 3: publicKey
-                "\"SIGNATURE\" BLOB);"); // 4: signature
+                "\"SERIALIZED\" BLOB);"); // 2: serialized
     }
 
     /** Drops the underlying database table. */
@@ -69,19 +65,9 @@ public class DbSignedPreKeyDao extends AbstractDao<DbSignedPreKey, Long> {
             stmt.bindLong(2, dbSignedPreKeyId);
         }
  
-        byte[] privateKey = entity.getPrivateKey();
-        if (privateKey != null) {
-            stmt.bindBlob(3, privateKey);
-        }
- 
-        byte[] publicKey = entity.getPublicKey();
-        if (publicKey != null) {
-            stmt.bindBlob(4, publicKey);
-        }
- 
-        byte[] signature = entity.getSignature();
-        if (signature != null) {
-            stmt.bindBlob(5, signature);
+        byte[] serialized = entity.getSerialized();
+        if (serialized != null) {
+            stmt.bindBlob(3, serialized);
         }
     }
 
@@ -99,19 +85,9 @@ public class DbSignedPreKeyDao extends AbstractDao<DbSignedPreKey, Long> {
             stmt.bindLong(2, dbSignedPreKeyId);
         }
  
-        byte[] privateKey = entity.getPrivateKey();
-        if (privateKey != null) {
-            stmt.bindBlob(3, privateKey);
-        }
- 
-        byte[] publicKey = entity.getPublicKey();
-        if (publicKey != null) {
-            stmt.bindBlob(4, publicKey);
-        }
- 
-        byte[] signature = entity.getSignature();
-        if (signature != null) {
-            stmt.bindBlob(5, signature);
+        byte[] serialized = entity.getSerialized();
+        if (serialized != null) {
+            stmt.bindBlob(3, serialized);
         }
     }
 
@@ -125,9 +101,7 @@ public class DbSignedPreKeyDao extends AbstractDao<DbSignedPreKey, Long> {
         DbSignedPreKey entity = new DbSignedPreKey( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1), // dbSignedPreKeyId
-            cursor.isNull(offset + 2) ? null : cursor.getBlob(offset + 2), // privateKey
-            cursor.isNull(offset + 3) ? null : cursor.getBlob(offset + 3), // publicKey
-            cursor.isNull(offset + 4) ? null : cursor.getBlob(offset + 4) // signature
+            cursor.isNull(offset + 2) ? null : cursor.getBlob(offset + 2) // serialized
         );
         return entity;
     }
@@ -136,9 +110,7 @@ public class DbSignedPreKeyDao extends AbstractDao<DbSignedPreKey, Long> {
     public void readEntity(Cursor cursor, DbSignedPreKey entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setDbSignedPreKeyId(cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1));
-        entity.setPrivateKey(cursor.isNull(offset + 2) ? null : cursor.getBlob(offset + 2));
-        entity.setPublicKey(cursor.isNull(offset + 3) ? null : cursor.getBlob(offset + 3));
-        entity.setSignature(cursor.isNull(offset + 4) ? null : cursor.getBlob(offset + 4));
+        entity.setSerialized(cursor.isNull(offset + 2) ? null : cursor.getBlob(offset + 2));
      }
     
     @Override

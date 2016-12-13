@@ -13,9 +13,7 @@ public class DbSignedPreKey {
     @Id(autoincrement = true)
     private Long id;
     private Integer dbSignedPreKeyId;
-    private byte[] privateKey;
-    private byte[] publicKey;
-    private byte[] signature;
+    private byte[] serialized;
 
     @Generated
     public DbSignedPreKey() {
@@ -26,12 +24,10 @@ public class DbSignedPreKey {
     }
 
     @Generated
-    public DbSignedPreKey(Long id, Integer dbSignedPreKeyId, byte[] privateKey, byte[] publicKey, byte[] signature) {
+    public DbSignedPreKey(Long id, Integer dbSignedPreKeyId, byte[] serialized) {
         this.id = id;
         this.dbSignedPreKeyId = dbSignedPreKeyId;
-        this.privateKey = privateKey;
-        this.publicKey = publicKey;
-        this.signature = signature;
+        this.serialized = serialized;
     }
 
     public Long getId() {
@@ -50,28 +46,12 @@ public class DbSignedPreKey {
         this.dbSignedPreKeyId = dbSignedPreKeyId;
     }
 
-    public byte[] getPrivateKey() {
-        return privateKey;
+    public byte[] getSerialized() {
+        return serialized;
     }
 
-    public void setPrivateKey(byte[] privateKey) {
-        this.privateKey = privateKey;
-    }
-
-    public byte[] getPublicKey() {
-        return publicKey;
-    }
-
-    public void setPublicKey(byte[] publicKey) {
-        this.publicKey = publicKey;
-    }
-
-    public byte[] getSignature() {
-        return signature;
-    }
-
-    public void setSignature(byte[] signature) {
-        this.signature = signature;
+    public void setSerialized(byte[] serialized) {
+        this.serialized = serialized;
     }
 
 }

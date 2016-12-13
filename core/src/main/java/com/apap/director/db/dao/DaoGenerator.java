@@ -112,8 +112,7 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
         Entity dbPreKey = schema.addEntity("DbPreKey");
         dbPreKey.addIdProperty().primaryKey().autoincrement();
         dbPreKey.addIntProperty("dbPreKeyId");
-        dbPreKey.addByteArrayProperty("privateKey");
-        dbPreKey.addByteArrayProperty("publicKey");
+        dbPreKey.addByteArrayProperty("serialized");
         return dbPreKey;
     }
 
@@ -140,9 +139,7 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
         Entity dbSignedPreKey = schema.addEntity("DbSignedPreKey");
         dbSignedPreKey.addIdProperty().primaryKey().autoincrement();
         dbSignedPreKey.addIntProperty("dbSignedPreKeyId");
-        dbSignedPreKey.addByteArrayProperty("privateKey");
-        dbSignedPreKey.addByteArrayProperty("publicKey");
-        dbSignedPreKey.addByteArrayProperty("signature");
+        dbSignedPreKey.addByteArrayProperty("serialized");
         return dbSignedPreKey;
     }
 }

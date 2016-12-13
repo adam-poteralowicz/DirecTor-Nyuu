@@ -13,8 +13,7 @@ public class DbPreKey {
     @Id(autoincrement = true)
     private Long id;
     private Integer dbPreKeyId;
-    private byte[] privateKey;
-    private byte[] publicKey;
+    private byte[] serialized;
 
     @Generated
     public DbPreKey() {
@@ -25,11 +24,10 @@ public class DbPreKey {
     }
 
     @Generated
-    public DbPreKey(Long id, Integer dbPreKeyId, byte[] privateKey, byte[] publicKey) {
+    public DbPreKey(Long id, Integer dbPreKeyId, byte[] serialized) {
         this.id = id;
         this.dbPreKeyId = dbPreKeyId;
-        this.privateKey = privateKey;
-        this.publicKey = publicKey;
+        this.serialized = serialized;
     }
 
     public Long getId() {
@@ -48,20 +46,12 @@ public class DbPreKey {
         this.dbPreKeyId = dbPreKeyId;
     }
 
-    public byte[] getPrivateKey() {
-        return privateKey;
+    public byte[] getSerialized() {
+        return serialized;
     }
 
-    public void setPrivateKey(byte[] privateKey) {
-        this.privateKey = privateKey;
-    }
-
-    public byte[] getPublicKey() {
-        return publicKey;
-    }
-
-    public void setPublicKey(byte[] publicKey) {
-        this.publicKey = publicKey;
+    public void setSerialized(byte[] serialized) {
+        this.serialized = serialized;
     }
 
 }
