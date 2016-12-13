@@ -813,7 +813,7 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
         try {
             openReadableDb();
             DbIdentityKeyDao dbIdentityKeyDao = daoSession.getDbIdentityKeyDao();
-            dbIdentityKeys = dbIdentityKeyDao.queryBuilder().where(DbSessionDao.Properties.Name.eq(name)).list();
+            dbIdentityKeys = dbIdentityKeyDao.queryBuilder().where(DbIdentityKeyDao.Properties.Name.eq(name)).list();
             daoSession.clear();
         } catch (Exception e) {
             e.printStackTrace();
