@@ -1,38 +1,81 @@
 package com.apap.director.im.signal;
 
+import com.apap.director.db.dao.model.DbSession;
+import com.apap.director.db.manager.DatabaseManager;
+
 import org.whispersystems.libsignal.SignalProtocolAddress;
 import org.whispersystems.libsignal.state.SessionRecord;
 import org.whispersystems.libsignal.state.SessionStore;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Ala on 29/11/2016.
- */
+import javax.inject.Inject;
+
 
 public class DirectorSessionStore implements SessionStore {
 
+    @Inject
+    public DatabaseManager manager;
+
     @Override
     public SessionRecord loadSession(SignalProtocolAddress address) {
-        return null;
+        try {
+            List<DbSession> list = manager.listDbSessionsByName(address.getName());
+            for (DbSession session : list) {
+                if (session.getDeviceId() == address.getDeviceId())
+                    return new SessionRecord(session.getSerialized());
+            }
+            return null;
+        }
+        catch(IOException exception){
+            return null;
+        }
     }
 
     @Override
     public List<Integer> getSubDeviceSessions(String name) {
-        return null;
+        List<DbSession> list = manager.listDbSessionsByName(name);
+        List<Integer> subDeviceSessions = new ArrayList<>(list.size());
+
+        for(DbSession session : list){
+            subDeviceSessions.add(session.getDeviceId());
+        }
+
+        return subDeviceSessions;
     }
 
     @Override
     public void storeSession(SignalProtocolAddress address, SessionRecord record) {
+
+        DbSession session = new DbSession();
+        session.setName(address.getName());
+        session.setDeviceId(address.getDeviceId());
+        session.setSerialized(record.serialize());
+
+        manager.insertOrUpdateDbSession(session);
+
     }
 
     @Override
     public boolean containsSession(SignalProtocolAddress address) {
+
+        List<DbSession> sessions = manager.listDbSessionsByName(address.getName());
+        for(DbSession session : sessions){
+            if(session.getDeviceId()==address.getDeviceId()) return true;
+        }
+
         return false;
+
     }
 
     @Override
     public void deleteSession(SignalProtocolAddress address) {
+        List<DbSession> sessions = manager.listDbSessionsByName(address.getName());
+        for(DbSession session : sessions){
+           // if(session.getDeviceId()==address.getDeviceId()) manager.deleteDbS
+        }
 
     }
 

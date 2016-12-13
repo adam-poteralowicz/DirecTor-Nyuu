@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
 
+import com.apap.director.db.dao.model.DbIdentityKey;
+import com.apap.director.db.manager.DatabaseManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.whispersystems.libsignal.IdentityKey;
@@ -12,15 +14,20 @@ import org.whispersystems.libsignal.SignalProtocolAddress;
 import org.whispersystems.libsignal.state.IdentityKeyStore;
 
 import java.io.IOException;
+import java.util.List;
+
+import javax.inject.Inject;
 
 public class DirectorIdentityKeyStore implements IdentityKeyStore {
 
+    @Inject
+    private DatabaseManager manager;
+
     private Context context;
 
-
-    public static String IDENTITY_PREF = "com.apap.director.identity.pref";
-    public static String KEY_PAIR = "key_pair";
-    public static String LOCAL_ID = "local_id";
+    public static final String IDENTITY_PREF = "com.apap.director.identity.pref";
+    public static final String KEY_PAIR = "key_pair";
+    public static final String LOCAL_ID = "local_id";
 
     public DirectorIdentityKeyStore(Context context){
         this.context = context;
@@ -46,12 +53,20 @@ public class DirectorIdentityKeyStore implements IdentityKeyStore {
 
     @Override
     public void saveIdentity(SignalProtocolAddress address, IdentityKey identityKey) {
-
-
+        DbIdentityKey dbKey = new DbIdentityKey();
+        dbKey.setName(address.getName());
+        dbKey.setDeviceId(address.getDeviceId());
+        manager.insertOrUpdateDbIdentityKey(dbKey);
     }
 
     @Override
     public boolean isTrustedIdentity(SignalProtocolAddress address, IdentityKey identityKey) {
+
+        List<DbIdentityKey> list = manager.listDbIdentityKeysByName(address.getName());
+
+        for(DbIdentityKey key : list) {
+            if (key.getDeviceId() == address.getDeviceId()) return true;
+        }
 
         return false;
     }

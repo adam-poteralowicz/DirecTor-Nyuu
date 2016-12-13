@@ -1,34 +1,59 @@
 package com.apap.director.im.signal;
 
+import com.apap.director.db.dao.model.DbPreKey;
+import com.apap.director.db.manager.DatabaseManager;
+
 import org.whispersystems.libsignal.InvalidKeyIdException;
+import org.whispersystems.libsignal.ecc.DjbECPublicKey;
+import org.whispersystems.libsignal.ecc.ECKeyPair;
 import org.whispersystems.libsignal.state.*;
 import org.whispersystems.libsignal.state.PreKeyRecord;
 
-/**
- * Created by Ala on 29/11/2016.
- */
+import java.io.IOException;
+
+import javax.inject.Inject;
+
+
 
 public class DirectorPreKeyStore implements PreKeyStore {
 
-
+    @Inject
+    public DatabaseManager manager;
 
     @Override
     public PreKeyRecord loadPreKey(int preKeyId) throws InvalidKeyIdException {
-        return null;
+        try {
+            DbPreKey preKey = manager.getDbPreKeyByDbPreKeyId(preKeyId);
+
+            if ( preKey == null ) throw new InvalidKeyIdException("No such key id");
+
+            return new PreKeyRecord(preKey.getSerialized());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
     public void storePreKey(int preKeyId, PreKeyRecord record) {
+        DbPreKey preKey = new DbPreKey();
+        preKey.setSerialized(record.serialize());
+        preKey.setDbPreKeyId(preKeyId);
+        manager.insertOrUpdateDbPreKey(preKey);
 
     }
 
     @Override
     public boolean containsPreKey(int preKeyId) {
-        return false;
+
+        return manager.getDbPreKeyByDbPreKeyId(preKeyId) == null ? false : true;
+
     }
 
     @Override
     public void removePreKey(int preKeyId) {
+
+        manager.deleteDbPreKeyByDbPreKeyId(preKeyId);
 
     }
 }
