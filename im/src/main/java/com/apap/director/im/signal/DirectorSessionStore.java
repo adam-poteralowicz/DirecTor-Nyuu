@@ -72,15 +72,11 @@ public class DirectorSessionStore implements SessionStore {
 
     @Override
     public void deleteSession(SignalProtocolAddress address) {
-        List<DbSession> sessions = manager.listDbSessionsByName(address.getName());
-        for(DbSession session : sessions){
-           // if(session.getDeviceId()==address.getDeviceId()) manager.deleteDbS
-        }
-
+        manager.deleteDbSessionByDeviceIdAndName(address.getDeviceId(), address.getName());
     }
 
     @Override
     public void deleteAllSessions(String name) {
-
+        manager.deleteDbSessionByName(name);
     }
 }

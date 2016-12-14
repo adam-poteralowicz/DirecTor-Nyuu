@@ -1,8 +1,6 @@
 package com.apap.director.im.signal;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.util.Base64;
 
 import com.apap.director.db.dao.model.DbIdentityKey;
 import com.apap.director.db.manager.DatabaseManager;

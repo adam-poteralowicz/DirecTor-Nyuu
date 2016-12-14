@@ -4,10 +4,8 @@ import com.apap.director.db.dao.model.DbPreKey;
 import com.apap.director.db.manager.DatabaseManager;
 
 import org.whispersystems.libsignal.InvalidKeyIdException;
-import org.whispersystems.libsignal.ecc.DjbECPublicKey;
-import org.whispersystems.libsignal.ecc.ECKeyPair;
-import org.whispersystems.libsignal.state.*;
 import org.whispersystems.libsignal.state.PreKeyRecord;
+import org.whispersystems.libsignal.state.PreKeyStore;
 
 import java.io.IOException;
 

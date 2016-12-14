@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.apap.director.db.dao.model.DaoMaster;
 import com.apap.director.db.dao.model.DaoSession;
+import com.apap.director.db.manager.DatabaseManager;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -23,31 +24,8 @@ public class DaoModule {
 
     @Provides
     @Singleton
-    @Named("contactDao")
-    public DaoSession createContactDaoSession() {
-        DaoMaster.DevOpenHelper contactsHelper = new DaoMaster.DevOpenHelper(context, "contact-db", null);
-        SQLiteDatabase contact_db = contactsHelper.getWritableDatabase();
-        DaoMaster contactDaoMaster = new DaoMaster(contact_db);
-        return contactDaoMaster.newSession();
+    public DatabaseManager provideDatabaseManager(){
+        return new DatabaseManager(context);
     }
 
-    @Provides
-    @Singleton
-    @Named("conversationDao")
-    public DaoSession createConversationDaoSession() {
-        DaoMaster.DevOpenHelper inboxHelper = new DaoMaster.DevOpenHelper(context, "conversation-db", null);
-        SQLiteDatabase conversation_db = inboxHelper.getWritableDatabase();
-        DaoMaster conversationDaoMaster = new DaoMaster(conversation_db);
-        return conversationDaoMaster.newSession();
-    }
-
-    @Provides
-    @Singleton
-    @Named("messageDao")
-    public DaoSession createMessageDaoSession() {
-        DaoMaster.DevOpenHelper messageHelper = new DaoMaster.DevOpenHelper(context, "message-db", null);
-        SQLiteDatabase message_db = messageHelper.getWritableDatabase();
-        DaoMaster messageDaoMaster = new DaoMaster(message_db);
-        return messageDaoMaster.newSession();
-    }
 }
