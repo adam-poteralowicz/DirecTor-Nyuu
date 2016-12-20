@@ -17,7 +17,7 @@ public class SignalModule {
 
     private Context context;
 
-    SignalModule(Context context){
+    public SignalModule(Context context){
         this.context = context;
     }
 

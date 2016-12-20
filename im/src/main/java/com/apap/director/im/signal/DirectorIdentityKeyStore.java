@@ -19,7 +19,7 @@ import javax.inject.Inject;
 public class DirectorIdentityKeyStore implements IdentityKeyStore {
 
     @Inject
-    private DatabaseManager manager;
+    public DatabaseManager manager;
 
     private Context context;
 
