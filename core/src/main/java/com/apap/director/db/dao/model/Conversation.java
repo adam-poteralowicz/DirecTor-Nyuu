@@ -175,8 +175,4 @@ public class Conversation {
         }
     }
 
-    @Override
-    public String toString() {
-        return recipient;
-    }
 }

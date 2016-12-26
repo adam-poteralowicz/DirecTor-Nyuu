@@ -26,6 +26,7 @@ public class DbSessionDao extends AbstractDao<DbSession, Long> {
         public final static Property DeviceId = new Property(1, Integer.class, "deviceId", false, "DEVICE_ID");
         public final static Property Name = new Property(2, String.class, "name", false, "NAME");
         public final static Property Serialized = new Property(3, byte[].class, "serialized", false, "SERIALIZED");
+        public final static Property IdentityName = new Property(4, String.class, "identityName", false, "IDENTITY_NAME");
     }
 
 
@@ -44,7 +45,8 @@ public class DbSessionDao extends AbstractDao<DbSession, Long> {
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"DEVICE_ID\" INTEGER," + // 1: deviceId
                 "\"NAME\" TEXT," + // 2: name
-                "\"SERIALIZED\" BLOB);"); // 3: serialized
+                "\"SERIALIZED\" BLOB," + // 3: serialized
+                "\"IDENTITY_NAME\" TEXT);"); // 4: identityName
     }
 
     /** Drops the underlying database table. */
@@ -76,6 +78,11 @@ public class DbSessionDao extends AbstractDao<DbSession, Long> {
         if (serialized != null) {
             stmt.bindBlob(4, serialized);
         }
+ 
+        String identityName = entity.getIdentityName();
+        if (identityName != null) {
+            stmt.bindString(5, identityName);
+        }
     }
 
     @Override
@@ -101,6 +108,11 @@ public class DbSessionDao extends AbstractDao<DbSession, Long> {
         if (serialized != null) {
             stmt.bindBlob(4, serialized);
         }
+ 
+        String identityName = entity.getIdentityName();
+        if (identityName != null) {
+            stmt.bindString(5, identityName);
+        }
     }
 
     @Override
@@ -114,7 +126,8 @@ public class DbSessionDao extends AbstractDao<DbSession, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1), // deviceId
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // name
-            cursor.isNull(offset + 3) ? null : cursor.getBlob(offset + 3) // serialized
+            cursor.isNull(offset + 3) ? null : cursor.getBlob(offset + 3), // serialized
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) // identityName
         );
         return entity;
     }
@@ -125,6 +138,7 @@ public class DbSessionDao extends AbstractDao<DbSession, Long> {
         entity.setDeviceId(cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1));
         entity.setName(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setSerialized(cursor.isNull(offset + 3) ? null : cursor.getBlob(offset + 3));
+        entity.setIdentityName(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
      }
     
     @Override

@@ -8,6 +8,7 @@ import com.apap.director.db.dao.model.DbSession;
 import com.apap.director.db.dao.model.DbSignedPreKey;
 import com.apap.director.db.dao.model.Message;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -306,4 +307,24 @@ public interface IDatabaseManager {
     void deleteDbSession(DbSession dbSession);
 
     void deleteDbSessionByDeviceIdAndName(Integer deviceId, String name);
+
+    DbSession findDbSessionByAddress(String name, Integer deviceId, String identityName);
+
+    DbIdentityKey findDbIdentityKeyByAddress(String name, Integer deviceId, String identityName);
+
+    DbSession getDbSessionByIdentityName(String identityName);
+
+    DbIdentityKey getDbIdentityKeyByIdentityName(String identityName);
+
+    DbPreKey getDbPreKeyByIdentityName(String identityName);
+
+    DbSignedPreKey getDbSignedPreKeyByIdentityName(String identityName);
+
+    void deleteDbSessionByIdentityName(String identityName);
+
+    void deleteIdentityKeyByIdentityName(String identityName);
+
+    void deletePreKeyByIdentityName(String identityName);
+
+    void deleteSignedPreKeyByIdentityName(String identityName);
 }

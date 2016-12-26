@@ -25,6 +25,7 @@ public class DbPreKeyDao extends AbstractDao<DbPreKey, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property DbPreKeyId = new Property(1, Integer.class, "dbPreKeyId", false, "DB_PRE_KEY_ID");
         public final static Property Serialized = new Property(2, byte[].class, "serialized", false, "SERIALIZED");
+        public final static Property IdentityName = new Property(3, String.class, "identityName", false, "IDENTITY_NAME");
     }
 
 
@@ -42,7 +43,8 @@ public class DbPreKeyDao extends AbstractDao<DbPreKey, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"DB_PRE_KEY\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"DB_PRE_KEY_ID\" INTEGER," + // 1: dbPreKeyId
-                "\"SERIALIZED\" BLOB);"); // 2: serialized
+                "\"SERIALIZED\" BLOB," + // 2: serialized
+                "\"IDENTITY_NAME\" TEXT);"); // 3: identityName
     }
 
     /** Drops the underlying database table. */
@@ -69,6 +71,11 @@ public class DbPreKeyDao extends AbstractDao<DbPreKey, Long> {
         if (serialized != null) {
             stmt.bindBlob(3, serialized);
         }
+ 
+        String identityName = entity.getIdentityName();
+        if (identityName != null) {
+            stmt.bindString(4, identityName);
+        }
     }
 
     @Override
@@ -89,6 +96,11 @@ public class DbPreKeyDao extends AbstractDao<DbPreKey, Long> {
         if (serialized != null) {
             stmt.bindBlob(3, serialized);
         }
+ 
+        String identityName = entity.getIdentityName();
+        if (identityName != null) {
+            stmt.bindString(4, identityName);
+        }
     }
 
     @Override
@@ -101,7 +113,8 @@ public class DbPreKeyDao extends AbstractDao<DbPreKey, Long> {
         DbPreKey entity = new DbPreKey( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1), // dbPreKeyId
-            cursor.isNull(offset + 2) ? null : cursor.getBlob(offset + 2) // serialized
+            cursor.isNull(offset + 2) ? null : cursor.getBlob(offset + 2), // serialized
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3) // identityName
         );
         return entity;
     }
@@ -111,6 +124,7 @@ public class DbPreKeyDao extends AbstractDao<DbPreKey, Long> {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setDbPreKeyId(cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1));
         entity.setSerialized(cursor.isNull(offset + 2) ? null : cursor.getBlob(offset + 2));
+        entity.setIdentityName(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
      }
     
     @Override
