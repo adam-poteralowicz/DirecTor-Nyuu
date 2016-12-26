@@ -43,6 +43,7 @@ public class SingleContactActivity extends Activity {
 
     Intent intent;
     String contactNameFromIntent;
+    Long contactIdFromIntent;
 
     public void onCreate(Bundle savedInstanceState) {
 
@@ -52,6 +53,7 @@ public class SingleContactActivity extends Activity {
 
         super.onCreate(savedInstanceState);
 
+        contactIdFromIntent = getIntent().getLongExtra("contactId", 1L);
         contactNameFromIntent = getIntent().getStringExtra("contactName");
         contactNameView.setText(contactNameFromIntent);
         myOptionsList = new ArrayList<String>();
@@ -75,22 +77,22 @@ public class SingleContactActivity extends Activity {
                 switch (position) {
                     case 0:
                     {
-                        Long contactId = databaseManager.getContactByName(contactNameFromIntent).getId();
-                        if (databaseManager.getConversationByContactId(contactId) == null) {
+                        if (databaseManager.getConversationByContactId(contactIdFromIntent) == null) {
                             Conversation conversation = new Conversation();
                             conversation.setRecipient(contactNameFromIntent);
-                            conversation.setContactId(contactId);
+                            conversation.setContactId(contactIdFromIntent);
                             databaseManager.insertOrUpdateConversation(conversation);
                         }
 
                         intent = new Intent(App.getContext(), NewMsgActivity.class);
                         intent.putExtra("recipient", contactNameFromIntent);
+                        intent.putExtra("contactId", contactIdFromIntent);
                         startActivity(intent);
                         break;
                     }
                     case 1:
                     {
-                        databaseManager.deleteContactByName(contactNameFromIntent);
+                        databaseManager.deleteContactById(contactIdFromIntent);
                         intent = new Intent(App.getContext(), AuthUserActivity.class);
                         startActivity(intent);
                         break;

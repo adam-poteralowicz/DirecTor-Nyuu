@@ -64,8 +64,9 @@ public class ContactsFragment extends Fragment {
 
     @OnItemClick(R.id.contactsView)
     public void showContactDetails(int position){
-        Intent intent = new Intent(getActivity(), SingleContactActivity.class);
+        Intent intent = new Intent(App.getContext(), SingleContactActivity.class);
         intent.putExtra("contactName", contactList.get(position).getName());
+        intent.putExtra("contactId", contactList.get(position).getId());
         startActivity(intent);
     }
 

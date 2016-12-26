@@ -35,7 +35,7 @@ public class NewMsgActivity extends Activity {
 
     ArrayList<String> messages_list;
     ArrayAdapter<String> arrayAdapter;
-    private Long contactId;
+    private Long contactIdFromIntent;
     private List<Message> myMessages;
 
 
@@ -55,9 +55,9 @@ public class NewMsgActivity extends Activity {
         }
 
         messages_list = new ArrayList<String>();
-        contactId = databaseManager.getContactByName(String.valueOf(recipient.getText())).getId();
-            final Conversation conversation = databaseManager.getConversationByContactId(contactId);
-            if (conversation == null)
+            contactIdFromIntent = getIntent().getLongExtra("contactId", 1L);
+            final Conversation conversation = databaseManager.getConversationByContactId(contactIdFromIntent);
+                if (conversation == null)
                 Log.d("conversation", "null");
             if (conversation.getMessages() != null)
                 myMessages = conversation.getMessages();
@@ -88,7 +88,7 @@ public class NewMsgActivity extends Activity {
 
     public void onClick(View view) {
 
-        Conversation conversation = databaseManager.getConversationByContactId(contactId);
+        Conversation conversation = databaseManager.getConversationByContactId(contactIdFromIntent);
         Message message = new Message();
         message.setRecipient(String.valueOf(recipient.getText()));
         message.setDate(new Date());
@@ -103,7 +103,7 @@ public class NewMsgActivity extends Activity {
             Log.v("Message sent", String.valueOf(newMessageField.getText()));
         }
 
-        conversation.setContactId(contactId);
+        conversation.setContactId(contactIdFromIntent);
         conversation.setRecipient(message.getRecipient());
         message.setConversationId(conversation.getId());
 
