@@ -2,28 +2,31 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:focusableInTouchMode="true">
 
     <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/newContactName"
             android:layout_marginLeft="75dp"
-        android:layout_marginRight="75dp"
-        android:layout_above="@+id/addContactButton"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="25dp" />
+            android:layout_marginRight="75dp"
+            android:layout_above="@+id/addContactButton"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="25dp"
+            android:nextFocusUp="@id/newContactName"
+            android:nextFocusLeft="@id/newContactName"/>
 
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add"
             android:id="@+id/addContactButton"
-        android:clickable="true"
+            android:clickable="true"
             android:onClick="onClick"
-        android:layout_marginBottom="44dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+            android:layout_marginBottom="44dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true" />
 
     <fragment
         android:layout_width="match_parent"

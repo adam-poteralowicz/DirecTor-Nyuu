@@ -8,10 +8,12 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.method.TextKeyListener;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -36,6 +38,7 @@ public class SingleContactActivity extends Activity {
     ImageView imageView;
     Intent intent;
     String contactNameFromIntent;
+    EditText contactNameEditText;
 
     public void onCreate(Bundle savedInstanceState) {
         ((App) getApplication()).getDaoComponent().inject(this);
@@ -45,7 +48,7 @@ public class SingleContactActivity extends Activity {
         // init database manager
         databaseManager = new DatabaseManager(this);
 
-        AutoFitTextView autoFitTextView = AutoFitTextView.with(R.id.singleContactScrollView, R.id.singleContactLinearLayout);
+        contactNameEditText = (EditText) findViewById(R.id.contactName);
         imageView = (ImageView) findViewById(R.id.imageView);
         contactNameFromIntent = getIntent().getStringExtra("contactName");
         contactNameView = (TextView) findViewById(R.id.contactName);
@@ -101,6 +104,9 @@ public class SingleContactActivity extends Activity {
                 }
             }
         });
+
+        contactNameEditText.setSelectAllOnFocus(true);
+
 
     }
 
