@@ -45,6 +45,7 @@ public class SingleContactActivity extends Activity {
         // init database manager
         databaseManager = new DatabaseManager(this);
 
+        AutoFitTextView autoFitTextView = AutoFitTextView.with(R.id.singleContactScrollView, R.id.singleContactLinearLayout);
         imageView = (ImageView) findViewById(R.id.imageView);
         contactNameFromIntent = getIntent().getStringExtra("contactName");
         contactNameView = (TextView) findViewById(R.id.contactName);
@@ -181,6 +182,7 @@ public class SingleContactActivity extends Activity {
             imageView.setImageBitmap(bitmap);
         }
     }
+
 
     public void checkIfAvatarExists() {
         if (databaseManager.getContactByName(contactNameFromIntent).getImage() != null) {
