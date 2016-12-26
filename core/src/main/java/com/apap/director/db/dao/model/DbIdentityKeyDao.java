@@ -26,6 +26,7 @@ public class DbIdentityKeyDao extends AbstractDao<DbIdentityKey, Long> {
         public final static Property DeviceId = new Property(1, Integer.class, "deviceId", false, "DEVICE_ID");
         public final static Property Name = new Property(2, String.class, "name", false, "NAME");
         public final static Property Key = new Property(3, byte[].class, "key", false, "KEY");
+        public final static Property IdentityName = new Property(4, String.class, "identityName", false, "IDENTITY_NAME");
     }
 
 
@@ -44,7 +45,8 @@ public class DbIdentityKeyDao extends AbstractDao<DbIdentityKey, Long> {
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"DEVICE_ID\" INTEGER," + // 1: deviceId
                 "\"NAME\" TEXT," + // 2: name
-                "\"KEY\" BLOB);"); // 3: key
+                "\"KEY\" BLOB," + // 3: key
+                "\"IDENTITY_NAME\" TEXT);"); // 4: identityName
     }
 
     /** Drops the underlying database table. */
@@ -76,6 +78,11 @@ public class DbIdentityKeyDao extends AbstractDao<DbIdentityKey, Long> {
         if (key != null) {
             stmt.bindBlob(4, key);
         }
+ 
+        String identityName = entity.getIdentityName();
+        if (identityName != null) {
+            stmt.bindString(5, identityName);
+        }
     }
 
     @Override
@@ -101,6 +108,11 @@ public class DbIdentityKeyDao extends AbstractDao<DbIdentityKey, Long> {
         if (key != null) {
             stmt.bindBlob(4, key);
         }
+ 
+        String identityName = entity.getIdentityName();
+        if (identityName != null) {
+            stmt.bindString(5, identityName);
+        }
     }
 
     @Override
@@ -114,7 +126,8 @@ public class DbIdentityKeyDao extends AbstractDao<DbIdentityKey, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1), // deviceId
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // name
-            cursor.isNull(offset + 3) ? null : cursor.getBlob(offset + 3) // key
+            cursor.isNull(offset + 3) ? null : cursor.getBlob(offset + 3), // key
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) // identityName
         );
         return entity;
     }
@@ -125,6 +138,7 @@ public class DbIdentityKeyDao extends AbstractDao<DbIdentityKey, Long> {
         entity.setDeviceId(cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1));
         entity.setName(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setKey(cursor.isNull(offset + 3) ? null : cursor.getBlob(offset + 3));
+        entity.setIdentityName(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
      }
     
     @Override

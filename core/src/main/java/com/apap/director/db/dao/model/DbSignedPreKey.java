@@ -14,6 +14,7 @@ public class DbSignedPreKey {
     private Long id;
     private Integer dbSignedPreKeyId;
     private byte[] serialized;
+    private String identityName;
 
     @Generated
     public DbSignedPreKey() {
@@ -24,10 +25,11 @@ public class DbSignedPreKey {
     }
 
     @Generated
-    public DbSignedPreKey(Long id, Integer dbSignedPreKeyId, byte[] serialized) {
+    public DbSignedPreKey(Long id, Integer dbSignedPreKeyId, byte[] serialized, String identityName) {
         this.id = id;
         this.dbSignedPreKeyId = dbSignedPreKeyId;
         this.serialized = serialized;
+        this.identityName = identityName;
     }
 
     public Long getId() {
@@ -52,6 +54,14 @@ public class DbSignedPreKey {
 
     public void setSerialized(byte[] serialized) {
         this.serialized = serialized;
+    }
+
+    public String getIdentityName() {
+        return identityName;
+    }
+
+    public void setIdentityName(String identityName) {
+        this.identityName = identityName;
     }
 
 }

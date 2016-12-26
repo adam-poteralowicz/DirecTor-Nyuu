@@ -15,6 +15,7 @@ public class DbIdentityKey {
     private Integer deviceId;
     private String name;
     private byte[] key;
+    private String identityName;
 
     @Generated
     public DbIdentityKey() {
@@ -25,11 +26,12 @@ public class DbIdentityKey {
     }
 
     @Generated
-    public DbIdentityKey(Long id, Integer deviceId, String name, byte[] key) {
+    public DbIdentityKey(Long id, Integer deviceId, String name, byte[] key, String identityName) {
         this.id = id;
         this.deviceId = deviceId;
         this.name = name;
         this.key = key;
+        this.identityName = identityName;
     }
 
     public Long getId() {
@@ -62,6 +64,14 @@ public class DbIdentityKey {
 
     public void setKey(byte[] key) {
         this.key = key;
+    }
+
+    public String getIdentityName() {
+        return identityName;
+    }
+
+    public void setIdentityName(String identityName) {
+        this.identityName = identityName;
     }
 
 }

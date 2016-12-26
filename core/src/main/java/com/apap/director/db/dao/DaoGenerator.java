@@ -100,6 +100,7 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
         dbIdentityKey.addIntProperty("deviceId");
         dbIdentityKey.addStringProperty("name");
         dbIdentityKey.addByteArrayProperty("key");
+        dbIdentityKey.addStringProperty("identityName");
         return dbIdentityKey;
     }
 
@@ -113,6 +114,7 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
         dbPreKey.addIdProperty().primaryKey().autoincrement();
         dbPreKey.addIntProperty("dbPreKeyId");
         dbPreKey.addByteArrayProperty("serialized");
+        dbPreKey.addStringProperty("identityName");
         return dbPreKey;
     }
 
@@ -127,6 +129,7 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
         dbSession.addIntProperty("deviceId");
         dbSession.addStringProperty("name");
         dbSession.addByteArrayProperty("serialized");
+        dbSession.addStringProperty("identityName");
         return dbSession;
     }
 
@@ -140,6 +143,7 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
         dbSignedPreKey.addIdProperty().primaryKey().autoincrement();
         dbSignedPreKey.addIntProperty("dbSignedPreKeyId");
         dbSignedPreKey.addByteArrayProperty("serialized");
+        dbSignedPreKey.addStringProperty("identityName");
         return dbSignedPreKey;
     }
 }

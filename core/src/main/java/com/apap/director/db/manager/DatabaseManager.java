@@ -792,7 +792,8 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
         return dbSession;
     }
 
-    @Override public synchronized ArrayList<DbSession> listDbSessionsByName(String name) {
+    @Override
+    public synchronized ArrayList<DbSession> listDbSessionsByName(String name) {
         List<DbSession> dbSessions = null;
         try {
             openReadableDb();
@@ -808,7 +809,8 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
         return null;
     }
 
-    @Override public synchronized ArrayList<DbIdentityKey> listDbIdentityKeysByName(String name) {
+    @Override
+    public synchronized ArrayList<DbIdentityKey> listDbIdentityKeysByName(String name) {
         List<DbIdentityKey> dbIdentityKeys = null;
         try {
             openReadableDb();
@@ -824,7 +826,8 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
         return null;
     }
 
-    @Override public synchronized void deleteDbSession(DbSession dbSession) {
+    @Override
+    public synchronized void deleteDbSession(DbSession dbSession) {
         try {
             if (dbSession != null) {
                 openWritableDb();
@@ -836,7 +839,8 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
         }
     }
 
-    @Override public synchronized void deleteDbSessionByDeviceIdAndName(Integer deviceId, String name) {
+    @Override
+    public synchronized void deleteDbSessionByDeviceIdAndName(Integer deviceId, String name) {
         try {
             openWritableDb();
             DbSessionDao dao = daoSession.getDbSessionDao();
@@ -850,5 +854,160 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
             e.printStackTrace();
         }
     }
+
+    @Override
+    public synchronized DbSession findDbSessionByAddress(String name, Integer deviceId, String identityName) {
+        DbSession dbSession = null;
+        try {
+            openReadableDb();
+            DbSessionDao dbSessionDao = daoSession.getDbSessionDao();
+            WhereCondition condition1 = DbSessionDao.Properties.Name.eq(name);
+            WhereCondition condition2 = DbSessionDao.Properties.DeviceId.eq(deviceId);
+            WhereCondition condition3 = DbSessionDao.Properties.IdentityName.eq(identityName);
+            QueryBuilder<DbSession> queryBuilder = dbSessionDao.queryBuilder().where(condition1, condition2, condition3);
+            dbSession = queryBuilder.list().get(0);
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (dbSession != null) {
+            return dbSession;
+        }
+        return null;
+    }
+
+    @Override
+    public synchronized DbIdentityKey findDbIdentityKeyByAddress(String name, Integer deviceId, String identityName) {
+        DbIdentityKey dbIdentityKey = null;
+        try {
+            openReadableDb();
+            DbIdentityKeyDao dbIdentityKeyDao = daoSession.getDbIdentityKeyDao();
+            WhereCondition condition1 = DbIdentityKeyDao.Properties.Name.eq(name);
+            WhereCondition condition2 = DbIdentityKeyDao.Properties.DeviceId.eq(deviceId);
+            WhereCondition condition3 = DbIdentityKeyDao.Properties.IdentityName.eq(identityName);
+            QueryBuilder<DbIdentityKey> queryBuilder = dbIdentityKeyDao.queryBuilder().where(condition1, condition2, condition3);
+            dbIdentityKey = queryBuilder.list().get(0);
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (dbIdentityKey != null) {
+            return dbIdentityKey;
+        }
+        return null;
+    }
+
+    @Override
+    public synchronized DbSession getDbSessionByIdentityName(String identityName) {
+        DbSession dbSession = null;
+        try {
+            openReadableDb();
+            DbSessionDao dbSessionDao = daoSession.getDbSessionDao();
+            dbSession = dbSessionDao.queryBuilder().where(DbSessionDao.Properties.IdentityName.eq(identityName)).list().get(0);
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return dbSession;
+    }
+
+    @Override
+    public synchronized DbIdentityKey getDbIdentityKeyByIdentityName(String identityName) {
+        DbIdentityKey dbIdentityKey = null;
+        try {
+            openReadableDb();
+            DbIdentityKeyDao dbIdentityKeyDao = daoSession.getDbIdentityKeyDao();
+            dbIdentityKey = dbIdentityKeyDao.queryBuilder().where(DbIdentityKeyDao.Properties.IdentityName.eq(identityName)).list().get(0);
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return dbIdentityKey;
+    }
+
+    @Override
+    public synchronized DbPreKey getDbPreKeyByIdentityName(String identityName) {
+        DbPreKey dbPreKey = null;
+        try {
+            openReadableDb();
+            DbPreKeyDao dbPreKeyDao = daoSession.getDbPreKeyDao();
+            dbPreKey = dbPreKeyDao.queryBuilder().where(DbPreKeyDao.Properties.IdentityName.eq(identityName)).list().get(0);
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return dbPreKey;
+    }
+
+    @Override
+    public synchronized DbSignedPreKey getDbSignedPreKeyByIdentityName(String identityName) {
+        DbSignedPreKey dbSignedPreKey = null;
+        try {
+            openReadableDb();
+            DbSignedPreKeyDao dbSignedPreKeyDao = daoSession.getDbSignedPreKeyDao();
+            dbSignedPreKey = dbSignedPreKeyDao.queryBuilder().where(DbSignedPreKeyDao.Properties.IdentityName.eq(identityName)).list().get(0);
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return dbSignedPreKey;
+    }
+
+    @Override
+    public synchronized void deleteDbSessionByIdentityName(String identityName) {
+        try {
+            openWritableDb();
+            DbSessionDao dao = daoSession.getDbSessionDao();
+
+            QueryBuilder<DbSession> queryBuilder = dao.queryBuilder().where(DbSessionDao.Properties.IdentityName.eq(identityName));
+            dao.deleteInTx(queryBuilder.list());
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public synchronized void deleteIdentityKeyByIdentityName(String identityName) {
+        try {
+            openWritableDb();
+            DbIdentityKeyDao dao = daoSession.getDbIdentityKeyDao();
+
+            QueryBuilder<DbIdentityKey> queryBuilder = dao.queryBuilder().where(DbIdentityKeyDao.Properties.IdentityName.eq(identityName));
+            dao.deleteInTx(queryBuilder.list());
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public synchronized void deletePreKeyByIdentityName(String identityName) {
+        try {
+            openWritableDb();
+            DbPreKeyDao dao = daoSession.getDbPreKeyDao();
+
+            QueryBuilder<DbPreKey> queryBuilder = dao.queryBuilder().where(DbPreKeyDao.Properties.IdentityName.eq(identityName));
+            dao.deleteInTx(queryBuilder.list());
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public synchronized void deleteSignedPreKeyByIdentityName(String identityName) {
+        try {
+            openWritableDb();
+            DbSignedPreKeyDao dao = daoSession.getDbSignedPreKeyDao();
+
+            QueryBuilder<DbSignedPreKey> queryBuilder = dao.queryBuilder().where(DbSignedPreKeyDao.Properties.IdentityName.eq(identityName));
+            dao.deleteInTx(queryBuilder.list());
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
 

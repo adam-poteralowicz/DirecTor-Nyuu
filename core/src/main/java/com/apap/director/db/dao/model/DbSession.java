@@ -15,6 +15,7 @@ public class DbSession {
     private Integer deviceId;
     private String name;
     private byte[] serialized;
+    private String identityName;
 
     @Generated
     public DbSession() {
@@ -25,11 +26,12 @@ public class DbSession {
     }
 
     @Generated
-    public DbSession(Long id, Integer deviceId, String name, byte[] serialized) {
+    public DbSession(Long id, Integer deviceId, String name, byte[] serialized, String identityName) {
         this.id = id;
         this.deviceId = deviceId;
         this.name = name;
         this.serialized = serialized;
+        this.identityName = identityName;
     }
 
     public Long getId() {
@@ -62,6 +64,14 @@ public class DbSession {
 
     public void setSerialized(byte[] serialized) {
         this.serialized = serialized;
+    }
+
+    public String getIdentityName() {
+        return identityName;
+    }
+
+    public void setIdentityName(String identityName) {
+        this.identityName = identityName;
     }
 
 }

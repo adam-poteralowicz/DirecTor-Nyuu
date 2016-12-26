@@ -96,8 +96,4 @@ public class Message {
         this.conversationId = conversationId;
     }
 
-    @Override
-    public String toString() {
-        return content;
-    }
 }
