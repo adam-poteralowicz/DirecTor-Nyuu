@@ -12,10 +12,10 @@ import com.apap.director.client.R;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
 
+import butterknife.OnClick;
+
 public class LoginActivity extends Activity {
 
-
-    EditText usernameField, passwordField, serverField;
     Shimmer shimmer;
 
     @Override
@@ -23,12 +23,6 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_view);
 
-        usernameField = (EditText) findViewById(R.id.username);
-        usernameField.setHint("Username");
-        passwordField = (EditText) findViewById(R.id.password);
-        passwordField.setHint("Password");
-        serverField = (EditText) findViewById(R.id.server);
-        serverField.setHint("Server");
         ShimmerTextView shimmerTextView = (ShimmerTextView) findViewById(R.id.shimmer_tv);
         shimmerTextView.setTextColor(new ColorStateList(
                 new int[][]{
@@ -43,15 +37,11 @@ public class LoginActivity extends Activity {
 
     }
 
+    @OnClick(R.id.postLoginButton)
     public void onClick(View view) {
         // TODO: Save new user upon first login
-
-        if (view.getId() == R.id.postLoginButton) {
-
             shimmer.cancel();
             Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);
             startActivityForResult(selectedIntent, 0002);
-
-        }
     }
 }

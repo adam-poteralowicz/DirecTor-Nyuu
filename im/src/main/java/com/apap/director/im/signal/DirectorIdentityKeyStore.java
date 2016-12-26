@@ -18,8 +18,7 @@ import javax.inject.Inject;
 
 public class DirectorIdentityKeyStore implements IdentityKeyStore {
 
-    @Inject
-    public DatabaseManager manager;
+    private DatabaseManager manager;
 
     private Context context;
 
@@ -27,8 +26,10 @@ public class DirectorIdentityKeyStore implements IdentityKeyStore {
     public static final String KEY_PAIR = "key_pair";
     public static final String LOCAL_ID = "local_id";
 
-    public DirectorIdentityKeyStore(Context context){
+    @Inject
+    public DirectorIdentityKeyStore(Context context, DatabaseManager manager){
         this.context = context;
+        this.manager = manager;
     }
 
     @Override

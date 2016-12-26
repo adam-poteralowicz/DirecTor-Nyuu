@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.fragment.DeviceDetailFragment;
 import com.apap.director.client.fragment.DeviceListFragment;
@@ -26,9 +27,17 @@ import com.apap.director.db.manager.IDatabaseManager;
 import com.apap.director.client.wifi.WiFiDirectBroadcastReceiver;
 import com.apap.director.db.dao.model.Contact;
 
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 public class AddContactActivity extends AppCompatActivity implements WifiP2pManager.ChannelListener, DeviceListFragment.DeviceActionListener {
-    private IDatabaseManager databaseManager;
-    EditText newContactName;
+
+    @Inject public DatabaseManager databaseManager;
+
+    @BindView(R.id.newContactName) EditText newContactName;
     public static final String TAG = "DirecTor";
     private WifiP2pManager manager;
     private boolean isWifiP2pEnabled = false;
@@ -44,9 +53,11 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
         this.isWifiP2pEnabled = isWifiP2pEnabled;
     }
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_contact_view);
+        ButterKnife.bind(this);
 
         // add necessary intent values to be matched.
 
@@ -61,24 +72,20 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
         newContactName = (EditText) findViewById(R.id.newContactName);
         newContactName.setHint("CONTACT NAME");
 
-//        ((App) getApplication()).getDaoComponent().inject(this);
-
-        // init database manager
-        databaseManager = new DatabaseManager(this);
+        ((App) getApplication()).getDaoComponent().inject(this);
         getSupportActionBar().show();
     }
 
-    public void onClick(View view) {
-        if (view.getId() == R.id.addContactButton) {
-            if (String.valueOf(newContactName.getText()).matches(".*\\w.*")
-                    && (String.valueOf(newContactName.getText().charAt(0))).trim().length() > 0) {
-                Contact contact = new Contact();
-                contact.setName(String.valueOf(newContactName.getText()));
-                databaseManager.insertContact(contact);
+    @OnClick(R.id.addContactButton)
+    public void onClick() {
+        if (String.valueOf(newContactName.getText()).matches(".*\\w.*")
+                && (String.valueOf(newContactName.getText().charAt(0))).trim().length() > 0) {
+            Contact contact = new Contact();
+            contact.setName(String.valueOf(newContactName.getText()));
+            databaseManager.insertContact(contact);
 
-                Intent selectedIntent = new Intent(AddContactActivity.this, AuthUserActivity.class);
-                startActivityForResult(selectedIntent, 0013);
-            }
+            Intent selectedIntent = new Intent(AddContactActivity.this, AuthUserActivity.class);
+            startActivityForResult(selectedIntent, 0013);
         }
     }
 
@@ -92,38 +99,6 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
             databaseManager = new DatabaseManager(this);
 
         super.onRestart();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        unregisterReceiver(receiver);
-    }
-
-    /**
-     * Called after onRestoreInstanceState(Bundle), onRestart(), or onPause(), for your activity
-     * to start interacting with the user.
-     */
-    /** register the BroadcastReceiver with the intent values to be matched */
-    @Override
-    protected void onResume() {
-        // init database manager
-        databaseManager = DatabaseManager.getInstance(this);
-
-        super.onResume();
-        receiver = new WiFiDirectBroadcastReceiver(manager, channel, this);
-        registerReceiver(receiver, intentFilter);
-    }
-
-    /**
-     * Called when you are no longer visible to the user.
-     */
-    @Override
-    protected void onStop() {
-        if (databaseManager != null)
-            databaseManager.closeDbConnections();
-
-        super.onStop();
     }
 
     /**

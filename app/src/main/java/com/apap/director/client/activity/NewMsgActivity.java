@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -12,44 +11,48 @@ import android.widget.TextView;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.db.manager.DatabaseManager;
-import com.apap.director.db.manager.IDatabaseManager;
 import com.apap.director.db.dao.model.Conversation;
 import com.apap.director.db.dao.model.Message;
-import com.apap.director.im.domain.chat.service.TCPChatService;
+import com.apap.director.db.manager.DatabaseManager;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnItemLongClick;
+
 public class NewMsgActivity extends Activity {
-    EditText newMessageField;
-    TextView recipient;
-    ListView messagesView;
+
+    @BindView(R.id.messengerField) EditText newMessageField;
+    @BindView(R.id.newMsgRecipient) TextView recipient;
+    @BindView(R.id.conversationView) ListView messagesView;
+
+    @Inject public DatabaseManager databaseManager;
+
     ArrayList<String> messages_list;
     ArrayAdapter<String> arrayAdapter;
-    private IDatabaseManager databaseManager;
     private Long contactId;
     private List<Message> myMessages;
 
-    TCPChatService chatService;
+
+    //TODO: Split this method
 
     public void onCreate(Bundle savedInstanceState) {
-//        ((App) getApplication()).getDaoComponent().inject(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.new_msg_view);
 
-        messagesView = (ListView) findViewById(R.id.conversationView);
-        newMessageField = (EditText) findViewById(R.id.messengerField);
-        recipient = (TextView) findViewById(R.id.newMsgRecipient);
+        ((App) getApplication()).getDaoComponent().inject(this);
+        setContentView(R.layout.new_msg_view);
+        ButterKnife.bind(this);
+
         if (getIntent().getStringExtra("recipient") != null) {
             recipient.setText(getIntent().getStringExtra("recipient"));
         } else {
             recipient.setText(getIntent().getStringExtra("msgTitle"));
         }
-
-        // init database manager
-        databaseManager = new DatabaseManager(this);
 
         messages_list = new ArrayList<String>();
         contactId = databaseManager.getContactByName(String.valueOf(recipient.getText())).getId();
@@ -71,48 +74,21 @@ public class NewMsgActivity extends Activity {
                     android.R.layout.simple_list_item_1,
                     messages_list);
             messagesView.setAdapter(arrayAdapter);
-            messagesView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                    Long messageId = myMessages.get(position).getId();
-                    databaseManager.deleteMessageById(messageId);
-                    messages_list.remove(position);
-                    arrayAdapter.notifyDataSetChanged();
-                    return true;
-                }
-            });
+    }
 
+    @OnItemLongClick(R.id.conversationView)
+    public boolean deleteMessage(int position){
+        Log.v("DTOR/NewMsgActivity", "Deleting message, position: "+position);
+        Long messageId = myMessages.get(position).getId();
+        databaseManager.deleteMessageById(messageId);
+        messages_list.remove(position);
+        arrayAdapter.notifyDataSetChanged();
+        return true;
     }
 
     public void onClick(View view) {
 
-//        ServiceConnection connection = new ServiceConnection() {
-//            @Override
-//            public void onServiceConnected(ComponentName name, IBinder service) {
-//                Log.v("HAI/ServiceConnection", "Connected");
-//                Log.v("HAI", "HAI HAI HAI");
-//                SimpleBinder binder = (SimpleBinder) service;
-//                chatService = (TCPChatService) binder.getService();
-//
-//
-//                Log.v("HAI/NewMsgActivity", "WAITED");
-//                chatService.sendMessage("ejabberd@dev02.sagiton.pl", "hai from app");
-//            }
-//
-//            @Override
-//            public void onServiceDisconnected(ComponentName name) {
-//                Log.v("HAIServiceConnection", "Disconnected");
-//            }
-//
-//        };
-//
-//        Log.v("HAI/NewMsgActivity", "Trying to bind...");
-//        Intent intent = new Intent(this, TCPChatService.class);
-//        bindService(intent, connection, Context.BIND_AUTO_CREATE);
-
-//        DaoSession conversationDaoSession = ((App) getApplicationContext()).getConversationDaoSession();
-
         Conversation conversation = databaseManager.getConversationByContactId(contactId);
-        List<Message> messages = conversation.getMessages();
         Message message = new Message();
         message.setRecipient(String.valueOf(recipient.getText()));
         message.setDate(new Date());
@@ -131,7 +107,7 @@ public class NewMsgActivity extends Activity {
         conversation.setRecipient(message.getRecipient());
         message.setConversationId(conversation.getId());
 
-        messages.add(message);
+        myMessages.add(message);
         databaseManager.insertOrUpdateMessage(message);
         databaseManager.insertOrUpdateConversation(conversation);
 
@@ -139,45 +115,6 @@ public class NewMsgActivity extends Activity {
         messagesView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
         messagesView.setStackFromBottom(true);
 
-//        if (chatService == null)
-//            Toast.makeText(NewMsgActivity.this, "chat service null", Toast.LENGTH_LONG).show();
-        //chatService.sendMessage(message.getRecipient(), message.getContent());
-
-    }
-
-    /**
-     * Called after your activity has been stopped, prior to it being started again.
-     * Always followed by onStart()
-     */
-    @Override
-    protected void onRestart() {
-        if (databaseManager == null)
-            databaseManager = new DatabaseManager(this);
-
-        super.onRestart();
-    }
-
-    /**
-     * Called after onRestoreInstanceState(Bundle), onRestart(), or onPause(), for your activity
-     * to start interacting with the user.
-     */
-    @Override
-    protected void onResume() {
-        // init database manager
-        databaseManager = DatabaseManager.getInstance(this);
-
-        super.onResume();
-    }
-
-    /**
-     * Called when you are no longer visible to the user.
-     */
-    @Override
-    protected void onStop() {
-        if (databaseManager != null)
-            databaseManager.closeDbConnections();
-
-        super.onStop();
     }
 
 }

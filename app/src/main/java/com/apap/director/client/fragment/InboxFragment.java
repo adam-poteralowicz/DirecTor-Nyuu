@@ -21,38 +21,37 @@ import com.apap.director.db.dao.model.Conversation;
 
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnItemClick;
+import butterknife.OnItemLongClick;
+
 public class InboxFragment extends Fragment {
 
-    private IDatabaseManager databaseManager;
+    @Inject DatabaseManager databaseManager;
     private ArrayList<Conversation> conversationList;
-    Intent intent;
+    private ArrayAdapter<Conversation> arrayAdapter;
+    @BindView(R.id.msgList) ListView msgListView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(
                 R.layout.inbox_view, container, false);
+        ButterKnife.bind(this, rootView);
 
         return rootView;
     }
 
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
-//        ((App) getActivity().getApplication()).getDaoComponent().inject(this);
+        ((App) getActivity().getApplication()).getDaoComponent().inject(this);
         super.onActivityCreated(savedInstanceState);
-        ListView msgListView = (ListView) getActivity().findViewById(R.id.msgList);
 
-        if(msgListView == null) Log.i("MSG LIST", "null");
-
-        // init database manager
-        databaseManager = new DatabaseManager(getActivity());
-
-        //conversationList = new ArrayList<Conversation>();
         conversationList = databaseManager.listConversations();
-        final ArrayAdapter<Conversation> arrayAdapter = new ArrayAdapter<Conversation>(
-
-                // TODO:  replace App.getContext to this.getContext
-
-                App.getContext(),
+        arrayAdapter = new ArrayAdapter<Conversation>(
+                getActivity(),
                 android.R.layout.simple_list_item_1,
                 conversationList);
 
@@ -60,29 +59,23 @@ public class InboxFragment extends Fragment {
 
         msgListView.setAdapter(arrayAdapter);
 
-        intent = new Intent(App.getContext(), NewMsgActivity.class);
 
-        msgListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(App.getContext(), conversationList.get(position).getRecipient(), Toast.LENGTH_LONG).show();
-                intent.putExtra("msgTitle", conversationList.get(position).getRecipient());
-                startActivity(intent);
-            }
-        });
+    }
 
-        msgListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+    @OnItemClick(R.id.msgList)
+    public void startSendMessageActivity(int position){
+        Toast.makeText(getActivity(), conversationList.get(position).getRecipient(), Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(getActivity(), NewMsgActivity.class);
+        intent.putExtra("msgTitle", conversationList.get(position).getRecipient());
+        startActivity(intent);
+    }
 
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                //TODO: Lepiej kasowac konwersacje po id
-                databaseManager.deleteConversationByRecipient(conversationList.get(position).getRecipient());
-                arrayAdapter.notifyDataSetChanged();
-                onActivityCreated(savedInstanceState);
-
-                return true;
-            }
-        });
-
+    @OnItemLongClick(R.id.msgList)
+    public boolean deleteConversation(int position){
+        //TODO: Lepiej kasowac konwersacje po id
+        databaseManager.deleteConversationByRecipient(conversationList.get(position).getRecipient());
+        conversationList.remove(position);
+        arrayAdapter.notifyDataSetChanged();
+        return true;
     }
 }

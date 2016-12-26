@@ -1,29 +1,17 @@
-package com.apap.director.im.domain.websocket.service;
-
-import android.app.Service;
-import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.IBinder;
-import android.support.annotation.Nullable;
-import android.util.Log;
+package com.apap.director.im.websocket.service;
 
 import com.apap.director.im.config.IMConfig;
 import com.apap.director.im.signal.DirectorIdentityKeyStore;
 import com.apap.director.im.signal.DirectorPreKeyStore;
 import com.apap.director.im.signal.DirectorSessionStore;
 import com.apap.director.im.signal.DirectorSignedPreKeyStore;
-import com.apap.director.im.util.SimpleBinder;
 
 import org.java_websocket.WebSocket;
 
 import javax.inject.Inject;
 
-import rx.Subscription;
-import rx.functions.Action1;
-import rx.plugins.RxJavaHooks;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.client.StompClient;
-import ua.naiksoftware.stomp.client.StompMessage;
 
 public class StompService {
 

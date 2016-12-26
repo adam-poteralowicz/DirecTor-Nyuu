@@ -42,15 +42,15 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:24.2.1'
 
-    compile 'org.greenrobot:greendao:3.2.0'
-    compile 'org.greenrobot:greendao-generator:3.2.0'
+    compile 'com.jakewharton:butterknife:8.4.0'
+    apt 'com.jakewharton:butterknife-compiler:8.4.0'
 
-    compile 'com.google.dagger:dagger:2.2'
-    apt "com.google.dagger:dagger-compiler:2.2"
+    compile 'com.google.dagger:dagger:2.5'
+    apt "com.google.dagger:dagger-compiler:2.5"
 
     // Needed for @Generated annotation (missing in Android API jar)
     // No longer needed in dagger >= 2.1-SNAPSHOT (github.com/google/dagger/issues/95)
-    compile 'javax.annotation:jsr250-api:1.0'
+    //compile 'javax.annotation:jsr250-api:1.0'
 
 
     compile 'com.romainpiel.shimmer:library:1.4.0@aar'

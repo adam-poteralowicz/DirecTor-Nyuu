@@ -27,29 +27,33 @@ import com.apap.director.db.dao.model.Conversation;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class SingleContactActivity extends Activity {
 
-    private IDatabaseManager databaseManager;
+    @Inject public DatabaseManager databaseManager;
     List<String> myOptionsList = null;
-    TextView contactNameView;
-    ListView options;
-    ImageView imageView;
+
+    @BindView(R.id.contactName) TextView contactNameView;
+    @BindView(R.id.optionsList) ListView options;
+    @BindView(R.id.imageView) ImageView imageView;
+
     Intent intent;
     String contactNameFromIntent;
 
     public void onCreate(Bundle savedInstanceState) {
-//        ((App) getApplication()).getDaoComponent().inject(this);
-        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.single_contact_view);
+        ((App) getApplication()).getDaoComponent().inject(this);
+        ButterKnife.bind(this);
 
-        // init database manager
-        databaseManager = new DatabaseManager(this);
+        super.onCreate(savedInstanceState);
 
-        imageView = (ImageView) findViewById(R.id.imageView);
         contactNameFromIntent = getIntent().getStringExtra("contactName");
-        contactNameView = (TextView) findViewById(R.id.contactName);
         contactNameView.setText(contactNameFromIntent);
-        options = (ListView) findViewById(R.id.optionsList);
         myOptionsList = new ArrayList<String>();
         myOptionsList.add("Send message");
         myOptionsList.add("Delete from contacts");
@@ -110,42 +114,6 @@ public class SingleContactActivity extends Activity {
             startActivityForResult(selectedIntent, 0011);
 
     }
-
-    /**
-     * Called after your activity has been stopped, prior to it being started again.
-     * Always followed by onStart()
-     */
-    @Override
-    protected void onRestart() {
-        if (databaseManager == null)
-            databaseManager = new DatabaseManager(this);
-
-        super.onRestart();
-    }
-
-    /**
-     * Called after onRestoreInstanceState(Bundle), onRestart(), or onPause(), for your activity
-     * to start interacting with the user.
-     */
-    @Override
-    protected void onResume() {
-        // init database manager
-        databaseManager = DatabaseManager.getInstance(this);
-
-        super.onResume();
-    }
-
-    /**
-     * Called when you are no longer visible to the user.
-     */
-    @Override
-    protected void onStop() {
-        if (databaseManager != null)
-            databaseManager.closeDbConnections();
-
-        super.onStop();
-    }
-
 
     public void uploadAvatar(View view) {
         if (view.getId() == R.id.imageView) {

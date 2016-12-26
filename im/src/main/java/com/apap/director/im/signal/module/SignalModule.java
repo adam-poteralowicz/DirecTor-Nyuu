@@ -2,6 +2,7 @@ package com.apap.director.im.signal.module;
 
 import android.content.Context;
 
+import com.apap.director.db.manager.DatabaseManager;
 import com.apap.director.im.signal.DirectorIdentityKeyStore;
 import com.apap.director.im.signal.DirectorPreKeyStore;
 import com.apap.director.im.signal.DirectorSessionStore;
@@ -22,25 +23,25 @@ public class SignalModule {
     }
 
     @Provides
-    @Singleton
-    public DirectorIdentityKeyStore provideIdentityKeyStore(){
-        return new DirectorIdentityKeyStore(context);
+    @ApplicationScope
+    public DirectorIdentityKeyStore provideIdentityKeyStore(DatabaseManager databaseManager){
+        return new DirectorIdentityKeyStore(context, databaseManager);
     }
 
     @Provides
-    @Singleton
+    @ApplicationScope
     public DirectorPreKeyStore providePreKeyStore(){
         return new DirectorPreKeyStore();
     }
 
     @Provides
-    @Singleton
+    @ApplicationScope
     public DirectorSessionStore provideSessionStore(){
         return new DirectorSessionStore();
     }
 
     @Provides
-    @Singleton
+    @ApplicationScope
     public DirectorSignedPreKeyStore provideSignedPreKeyStore(){
         return new DirectorSignedPreKeyStore();
     }

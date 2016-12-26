@@ -12,6 +12,7 @@ import android.widget.ListView;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
+import com.apap.director.client.activity.AddContactActivity;
 import com.apap.director.client.activity.AuthUserActivity;
 import com.apap.director.client.activity.SingleContactActivity;
 import com.apap.director.db.manager.DatabaseManager;
@@ -20,21 +21,27 @@ import com.apap.director.db.dao.model.Contact;
 
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnItemClick;
+
 
 public class ContactsFragment extends Fragment {
 
-    public AuthUserActivity aua;
-    private IDatabaseManager databaseManager;
+    @Inject DatabaseManager databaseManager;
+
     private ArrayList<Contact> contactList;
     private ArrayAdapter<Contact> arrayAdapter;
-    private ListView contactsListView;
-    Intent intent;
+    @BindView(R.id.contactsView) ListView contactsListView;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(
-                R.layout.contacts_view, container, false);
-        aua = (AuthUserActivity) getActivity();
+        View rootView = inflater.inflate(R.layout.contacts_view, container, false);
+        ButterKnife.bind(this, rootView);
 
         return rootView;
     }
@@ -42,12 +49,8 @@ public class ContactsFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
 
-//        ((App) getActivity().getApplication()).getDaoComponent().inject(this);
+        ((App) getActivity().getApplication()).getDaoComponent().inject(this);
         super.onActivityCreated(savedInstanceState);
-        contactsListView = (ListView) getActivity().findViewById(R.id.contactsView);
-
-        // init database manager
-        databaseManager = new DatabaseManager(getActivity());
 
         contactList = new ArrayList<Contact>();
         arrayAdapter = new ArrayAdapter<Contact>(
@@ -56,23 +59,21 @@ public class ContactsFragment extends Fragment {
                 contactList);
         contactsListView.setAdapter(arrayAdapter);
 
-        intent = new Intent(App.getContext(), SingleContactActivity.class);
-        contactsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                intent.putExtra("contactName", contactList.get(position).getName());
-                startActivity(intent);
-            }
-        });
-
         refreshContactList();
+    }
+
+    @OnItemClick(R.id.contactsView)
+    public void showContactDetails(int position){
+        Intent intent = new Intent(getActivity(), SingleContactActivity.class);
+        intent.putExtra("contactName", contactList.get(position).getName());
+        startActivity(intent);
     }
 
     /**
      * Display all the users from the DB into the listView
      */
     private void refreshContactList() {
-        contactList = DatabaseManager.getInstance(getActivity()).listContacts();
+        contactList = databaseManager.listContacts();
         if (contactList != null) {
             if (arrayAdapter == null) {
                 arrayAdapter = new ArrayAdapter<Contact>(
@@ -92,5 +93,10 @@ public class ContactsFragment extends Fragment {
         }
     }
 
+    @OnClick(R.id.addNewContactButton)
+    public void onClick(View view) {
+            Intent selectedIntent = new Intent(getActivity(), AddContactActivity.class);
+            startActivityForResult(selectedIntent, 0010);
+    }
 
 }

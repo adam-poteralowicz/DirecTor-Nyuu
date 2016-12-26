@@ -1,4 +1,4 @@
-//package com.apap.director.im.domain.websocket.service;
+//package com.apap.director.im.websocket.service;
 //
 //import android.content.ComponentName;
 //import android.content.ServiceConnection;
