@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
+import com.apap.director.client.adapter.MessageAdapter;
 import com.apap.director.director_db.manager.DatabaseManager;
 import com.apap.director.director_db.manager.IDatabaseManager;
 import com.apap.director.director_db.dao.model.Conversation;
@@ -26,13 +27,10 @@ public class NewMsgActivity extends Activity {
     EditText newMessageField;
     TextView recipient;
     ListView messagesView;
-    ArrayList<String> messages_list;
-    ArrayAdapter<String> arrayAdapter;
+    ArrayAdapter<Message> arrayAdapter;
     private IDatabaseManager databaseManager;
-    private Long contactId;
+    private Long contactIdFromIntent;
     private List<Message> myMessages;
-
-    TCPChatService chatService;
 
     public void onCreate(Bundle savedInstanceState) {
         ((App) getApplication()).getDaoComponent().inject(this);
@@ -51,98 +49,56 @@ public class NewMsgActivity extends Activity {
         // init database manager
         databaseManager = new DatabaseManager(this);
 
-        messages_list = new ArrayList<String>();
-        contactId = databaseManager.getContactByName(String.valueOf(recipient.getText())).getId();
-            final Conversation conversation = databaseManager.getConversationByContactId(contactId);
-            if (conversation == null)
-                Log.d("conversation", "null");
-            if (conversation.getMessages() != null)
-                myMessages = conversation.getMessages();
+        contactIdFromIntent = getIntent().getLongExtra("contactId", 1L);
+        final Conversation conversation = databaseManager.getConversationByContactId(contactIdFromIntent);
+        if (conversation == null)
+            Log.d("conversation", "null");
+        if (conversation.getMessages() != null)
+            myMessages = conversation.getMessages();
 
-            if (myMessages != null) {
-                Log.v("Conversation messages #", Integer.toString(conversation.getMessages().size()));
-                for (int i = 0; i < conversation.getMessages().size(); i++) {
-                    messages_list.add(conversation.getMessages().get(i).getContent());
-                }
+        if (myMessages != null) {
+            arrayAdapter = new MessageAdapter(this, R.layout.item_chat_left, myMessages);
+        }
+
+        messagesView.setAdapter(arrayAdapter);
+        messagesView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Long messageId = myMessages.get(position).getId();
+                databaseManager.deleteMessageById(messageId);
+                myMessages.remove(position);
+                arrayAdapter.notifyDataSetChanged();
+                return true;
             }
-
-            arrayAdapter = new ArrayAdapter<String>(
-                    App.getContext(),
-                    android.R.layout.simple_list_item_1,
-                    messages_list);
-            messagesView.setAdapter(arrayAdapter);
-            messagesView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                    Long messageId = myMessages.get(position).getId();
-                    databaseManager.deleteMessageById(messageId);
-                    messages_list.remove(position);
-                    arrayAdapter.notifyDataSetChanged();
-                    return true;
-                }
-            });
+        });
 
     }
 
     public void onClick(View view) {
-
-//        ServiceConnection connection = new ServiceConnection() {
-//            @Override
-//            public void onServiceConnected(ComponentName name, IBinder service) {
-//                Log.v("HAI/ServiceConnection", "Connected");
-//                Log.v("HAI", "HAI HAI HAI");
-//                SimpleBinder binder = (SimpleBinder) service;
-//                chatService = (TCPChatService) binder.getService();
-//
-//
-//                Log.v("HAI/NewMsgActivity", "WAITED");
-//                chatService.sendMessage("ejabberd@dev02.sagiton.pl", "hai from app");
-//            }
-//
-//            @Override
-//            public void onServiceDisconnected(ComponentName name) {
-//                Log.v("HAIServiceConnection", "Disconnected");
-//            }
-//
-//        };
-//
-//        Log.v("HAI/NewMsgActivity", "Trying to bind...");
-//        Intent intent = new Intent(this, TCPChatService.class);
-//        bindService(intent, connection, Context.BIND_AUTO_CREATE);
-
-//        DaoSession conversationDaoSession = ((App) getApplicationContext()).getConversationDaoSession();
-
-        Conversation conversation = databaseManager.getConversationByContactId(contactId);
-        List<Message> messages = conversation.getMessages();
+        Conversation conversation = databaseManager.getConversationByContactId(contactIdFromIntent);
         Message message = new Message();
         message.setRecipient(String.valueOf(recipient.getText()));
         message.setDate(new Date());
+        message.setMine(true);
 
         String messageText = String.valueOf(newMessageField.getText());
         if ("".equals(messageText)) {
-            messages_list.add("Sending empty message for fun!");
             message.setContent("Sending empty message for fun!");
         } else {
-            messages_list.add(String.valueOf(newMessageField.getText()));
             message.setContent(String.valueOf(newMessageField.getText()));
             Log.v("Message sent", String.valueOf(newMessageField.getText()));
         }
 
-        conversation.setContactId(contactId);
+        conversation.setContactId(contactIdFromIntent);
         conversation.setRecipient(message.getRecipient());
         message.setConversationId(conversation.getId());
 
-        messages.add(message);
+        myMessages.add(message);
         databaseManager.insertOrUpdateMessage(message);
         databaseManager.insertOrUpdateConversation(conversation);
 
         arrayAdapter.notifyDataSetChanged();
         messagesView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
         messagesView.setStackFromBottom(true);
-
-//        if (chatService == null)
-//            Toast.makeText(NewMsgActivity.this, "chat service null", Toast.LENGTH_LONG).show();
-        //chatService.sendMessage(message.getRecipient(), message.getContent());
-
     }
 
     /**

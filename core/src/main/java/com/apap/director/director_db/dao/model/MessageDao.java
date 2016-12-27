@@ -31,7 +31,8 @@ public class MessageDao extends AbstractDao<Message, Long> {
         public final static Property Recipient = new Property(2, String.class, "recipient", false, "RECIPIENT");
         public final static Property Content = new Property(3, String.class, "content", false, "CONTENT");
         public final static Property Date = new Property(4, java.util.Date.class, "date", false, "DATE");
-        public final static Property ConversationId = new Property(5, long.class, "conversationId", false, "CONVERSATION_ID");
+        public final static Property Mine = new Property(5, Boolean.class, "mine", false, "MINE");
+        public final static Property ConversationId = new Property(6, long.class, "conversationId", false, "CONVERSATION_ID");
     }
 
     private Query<Message> conversation_MessagesQuery;
@@ -53,7 +54,8 @@ public class MessageDao extends AbstractDao<Message, Long> {
                 "\"RECIPIENT\" TEXT NOT NULL ," + // 2: recipient
                 "\"CONTENT\" TEXT NOT NULL ," + // 3: content
                 "\"DATE\" INTEGER NOT NULL ," + // 4: date
-                "\"CONVERSATION_ID\" INTEGER NOT NULL );"); // 5: conversationId
+                "\"MINE\" INTEGER," + // 5: mine
+                "\"CONVERSATION_ID\" INTEGER NOT NULL );"); // 6: conversationId
     }
 
     /** Drops the underlying database table. */
@@ -78,7 +80,12 @@ public class MessageDao extends AbstractDao<Message, Long> {
         stmt.bindString(3, entity.getRecipient());
         stmt.bindString(4, entity.getContent());
         stmt.bindLong(5, entity.getDate().getTime());
-        stmt.bindLong(6, entity.getConversationId());
+ 
+        Boolean mine = entity.getMine();
+        if (mine != null) {
+            stmt.bindLong(6, mine ? 1L: 0L);
+        }
+        stmt.bindLong(7, entity.getConversationId());
     }
 
     @Override
@@ -97,7 +104,12 @@ public class MessageDao extends AbstractDao<Message, Long> {
         stmt.bindString(3, entity.getRecipient());
         stmt.bindString(4, entity.getContent());
         stmt.bindLong(5, entity.getDate().getTime());
-        stmt.bindLong(6, entity.getConversationId());
+ 
+        Boolean mine = entity.getMine();
+        if (mine != null) {
+            stmt.bindLong(6, mine ? 1L: 0L);
+        }
+        stmt.bindLong(7, entity.getConversationId());
     }
 
     @Override
@@ -113,7 +125,8 @@ public class MessageDao extends AbstractDao<Message, Long> {
             cursor.getString(offset + 2), // recipient
             cursor.getString(offset + 3), // content
             new java.util.Date(cursor.getLong(offset + 4)), // date
-            cursor.getLong(offset + 5) // conversationId
+            cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0, // mine
+            cursor.getLong(offset + 6) // conversationId
         );
         return entity;
     }
@@ -125,7 +138,8 @@ public class MessageDao extends AbstractDao<Message, Long> {
         entity.setRecipient(cursor.getString(offset + 2));
         entity.setContent(cursor.getString(offset + 3));
         entity.setDate(new java.util.Date(cursor.getLong(offset + 4)));
-        entity.setConversationId(cursor.getLong(offset + 5));
+        entity.setMine(cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0);
+        entity.setConversationId(cursor.getLong(offset + 6));
      }
     
     @Override

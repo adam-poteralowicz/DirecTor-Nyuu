@@ -61,6 +61,7 @@ public class ContactsFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 intent.putExtra("contactName", contactList.get(position).getName());
+                intent.putExtra("contactId", contactList.get(position).getId());
                 startActivity(intent);
             }
         });
