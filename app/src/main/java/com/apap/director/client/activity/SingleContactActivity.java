@@ -38,6 +38,7 @@ public class SingleContactActivity extends Activity {
     ImageView imageView;
     Intent intent;
     String contactNameFromIntent;
+    Long contactIdFromIntent;
     EditText contactNameEditText;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -48,6 +49,7 @@ public class SingleContactActivity extends Activity {
         // init database manager
         databaseManager = new DatabaseManager(this);
 
+        contactIdFromIntent = getIntent().getLongExtra("contactId", 1L);
         contactNameEditText = (EditText) findViewById(R.id.contactName);
         imageView = (ImageView) findViewById(R.id.imageView);
         contactNameFromIntent = getIntent().getStringExtra("contactName");
@@ -75,22 +77,22 @@ public class SingleContactActivity extends Activity {
                 switch (position) {
                     case 0:
                     {
-                        Long contactId = databaseManager.getContactByName(contactNameFromIntent).getId();
-                        if (databaseManager.getConversationByContactId(contactId) == null) {
+                        if (databaseManager.getConversationByContactId(contactIdFromIntent) == null) {
                             Conversation conversation = new Conversation();
                             conversation.setRecipient(contactNameFromIntent);
-                            conversation.setContactId(contactId);
+                            conversation.setContactId(contactIdFromIntent);
                             databaseManager.insertOrUpdateConversation(conversation);
                         }
 
                         intent = new Intent(App.getContext(), NewMsgActivity.class);
                         intent.putExtra("recipient", contactNameFromIntent);
+                        intent.putExtra("contactId", contactIdFromIntent);
                         startActivity(intent);
                         break;
                     }
                     case 1:
                     {
-                        databaseManager.deleteContactByName(contactNameFromIntent);
+                        databaseManager.deleteContactById(contactIdFromIntent);
                         intent = new Intent(App.getContext(), AuthUserActivity.class);
                         startActivity(intent);
                         break;

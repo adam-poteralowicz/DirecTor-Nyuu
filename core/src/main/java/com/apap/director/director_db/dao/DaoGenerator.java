@@ -86,6 +86,7 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
         message.addStringProperty("recipient").notNull();
         message.addStringProperty("content").notNull();
         message.addDateProperty("date").notNull();
+        message.addBooleanProperty("mine");
         return message;
     }
 
