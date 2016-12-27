@@ -17,7 +17,8 @@
         <TextView
             android:id="@+id/txt_msg"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:maxWidth="400dp"
             android:padding="10dp"
             android:textColor="@android:color/primary_text_light"
             android:layout_weight="1"/>
