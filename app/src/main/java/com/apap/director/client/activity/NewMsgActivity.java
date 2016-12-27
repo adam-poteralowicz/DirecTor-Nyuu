@@ -99,6 +99,7 @@ public class NewMsgActivity extends Activity {
         arrayAdapter.notifyDataSetChanged();
         messagesView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
         messagesView.setStackFromBottom(true);
+        newMessageField.setText("");
     }
 
     /**
