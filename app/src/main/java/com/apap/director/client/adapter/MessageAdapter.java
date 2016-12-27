@@ -8,9 +8,10 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.apap.director.client.R;
-import com.apap.director.director_db.dao.model.Message;
+import com.apap.director.db.dao.model.Message;
 
 import java.util.List;
+
 
 public class MessageAdapter extends ArrayAdapter<Message> {
     private Activity activity;
@@ -32,10 +33,10 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         int viewType = getItemViewType(position);
 
         if (chatMessage.isMine()) {
-            layoutResource = R.layout.item_chat_left;
+            layoutResource = R.layout.item_chat_right;
         } else {
             chatMessage.setMine(false);
-            layoutResource = R.layout.item_chat_right;
+            layoutResource = R.layout.item_chat_left;
         }
 
         if (convertView != null) {

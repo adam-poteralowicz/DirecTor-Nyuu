@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -12,11 +11,11 @@ import android.widget.TextView;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
+import com.apap.director.client.adapter.MessageAdapter;
 import com.apap.director.db.dao.model.Conversation;
 import com.apap.director.db.dao.model.Message;
 import com.apap.director.db.manager.DatabaseManager;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -31,20 +30,10 @@ public class NewMsgActivity extends Activity {
     @BindView(R.id.messengerField) EditText newMessageField;
     @BindView(R.id.newMsgRecipient) TextView recipient;
     @BindView(R.id.conversationView) ListView messagesView;
-
     @Inject public DatabaseManager databaseManager;
-
-    ArrayList<String> messages_list;
-    ArrayAdapter<String> arrayAdapter;
-    private Long contactIdFromIntent;
-    EditText newMessageField;
-    TextView recipient;
-    ListView messagesView;
     ArrayAdapter<Message> arrayAdapter;
-    private IDatabaseManager databaseManager;
     private Long contactIdFromIntent;
     private List<Message> myMessages;
-
 
     //TODO: Split this method
 

@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.text.method.TextKeyListener;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -21,10 +20,9 @@ import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.db.manager.DatabaseManager;
-import com.apap.director.db.manager.IDatabaseManager;
 import com.apap.director.db.dao.model.Contact;
 import com.apap.director.db.dao.model.Conversation;
+import com.apap.director.db.manager.DatabaseManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -128,42 +126,6 @@ public class SingleContactActivity extends Activity {
             startActivityForResult(selectedIntent, 0011);
 
     }
-
-    /**
-     * Called after your activity has been stopped, prior to it being started again.
-     * Always followed by onStart()
-     */
-    @Override
-    protected void onRestart() {
-        if (databaseManager == null)
-            databaseManager = new DatabaseManager(this);
-
-        super.onRestart();
-    }
-
-    /**
-     * Called after onRestoreInstanceState(Bundle), onRestart(), or onPause(), for your activity
-     * to start interacting with the user.
-     */
-    @Override
-    protected void onResume() {
-        // init database manager
-        databaseManager = DatabaseManager.getInstance(this);
-
-        super.onResume();
-    }
-
-    /**
-     * Called when you are no longer visible to the user.
-     */
-    @Override
-    protected void onStop() {
-        if (databaseManager != null)
-            databaseManager.closeDbConnections();
-
-        super.onStop();
-    }
-
 
     public void uploadAvatar(View view) {
         if (view.getId() == R.id.imageView) {

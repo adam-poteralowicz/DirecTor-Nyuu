@@ -1,5 +1,6 @@
 package com.apap.director.client.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -16,19 +17,17 @@ import com.apap.director.client.R;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
 
-import butterknife.OnClick;
-
-public class LoginActivity extends Activity {
 import java.io.IOException;
 
+import butterknife.OnClick;
 import cz.msebera.android.httpclient.client.HttpClient;
 import cz.msebera.android.httpclient.client.methods.HttpGet;
 import cz.msebera.android.httpclient.impl.client.BasicResponseHandler;
 import info.guardianproject.netcipher.NetCipher;
-import info.guardianproject.netcipher.client.StrongBuilder.Callback;
+import info.guardianproject.netcipher.client.StrongBuilder;
 import info.guardianproject.netcipher.client.StrongHttpClientBuilder;
 
-public class LoginActivity extends AppCompatActivity implements Callback<HttpClient> {
+public class LoginActivity extends AppCompatActivity implements StrongBuilder.Callback<HttpClient> {
 
     Shimmer shimmer;
 //    String HS_URL = "http://3zk5ak4bcbfvwgha.onion";

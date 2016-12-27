@@ -6,18 +6,15 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.activity.AddContactActivity;
-import com.apap.director.client.activity.AuthUserActivity;
 import com.apap.director.client.activity.SingleContactActivity;
-import com.apap.director.db.manager.DatabaseManager;
-import com.apap.director.db.manager.IDatabaseManager;
 import com.apap.director.db.dao.model.Contact;
+import com.apap.director.db.manager.DatabaseManager;
 
 import java.util.ArrayList;
 
