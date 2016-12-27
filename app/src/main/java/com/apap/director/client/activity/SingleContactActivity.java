@@ -8,10 +8,12 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.method.TextKeyListener;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -44,6 +46,7 @@ public class SingleContactActivity extends Activity {
     Intent intent;
     String contactNameFromIntent;
     Long contactIdFromIntent;
+    EditText contactNameEditText;
 
     public void onCreate(Bundle savedInstanceState) {
 
@@ -53,8 +56,14 @@ public class SingleContactActivity extends Activity {
 
         super.onCreate(savedInstanceState);
 
+        // init database manager
+        databaseManager = new DatabaseManager(this);
+
         contactIdFromIntent = getIntent().getLongExtra("contactId", 1L);
+        contactNameEditText = (EditText) findViewById(R.id.contactName);
+        imageView = (ImageView) findViewById(R.id.imageView);
         contactNameFromIntent = getIntent().getStringExtra("contactName");
+        contactNameView = (TextView) findViewById(R.id.contactName);
         contactNameView.setText(contactNameFromIntent);
         myOptionsList = new ArrayList<String>();
         myOptionsList.add("Send message");
@@ -107,6 +116,9 @@ public class SingleContactActivity extends Activity {
             }
         });
 
+        contactNameEditText.setSelectAllOnFocus(true);
+
+
     }
 
     @Override
@@ -116,6 +128,42 @@ public class SingleContactActivity extends Activity {
             startActivityForResult(selectedIntent, 0011);
 
     }
+
+    /**
+     * Called after your activity has been stopped, prior to it being started again.
+     * Always followed by onStart()
+     */
+    @Override
+    protected void onRestart() {
+        if (databaseManager == null)
+            databaseManager = new DatabaseManager(this);
+
+        super.onRestart();
+    }
+
+    /**
+     * Called after onRestoreInstanceState(Bundle), onRestart(), or onPause(), for your activity
+     * to start interacting with the user.
+     */
+    @Override
+    protected void onResume() {
+        // init database manager
+        databaseManager = DatabaseManager.getInstance(this);
+
+        super.onResume();
+    }
+
+    /**
+     * Called when you are no longer visible to the user.
+     */
+    @Override
+    protected void onStop() {
+        if (databaseManager != null)
+            databaseManager.closeDbConnections();
+
+        super.onStop();
+    }
+
 
     public void uploadAvatar(View view) {
         if (view.getId() == R.id.imageView) {

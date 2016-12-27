@@ -22,6 +22,7 @@ public class Message {
 
     @NotNull
     private java.util.Date date;
+    private Boolean mine;
     private long conversationId;
 
     @Generated
@@ -33,12 +34,13 @@ public class Message {
     }
 
     @Generated
-    public Message(Long id, String sender, String recipient, String content, java.util.Date date, long conversationId) {
+    public Message(Long id, String sender, String recipient, String content, java.util.Date date, Boolean mine, long conversationId) {
         this.id = id;
         this.sender = sender;
         this.recipient = recipient;
         this.content = content;
         this.date = date;
+        this.mine = mine;
         this.conversationId = conversationId;
     }
 
@@ -88,6 +90,14 @@ public class Message {
         this.date = date;
     }
 
+    public Boolean getMine() {
+        return mine;
+    }
+
+    public void setMine(Boolean mine) {
+        this.mine = mine;
+    }
+
     public long getConversationId() {
         return conversationId;
     }
@@ -99,5 +109,9 @@ public class Message {
     @Override
     public String toString() {
         return content;
+    }
+
+    public boolean isMine() {
+        return mine;
     }
 }

@@ -11,6 +11,8 @@ import com.apap.director.client.component.SignalComponent;
 import com.apap.director.db.dao.module.DaoModule;
 import com.apap.director.im.signal.module.SignalModule;
 import com.apap.director.im.websocket.module.WebSocketModule;
+import com.apap.director.im.domain.message.module.MessageModule;
+import info.guardianproject.netcipher.proxy.OrbotHelper;
 
 public class App extends Application {
 
@@ -33,8 +35,10 @@ public class App extends Application {
                     .daoComponent(daoComponent)
                     .build();
 
-
-
+            OrbotHelper.get(this).init();
+            //OrbotHelper.requestStartTor(this);
+            OrbotHelper.get(this).requestStatus(this);
+        }
 
         }
 

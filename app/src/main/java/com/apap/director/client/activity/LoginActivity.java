@@ -1,12 +1,16 @@
 package com.apap.director.client.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.Toast;
 
 import com.apap.director.client.R;
 import com.romainpiel.shimmer.Shimmer;
@@ -15,13 +19,41 @@ import com.romainpiel.shimmer.ShimmerTextView;
 import butterknife.OnClick;
 
 public class LoginActivity extends Activity {
+import java.io.IOException;
+
+import cz.msebera.android.httpclient.client.HttpClient;
+import cz.msebera.android.httpclient.client.methods.HttpGet;
+import cz.msebera.android.httpclient.impl.client.BasicResponseHandler;
+import info.guardianproject.netcipher.NetCipher;
+import info.guardianproject.netcipher.client.StrongBuilder.Callback;
+import info.guardianproject.netcipher.client.StrongHttpClientBuilder;
+
+public class LoginActivity extends AppCompatActivity implements Callback<HttpClient> {
 
     Shimmer shimmer;
+//    String HS_URL = "http://3zk5ak4bcbfvwgha.onion";
+    String HS_URL = "http://www.wp.pl/static.html";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_view);
+
+        try {
+            StrongHttpClientBuilder builder = new StrongHttpClientBuilder(this);
+            StrongHttpClientBuilder
+                    .forMaxSecurity(this)
+                    .withTorValidation()
+                    .build(this);
+            Log.d("Builder status", String.valueOf(builder.supportsHttpProxy())+"\n"+String.valueOf(builder.supportsSocksProxy())+"\n"+builder.toString());
+        }
+        catch (Exception e) {
+            Toast.makeText(this, R.string.msg_crash, Toast.LENGTH_LONG)
+                    .show();
+            Log.e(getClass().getSimpleName(),
+                    "Exception loading hidden service", e);
+            finish();
+        }
 
         ShimmerTextView shimmerTextView = (ShimmerTextView) findViewById(R.id.shimmer_tv);
         shimmerTextView.setTextColor(new ColorStateList(
@@ -35,6 +67,29 @@ public class LoginActivity extends Activity {
         shimmer = new Shimmer();
         shimmer.start(shimmerTextView);
 
+        getSupportActionBar().show();
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.tor_items, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.tor_conn_on:
+                NetCipher.useTor();
+                return true;
+            case R.id.tor_conn_off:
+                NetCipher.clearProxy();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @OnClick(R.id.postLoginButton)
@@ -43,5 +98,69 @@ public class LoginActivity extends Activity {
             shimmer.cancel();
             Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);
             startActivityForResult(selectedIntent, 0002);
+    }
+
+    @Override
+    public void onConnected(final HttpClient httpClient) {
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    Log.d("HS_URL", HS_URL);
+                    HttpGet get = new HttpGet(HS_URL);
+                    String result = httpClient.execute(get, new BasicResponseHandler());
+
+                    System.out.println(result);
+                } catch (IOException e) {
+                    onConnectionException(e);
+                }
+            }
+        }.start();
+    }
+
+    @Override
+    public void onConnectionException(Exception e) {
+        Log.e(getClass().getSimpleName(),
+                "Exception connecting to hidden service", e);
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(LoginActivity.this, R.string.msg_crash,
+                                Toast.LENGTH_LONG)
+                        .show();
+                finish();
+            }
+        });
+    }
+
+    @Override
+    public void onTimeout() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast
+                        .makeText(LoginActivity.this, R.string.msg_timeout,
+                                Toast.LENGTH_LONG)
+                        .show();
+                Log.d("onTimeout", String.valueOf(R.string.msg_timeout));
+                finish();
+            }
+        });
+    }
+
+    @Override
+    public void onInvalid() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast
+                        .makeText(LoginActivity.this, R.string.msg_invalid,
+                                Toast.LENGTH_LONG)
+                        .show();
+                Log.d("onInvalid", String.valueOf(R.string.msg_invalid));
+                finish();
+            }
+        });
     }
 }

@@ -15,39 +15,6 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="133dp" />
 
-    <EditText
-        android:layout_height="wrap_content"
-        android:id="@+id/password"
-        android:clickable="true"
-        android:contentDescription="Password"
-        android:layout_marginLeft="75dp"
-        android:layout_marginRight="75dp"
-        android:layout_width="match_parent"
-        android:maxLines="1"
-        android:layout_centerVertical="true" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/server"
-        android:clickable="true"
-        android:contentDescription="Server"
-        android:maxLines="1"
-        android:layout_above="@+id/password"
-        android:layout_alignStart="@+id/username"
-        android:layout_alignEnd="@+id/username" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/username"
-        android:clickable="true"
-        android:contentDescription="Username"
-        android:layout_marginLeft="75dp"
-        android:layout_marginRight="75dp"
-        android:maxLines="1"
-        android:layout_above="@+id/server" />
-
     <com.romainpiel.shimmer.ShimmerTextView
         android:id="@+id/shimmer_tv"
         android:text="DirecTor"

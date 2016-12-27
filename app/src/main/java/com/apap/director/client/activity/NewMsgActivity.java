@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -36,6 +37,12 @@ public class NewMsgActivity extends Activity {
     ArrayList<String> messages_list;
     ArrayAdapter<String> arrayAdapter;
     private Long contactIdFromIntent;
+    EditText newMessageField;
+    TextView recipient;
+    ListView messagesView;
+    ArrayAdapter<Message> arrayAdapter;
+    private IDatabaseManager databaseManager;
+    private Long contactIdFromIntent;
     private List<Message> myMessages;
 
 
@@ -54,26 +61,21 @@ public class NewMsgActivity extends Activity {
             recipient.setText(getIntent().getStringExtra("msgTitle"));
         }
 
-        messages_list = new ArrayList<String>();
-            contactIdFromIntent = getIntent().getLongExtra("contactId", 1L);
-            final Conversation conversation = databaseManager.getConversationByContactId(contactIdFromIntent);
-                if (conversation == null)
-                Log.d("conversation", "null");
-            if (conversation.getMessages() != null)
-                myMessages = conversation.getMessages();
+        // init database manager
+        databaseManager = new DatabaseManager(this);
 
-            if (myMessages != null) {
-                Log.v("Conversation messages #", Integer.toString(conversation.getMessages().size()));
-                for (int i = 0; i < conversation.getMessages().size(); i++) {
-                    messages_list.add(conversation.getMessages().get(i).getContent());
-                }
-            }
+        contactIdFromIntent = getIntent().getLongExtra("contactId", 1L);
+        final Conversation conversation = databaseManager.getConversationByContactId(contactIdFromIntent);
+        if (conversation == null)
+            Log.d("conversation", "null");
+        if (conversation.getMessages() != null)
+            myMessages = conversation.getMessages();
 
-            arrayAdapter = new ArrayAdapter<String>(
-                    App.getContext(),
-                    android.R.layout.simple_list_item_1,
-                    messages_list);
-            messagesView.setAdapter(arrayAdapter);
+        if (myMessages != null) {
+            arrayAdapter = new MessageAdapter(this, R.layout.item_chat_left, myMessages);
+        }
+
+        messagesView.setAdapter(arrayAdapter);
     }
 
     @OnItemLongClick(R.id.conversationView)
@@ -81,7 +83,7 @@ public class NewMsgActivity extends Activity {
         Log.v("DTOR/NewMsgActivity", "Deleting message, position: "+position);
         Long messageId = myMessages.get(position).getId();
         databaseManager.deleteMessageById(messageId);
-        messages_list.remove(position);
+        myMessages.remove(position);
         arrayAdapter.notifyDataSetChanged();
         return true;
     }
@@ -92,13 +94,12 @@ public class NewMsgActivity extends Activity {
         Message message = new Message();
         message.setRecipient(String.valueOf(recipient.getText()));
         message.setDate(new Date());
+        message.setMine(true);
 
         String messageText = String.valueOf(newMessageField.getText());
         if ("".equals(messageText)) {
-            messages_list.add("Sending empty message for fun!");
             message.setContent("Sending empty message for fun!");
         } else {
-            messages_list.add(String.valueOf(newMessageField.getText()));
             message.setContent(String.valueOf(newMessageField.getText()));
             Log.v("Message sent", String.valueOf(newMessageField.getText()));
         }
@@ -114,7 +115,7 @@ public class NewMsgActivity extends Activity {
         arrayAdapter.notifyDataSetChanged();
         messagesView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
         messagesView.setStackFromBottom(true);
-
+        newMessageField.setText("");
     }
 
 }

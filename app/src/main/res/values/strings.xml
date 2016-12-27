@@ -7,7 +7,7 @@
     <string name="connect_peer_button">Connect</string>
     <string name="disconnect_peer_button">Disconnect</string>
     <string name="get_file_button">Launch Gallery</string>
-    <string name="empty"></string>
+    <string name="empty"> </string>
     <string name="yes">yes</string>
     <string name="no">no</string>
     <string name="client_text">This device will act as a client. Click on Gallery button to pick a local(stored) file</string>
@@ -16,4 +16,16 @@
     <string name="group_owner_text">"Am I the Group Owner? "</string>
     <string name="label_me">ME</string>
     <string name="label_peers">PEERS</string>
+    <string name="tor_connect">TOR Connection On</string>
+    <string name="tor_disconnect">TOR Connection Off</string>
+    <string name="msg_crash">Exception connecting to hidden service</string>
+    <string name="msg_timeout">Orbot not installed or not connected to within 60 seconds</string>
+    <string name="msg_invalid">Tor connection is established, but validation failed</string>
+    <string name="nfc_button">NFC</string>
+    <string name="bt_button">Bluetooth</string>
+    <string name="title_alert_dialog">NFC TAG DISCOVERED</string>
+    <string name="write_button_label">Write message</string>
+    <string name="read_button_label">Read message</string>
+    <string name="bt_not_found">Bluetooth not found</string>
+    <string name="bt_cancelled">Bluetooth canncelled</string>
 </resources>

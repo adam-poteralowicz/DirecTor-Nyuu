@@ -1,4 +1,4 @@
-package com.apap.director.client.wifi;
+package com.apap.director.client.util.keyExchange;
 
 import android.app.IntentService;
 import android.content.ContentResolver;
@@ -37,10 +37,6 @@ public class FileTransferService extends IntentService {
         super("FileTransferService");
     }
 
-    /*
-     * (non-Javadoc)
-     * @see android.app.IntentService#onHandleIntent(android.content.Intent)
-     */
     @Override
     protected void onHandleIntent(Intent intent) {
 
@@ -70,14 +66,12 @@ public class FileTransferService extends IntentService {
             } catch (IOException e) {
                 Log.e(AddContactActivity.TAG, e.getMessage());
             } finally {
-                if (socket != null) {
-                    if (socket.isConnected()) {
-                        try {
-                            socket.close();
-                        } catch (IOException e) {
-                            // Give up
-                            e.printStackTrace();
-                        }
+                if (socket.isConnected()) {
+                    try {
+                        socket.close();
+                    } catch (IOException e) {
+                        // Give up
+                        e.printStackTrace();
                     }
                 }
             }
