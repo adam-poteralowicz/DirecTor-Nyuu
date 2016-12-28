@@ -9,5 +9,5 @@ public class SignedKey extends RealmObject {
     private long id;
     private int signedKeyId;
     private byte[] serializedKey;
-    private String identityName;
+    private Account account;
 }

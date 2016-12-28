@@ -1,37 +1,56 @@
 package com.apap.director.im;
 
 
-import android.accounts.Account;
+import android.util.Base64;
 
-import com.apap.director.db.manager.DatabaseManager;
+import com.apap.director.db.realm.model.Account;
+import com.apap.director.db.realm.model.Contact;
+import com.apap.director.db.realm.model.Message;
+import com.apap.director.db.realm.model.OneTimeKey;
 
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.util.KeyHelper;
 
-import javax.inject.Inject;
+import io.realm.Realm;
+import io.realm.RealmList;
+import io.realm.RealmResults;
 
-import static org.whispersystems.libsignal.util.KeyHelper.generateIdentityKeyPair;
 
 public class AccountManager {
 
+    private Realm realm;
 
-    private DatabaseManager manager;
-
-    @Inject
-    public AccountManager(DatabaseManager manager){
-        this.manager = manager;
+    public AccountManager() {
+        this.realm = Realm.getDefaultInstance();
     }
 
-    public void createAccount(String name){
+    public boolean createAccount(String name){
+
+        Account sameName = realm.where(Account.class).equalTo("name", name).findFirst();
+        if(sameName != null) return false;
 
         IdentityKeyPair identityKeyPair = KeyHelper.generateIdentityKeyPair();
         int registrationId  = KeyHelper.generateRegistrationId(false);
 
+        realm.beginTransaction();
+            Account account = realm.createObject(Account.class);
+            account.setKeyPair(identityKeyPair.serialize());
+            account.setName(name);
+            account.setRegistrationId(registrationId);
+        realm.commitTransaction();
 
+        return true;
 
     }
 
+    public boolean deleteAccount(String name){
+        realm.beginTransaction();
+            RealmResults<OneTimeKey> oneTimeKeys = realm.where(OneTimeKey.class).equalTo("account.name", name).findAll();
+            oneTimeKeys.deleteAllFromRealm();
+        realm.commitTransaction();
 
+        return false;
+    }
 
 
 }

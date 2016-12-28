@@ -12,4 +12,5 @@ public class Message extends RealmObject {
     private String content;
     private Date date;
     private Boolean mine;
+    private Account account;
 }

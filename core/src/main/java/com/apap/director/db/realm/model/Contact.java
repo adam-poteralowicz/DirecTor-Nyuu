@@ -10,6 +10,6 @@ public class Contact extends RealmObject {
     private long id;
     private String name;
     private Conversation conversation;
-    private RealmList<Address> adresses;
+    private RealmList<ContactKey> contactKeys;
 
 }

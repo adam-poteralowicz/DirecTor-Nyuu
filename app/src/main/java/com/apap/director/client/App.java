@@ -12,6 +12,7 @@ import com.apap.director.db.dao.module.DaoModule;
 import com.apap.director.im.signal.module.SignalModule;
 import com.apap.director.im.websocket.module.WebSocketModule;
 import info.guardianproject.netcipher.proxy.OrbotHelper;
+import io.realm.Realm;
 
 public class App extends Application {
 
@@ -23,6 +24,8 @@ public class App extends Application {
         public void onCreate() {
             super.onCreate();
             mContext = App.this;
+
+            Realm.init(this);
 
             daoComponent = DaggerDaoComponent.builder()
                     .daoModule(new DaoModule(this))
