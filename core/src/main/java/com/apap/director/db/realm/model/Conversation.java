@@ -18,4 +18,10 @@ public class Conversation extends RealmObject {
     private RealmList<Message> messages;
     private Session session;
     private Account account;
+
+    @Override
+    public String toString() {
+        return getContact().toString();
+        //return getContact().getName();
+    }
 }

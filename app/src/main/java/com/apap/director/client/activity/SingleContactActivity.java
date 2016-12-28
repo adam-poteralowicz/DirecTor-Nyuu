@@ -20,9 +20,9 @@ import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.db.dao.model.Contact;
-import com.apap.director.db.dao.model.Conversation;
 import com.apap.director.db.manager.DatabaseManager;
+import com.apap.director.db.realm.model.Contact;
+import com.apap.director.db.realm.model.Conversation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +31,8 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class SingleContactActivity extends Activity {
 
@@ -45,12 +47,15 @@ public class SingleContactActivity extends Activity {
     String contactNameFromIntent;
     Long contactIdFromIntent;
     EditText contactNameEditText;
+    private Realm realm;
 
     public void onCreate(Bundle savedInstanceState) {
 
         setContentView(R.layout.single_contact_view);
         ((App) getApplication()).getDaoComponent().inject(this);
         ButterKnife.bind(this);
+        Realm.init(this);
+        realm = Realm.getDefaultInstance();
 
         super.onCreate(savedInstanceState);
 
@@ -84,11 +89,11 @@ public class SingleContactActivity extends Activity {
                 switch (position) {
                     case 0:
                     {
-                        if (databaseManager.getConversationByContactId(contactIdFromIntent) == null) {
+                        if (realm.where(Conversation.class).equalTo("contact.id", contactIdFromIntent).findFirst() == null) {
+                            realm.beginTransaction();
                             Conversation conversation = new Conversation();
-                            conversation.setRecipient(contactNameFromIntent);
-                            conversation.setContactId(contactIdFromIntent);
-                            databaseManager.insertOrUpdateConversation(conversation);
+                            conversation.setContact(realm.where(Contact.class).equalTo("contactId", contactIdFromIntent).findFirst());
+                            realm.commitTransaction();
                         }
 
                         intent = new Intent(App.getContext(), NewMsgActivity.class);
@@ -99,7 +104,9 @@ public class SingleContactActivity extends Activity {
                     }
                     case 1:
                     {
-                        databaseManager.deleteContactById(contactIdFromIntent);
+                        realm.beginTransaction();
+                        realm.where(Contact.class).equalTo("id", contactIdFromIntent).findFirst().deleteFromRealm();
+                        realm.commitTransaction();
                         intent = new Intent(App.getContext(), AuthUserActivity.class);
                         startActivity(intent);
                         break;
@@ -147,9 +154,10 @@ public class SingleContactActivity extends Activity {
             assert cursor != null;
             cursor.moveToFirst();
             String imagePath = cursor.getString(cursor.getColumnIndex(filePath[0]));
-            Contact contact = databaseManager.getContactByName(contactNameFromIntent);
+            realm.beginTransaction();
+            Contact contact = realm.where(Contact.class).equalTo("name", contactNameFromIntent).findFirst();
             contact.setImage(imagePath);
-            databaseManager.updateContact(contact);
+            realm.commitTransaction();
 
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inPreferredConfig = Bitmap.Config.ARGB_8888;
@@ -163,8 +171,8 @@ public class SingleContactActivity extends Activity {
     }
 
     public void checkIfAvatarExists() {
-        if (databaseManager.getContactByName(contactNameFromIntent).getImage() != null) {
-            String imagePath = databaseManager.getContactByName(contactNameFromIntent).getImage();
+        if (realm.where(Contact.class).equalTo("id", contactIdFromIntent).findFirst().getImage() != null) {
+            String imagePath = realm.where(Contact.class).equalTo("id", contactIdFromIntent).findFirst().getImage();
             Log.v("Image path: ", imagePath);
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inPreferredConfig = Bitmap.Config.ARGB_8888;

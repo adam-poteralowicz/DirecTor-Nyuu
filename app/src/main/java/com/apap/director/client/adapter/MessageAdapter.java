@@ -8,7 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.apap.director.client.R;
-import com.apap.director.db.dao.model.Message;
+import com.apap.director.db.realm.model.Message;
 
 import java.util.List;
 

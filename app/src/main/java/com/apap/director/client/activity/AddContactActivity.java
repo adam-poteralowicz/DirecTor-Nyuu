@@ -32,16 +32,18 @@ import com.apap.director.client.R;
 import com.apap.director.client.fragment.DeviceDetailFragment;
 import com.apap.director.client.fragment.DeviceListFragment;
 import com.apap.director.db.manager.DatabaseManager;
-import com.apap.director.db.dao.model.Contact;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.realm.Realm;
+
 import com.apap.director.client.util.BTUtils;
 import com.apap.director.client.util.NFCUtils;
 import com.apap.director.client.util.keyExchange.WiFiDirectBroadcastReceiver;
+import com.apap.director.db.realm.model.Contact;
 
 
 import java.util.List;
@@ -59,24 +61,25 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
     private final IntentFilter intentFilter = new IntentFilter();
     private WifiP2pManager.Channel channel;
     private BroadcastReceiver receiver = null;
-
-    public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
-        this.isWifiP2pEnabled = isWifiP2pEnabled;
-    }
-
     public NfcAdapter _nfcAdapter;
     public Intent _intent;
     public PendingIntent _pendingIntent;
     public IntentFilter[] _readIntentFilters, _writeIntentFilters;
     private final String _MIME_TYPE = "text/plain";
-
     private String publicKey = "myUltraAwesomePublicKey";
+    private Realm realm;
 
+
+    public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
+        this.isWifiP2pEnabled = isWifiP2pEnabled;
+    }
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_contact_view);
         ButterKnife.bind(this);
+        Realm.init(this);
+        realm = Realm.getDefaultInstance();
 
         newContactName = (EditText) findViewById(R.id.newContactName);
         newContactName.setHint("CONTACT NAME");
@@ -212,13 +215,14 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
     public void onClick() {
         if ((String.valueOf(newContactName.getText()).matches(".*\\w.*")
                 && (String.valueOf(newContactName.getText().charAt(0))).trim().length() > 0)) {
-                Contact contact = new Contact();
+            realm.beginTransaction();
+                Contact contact = realm.createObject(Contact.class);
                 contact.setName(String.valueOf(newContactName.getText()));
-                databaseManager.insertContact(contact);
+            realm.commitTransaction();
 
-                Intent selectedIntent = new Intent(AddContactActivity.this, AuthUserActivity.class);
-                startActivityForResult(selectedIntent, 13);
-            }
+            Intent selectedIntent = new Intent(AddContactActivity.this, AuthUserActivity.class);
+            startActivityForResult(selectedIntent, 13);
+        }
     }
 
 
@@ -267,10 +271,6 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
         return true;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
-     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
