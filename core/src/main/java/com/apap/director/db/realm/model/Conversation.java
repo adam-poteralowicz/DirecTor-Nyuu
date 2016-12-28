@@ -15,5 +15,5 @@ public class Conversation extends RealmObject {
     private Contact contact;
     private RealmList<Message> messages;
     private Session session;
-
+    private String recipient;
 }

@@ -3,13 +3,13 @@ package com.apap.director.db.realm.model;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
-public class Session extends RealmObject {
+
+public class Address extends RealmObject {
 
     @PrimaryKey
     private long id;
-    private Conversation conversation;
-    private int deviceId;
-    private String name;
+
+    private Contact contact;
     private byte[] serializedKey;
-    private String identityName;
+    private int deviceId;
 }
