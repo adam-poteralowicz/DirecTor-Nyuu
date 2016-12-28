@@ -18,6 +18,7 @@ import com.apap.director.client.activity.NewMsgActivity;
 import com.apap.director.db.manager.DatabaseManager;
 import com.apap.director.db.manager.IDatabaseManager;
 import com.apap.director.db.dao.model.Conversation;
+import com.apap.director.db.realm.model.Message;
 
 import java.util.ArrayList;
 
@@ -27,6 +28,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnItemClick;
 import butterknife.OnItemLongClick;
+import io.realm.Realm;
+import io.realm.RealmChangeListener;
+import io.realm.RealmResults;
 
 public class InboxFragment extends Fragment {
 
@@ -48,6 +52,8 @@ public class InboxFragment extends Fragment {
     public void onActivityCreated(final Bundle savedInstanceState) {
         ((App) getActivity().getApplication()).getDaoComponent().inject(this);
         super.onActivityCreated(savedInstanceState);
+        Realm.init(this.getContext());
+        Realm realm = Realm.getDefaultInstance();
 
         conversationList = databaseManager.listConversations();
         arrayAdapter = new ArrayAdapter<Conversation>(
@@ -59,6 +65,14 @@ public class InboxFragment extends Fragment {
 
         msgListView.setAdapter(arrayAdapter);
 
+        final RealmResults<Message> messages = realm.where(Message.class).findAll();
+        messages.addChangeListener(new RealmChangeListener<RealmResults<Message>>() {
+            @Override
+            public void onChange(RealmResults<com.apap.director.db.realm.model.Message> results) {
+                // Query results are updated in real time
+                messages.size();
+            }
+        });
 
     }
 

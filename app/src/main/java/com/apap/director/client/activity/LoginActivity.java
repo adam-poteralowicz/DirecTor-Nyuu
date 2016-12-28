@@ -75,8 +75,9 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
         ));
         shimmer = new Shimmer();
         shimmer.start(shimmerTextView);
-
         getSupportActionBar().show();
+
+
 
     }
 
