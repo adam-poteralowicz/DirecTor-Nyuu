@@ -8,9 +8,12 @@ import com.apap.director.db.realm.model.Message;
 import com.apap.director.db.realm.model.OneTimeKey;
 import com.apap.director.db.realm.model.Session;
 import com.apap.director.db.realm.model.SignedKey;
+import com.apap.director.db.rest.service.UserService;
 
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.util.KeyHelper;
+
+import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -19,9 +22,15 @@ import io.realm.RealmResults;
 public class AccountManager {
 
     private Realm realm;
+    private UserService userService;
 
-    public AccountManager() {
+    public AccountManager(UserService userService) {
         this.realm = Realm.getDefaultInstance();
+    }
+
+    public ArrayList<Account> listAllAccounts(){
+        RealmResults<Account> accounts = realm.where(Account.class).findAll();
+        return new ArrayList<Account>(accounts);
     }
 
     public boolean createAccount(String name){
