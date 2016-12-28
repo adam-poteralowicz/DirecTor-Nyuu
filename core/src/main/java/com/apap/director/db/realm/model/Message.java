@@ -3,7 +3,13 @@ package com.apap.director.db.realm.model;
 import java.util.Date;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class Message extends RealmObject {
     @PrimaryKey
     private long id;
@@ -13,4 +19,9 @@ public class Message extends RealmObject {
     private Date date;
     private Boolean mine;
     private Account account;
+
+    public Boolean isMine() {
+        return mine;
+    }
 }
+

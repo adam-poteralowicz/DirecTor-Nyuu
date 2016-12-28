@@ -3,7 +3,13 @@ package com.apap.director.db.realm.model;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class Account extends RealmObject {
 
     @PrimaryKey
@@ -17,42 +23,6 @@ public class Account extends RealmObject {
     private SignedKey signedKey;
     private RealmList<Session> sessions;
     private boolean active;
-
-    public Account() {
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public String getName() {
-
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public byte[] getKeyPair() {
-        return keyPair;
-    }
-
-    public void setKeyPair(byte[] keyPair) {
-        this.keyPair = keyPair;
-    }
-
-    public int getRegistrationId() {
-        return registrationId;
-    }
-
-    public void setRegistrationId(int registrationId) {
-        this.registrationId = registrationId;
-    }
 
     public RealmList<Contact> getContacts() {
         return contacts;

@@ -3,11 +3,13 @@ package com.apap.director.db.realm.model;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-/**
- * Created by Ala on 28/12/2016.
- */
-
+@Getter
+@Setter
+@NoArgsConstructor
 public class Conversation extends RealmObject {
 
     @PrimaryKey
