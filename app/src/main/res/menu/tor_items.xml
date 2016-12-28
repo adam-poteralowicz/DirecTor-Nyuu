@@ -4,13 +4,19 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <item
+        android:id="@+id/swapId"
+        android:icon="@drawable/ic_swap_id"
+        android:title="@string/new_identity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:showAsAction="ifRoom|withText" />
+    <item
         android:id="@+id/tor_conn_on"
         android:icon="@drawable/ic_tor_on"
         android:title="@string/tor_connect"
         app:showAsAction="ifRoom|withText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-
     <item
         android:id="@+id/tor_conn_off"
         android:icon="@drawable/ic_tor_off"
@@ -19,10 +25,4 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <item
-        android:id="@+id/swapId"
-        android:icon="@drawable/ic_swap_id"
-        android:title="@string/new_identity"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
 </menu>
