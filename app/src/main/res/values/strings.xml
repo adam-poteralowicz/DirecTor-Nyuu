@@ -16,8 +16,9 @@
     <string name="group_owner_text">"Am I the Group Owner? "</string>
     <string name="label_me">ME</string>
     <string name="label_peers">PEERS</string>
-    <string name="tor_connect">TOR Connection On</string>
-    <string name="tor_disconnect">TOR Connection Off</string>
+    <string name="tor_connect">TOR On</string>
+    <string name="tor_disconnect">TOR Off</string>
+    <string name="new_identity">New Identity</string>
     <string name="msg_crash">Exception connecting to hidden service</string>
     <string name="msg_timeout">Orbot not installed or not connected to within 60 seconds</string>
     <string name="msg_invalid">Tor connection is established, but validation failed</string>

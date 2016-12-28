@@ -18,4 +18,11 @@
         app:showAsAction="ifRoom|withText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
+    <item
+        android:id="@+id/swapId"
+        android:icon="@drawable/ic_swap_id"
+        android:title="@string/new_identity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 </menu>

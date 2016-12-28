@@ -86,6 +86,9 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
             case R.id.tor_conn_off:
                 NetCipher.clearProxy();
                 return true;
+            case R.id.swapId:
+                Toast.makeText(this, "Poof! New identity! (Just kidding)", Toast.LENGTH_LONG).show();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
