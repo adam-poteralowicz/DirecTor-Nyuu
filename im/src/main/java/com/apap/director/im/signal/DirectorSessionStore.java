@@ -16,8 +16,12 @@ import javax.inject.Inject;
 
 public class DirectorSessionStore implements SessionStore {
 
+    private DatabaseManager manager;
+
     @Inject
-    public DatabaseManager manager;
+    public DirectorSessionStore(DatabaseManager manager) {
+        this.manager = manager;
+    }
 
     @Override
     public SessionRecord loadSession(SignalProtocolAddress address) {

@@ -73,6 +73,7 @@ public class InboxFragment extends Fragment {
     @OnItemLongClick(R.id.msgList)
     public boolean deleteConversation(int position){
         //TODO: Lepiej kasowac konwersacje po id
+        conversationList.get(position).getId();
         databaseManager.deleteConversationByRecipient(conversationList.get(position).getRecipient());
         conversationList.remove(position);
         arrayAdapter.notifyDataSetChanged();

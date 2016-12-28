@@ -13,11 +13,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.apap.director.client.App;
 import com.apap.director.client.R;
+import com.apap.director.im.websocket.service.StompService;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
 
 import java.io.IOException;
+
+import javax.inject.Inject;
 
 import butterknife.OnClick;
 import cz.msebera.android.httpclient.client.HttpClient;
@@ -26,6 +30,7 @@ import cz.msebera.android.httpclient.impl.client.BasicResponseHandler;
 import info.guardianproject.netcipher.NetCipher;
 import info.guardianproject.netcipher.client.StrongBuilder;
 import info.guardianproject.netcipher.client.StrongHttpClientBuilder;
+import ua.naiksoftware.stomp.Stomp;
 
 public class LoginActivity extends AppCompatActivity implements StrongBuilder.Callback<HttpClient> {
 
@@ -33,10 +38,15 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
 //    String HS_URL = "http://3zk5ak4bcbfvwgha.onion";
     String HS_URL = "http://www.wp.pl/static.html";
 
+    @Inject
+    StompService service;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_view);
+        ((App) getApplication()).getSignalComponent().inject(this);
+
 
         try {
             StrongHttpClientBuilder builder = new StrongHttpClientBuilder(this);
@@ -97,7 +107,9 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
     @OnClick(R.id.postLoginButton)
     public void onClick(View view) {
         // TODO: Save new user upon first login
-            shimmer.cancel();
+        service.connect();
+
+        shimmer.cancel();
             Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);
             startActivityForResult(selectedIntent, 0002);
     }

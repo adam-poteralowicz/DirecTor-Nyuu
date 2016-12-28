@@ -1,5 +1,6 @@
 package com.apap.director.client.component;
 
+import com.apap.director.client.activity.LoginActivity;
 import com.apap.director.db.manager.DatabaseManager;
 import com.apap.director.im.signal.module.ApplicationScope;
 import com.apap.director.im.websocket.module.WebSocketModule;
@@ -15,4 +16,5 @@ import dagger.Component;
 public interface SignalComponent {
 
     void inject(StompService stompService);
+    void inject(LoginActivity loginActivity);
 }

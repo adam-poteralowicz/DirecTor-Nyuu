@@ -1,5 +1,7 @@
 package com.apap.director.im.websocket.service;
 
+import android.util.Log;
+
 import com.apap.director.im.config.IMConfig;
 import com.apap.director.im.signal.DirectorIdentityKeyStore;
 import com.apap.director.im.signal.DirectorPreKeyStore;
@@ -12,30 +14,27 @@ import javax.inject.Inject;
 
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.client.StompClient;
+import ua.naiksoftware.stomp.client.StompMessage;
 
 public class StompService {
 
     private StompClient client;
 
-    @Inject
-    public DirectorPreKeyStore preKeyStore;
+    MessageAction messageAction;
 
     @Inject
-    public DirectorSessionStore sessionStore;
+    public StompService(MessageAction messageAction) {
+        this.messageAction = messageAction;
+        client = Stomp.over(WebSocket.class, "ws://"+ IMConfig.SERVER_IP+":7500" + IMConfig.WEBSOCKET_ENDPOINT+"/websocket");
 
-    @Inject
-    public DirectorIdentityKeyStore identityKeyStore;
-
-    @Inject
-    public DirectorSignedPreKeyStore signedPreKeyStore;
-
-    public StompService() {
-        client = Stomp.over(WebSocket.class, "ws://"+ IMConfig.SERVER_IP + IMConfig.WEBSOCKET_ENDPOINT+ "/websocket");
     }
 
     public void connect(){
+        Log.v("HAI", "Connecting to websocket...");
         client.connect();
-        //client.topic("/user/queue").subscribe(new MessageAction(), new ErrorAction());
+        Log.v("HAI", "connected: " + client.isConnected());
+        client.topic("/topic/greetings").subscribe(messageAction, new ErrorAction());
+        client.send("/app/hello", "hai");
 
     }
 

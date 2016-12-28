@@ -7,6 +7,8 @@ import com.apap.director.im.signal.DirectorIdentityKeyStore;
 import com.apap.director.im.signal.DirectorPreKeyStore;
 import com.apap.director.im.signal.DirectorSessionStore;
 import com.apap.director.im.signal.DirectorSignedPreKeyStore;
+import com.apap.director.im.websocket.service.MessageAction;
+import com.apap.director.im.websocket.service.StompService;
 
 import javax.inject.Singleton;
 
@@ -30,20 +32,31 @@ public class SignalModule {
 
     @Provides
     @ApplicationScope
-    public DirectorPreKeyStore providePreKeyStore(){
-        return new DirectorPreKeyStore();
+    public DirectorPreKeyStore providePreKeyStore(DatabaseManager databaseManager){
+        return new DirectorPreKeyStore(databaseManager);
     }
 
     @Provides
     @ApplicationScope
-    public DirectorSessionStore provideSessionStore(){
-        return new DirectorSessionStore();
+    public DirectorSessionStore provideSessionStore(DatabaseManager databaseManager){
+        return new DirectorSessionStore(databaseManager);
     }
 
     @Provides
     @ApplicationScope
-    public DirectorSignedPreKeyStore provideSignedPreKeyStore(){
-        return new DirectorSignedPreKeyStore();
+    public DirectorSignedPreKeyStore provideSignedPreKeyStore(DatabaseManager databaseManager){
+        return new DirectorSignedPreKeyStore(databaseManager);
     }
 
+    @Provides
+    @ApplicationScope
+    public StompService stompService(MessageAction messageAction){
+        return new StompService(messageAction);
+    }
+
+
+    @Provides
+    public MessageAction messageAction(DatabaseManager manager, DirectorPreKeyStore preKeyStore, DirectorSessionStore sessionStore, DirectorIdentityKeyStore identityKeyStore, DirectorSignedPreKeyStore signedPreKeyStore) {
+        return new MessageAction(manager, preKeyStore, identityKeyStore, sessionStore, signedPreKeyStore);
+    }
 }

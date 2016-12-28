@@ -16,8 +16,12 @@ import javax.inject.Inject;
 
 public class DirectorSignedPreKeyStore implements SignedPreKeyStore {
 
+    private DatabaseManager manager;
+
     @Inject
-    public DatabaseManager manager;
+    public DirectorSignedPreKeyStore(DatabaseManager manager) {
+        this.manager = manager;
+    }
 
     @Override
     public SignedPreKeyRecord loadSignedPreKey(int signedPreKeyId) throws InvalidKeyIdException {

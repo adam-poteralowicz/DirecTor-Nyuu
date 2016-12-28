@@ -13,9 +13,5 @@ public class WebSocketModule {
     public WebSocketModule(){
     }
 
-    @Provides
-    @Singleton
-    public StompService provideStompService(){
-        return new StompService();
-    }
+
 }
