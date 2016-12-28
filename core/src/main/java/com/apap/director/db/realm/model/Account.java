@@ -16,7 +16,7 @@ public class Account extends RealmObject {
     private RealmList<OneTimeKey> oneTimeKeys;
     private SignedKey signedKey;
     private RealmList<Session> sessions;
-
+    private boolean active;
 
     public Account() {
     }
@@ -84,5 +84,13 @@ public class Account extends RealmObject {
 
     public void setSessions(RealmList<Session> sessions) {
         this.sessions = sessions;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }
