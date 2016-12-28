@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -16,9 +15,7 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.activity.NewMsgActivity;
 import com.apap.director.db.manager.DatabaseManager;
-import com.apap.director.db.manager.IDatabaseManager;
-import com.apap.director.db.dao.model.Conversation;
-import com.apap.director.db.realm.model.Message;
+import com.apap.director.db.realm.model.Conversation;
 
 import java.util.ArrayList;
 
@@ -37,6 +34,7 @@ public class InboxFragment extends Fragment {
     @Inject DatabaseManager databaseManager;
     private ArrayList<Conversation> conversationList;
     private ArrayAdapter<Conversation> arrayAdapter;
+    private Realm realm;
     @BindView(R.id.msgList) ListView msgListView;
 
     @Override
@@ -52,8 +50,11 @@ public class InboxFragment extends Fragment {
     public void onActivityCreated(final Bundle savedInstanceState) {
         ((App) getActivity().getApplication()).getDaoComponent().inject(this);
         super.onActivityCreated(savedInstanceState);
+        Realm.init(this.getContext());
+        realm = Realm.getDefaultInstance();
 
-        conversationList = databaseManager.listConversations();
+        RealmResults<Conversation> conversationResults = realm.where(Conversation.class).findAll();
+        conversationList.addAll(realm.copyFromRealm(conversationResults));
         arrayAdapter = new ArrayAdapter<Conversation>(
                 getActivity(),
                 android.R.layout.simple_list_item_1,
@@ -63,9 +64,7 @@ public class InboxFragment extends Fragment {
 
         msgListView.setAdapter(arrayAdapter);
 
-        Realm.init(this.getContext());
-        Realm realm = Realm.getDefaultInstance();
-        final RealmResults<com.apap.director.db.realm.model.Conversation> conversations = realm.where(com.apap.director.db.realm.model.Conversation.class).findAll();
+        final RealmResults<Conversation> conversations = realm.where(Conversation.class).findAll();
         conversations.addChangeListener(new RealmChangeListener<RealmResults<com.apap.director.db.realm.model.Conversation>>() {
             @Override
             public void onChange(RealmResults<com.apap.director.db.realm.model.Conversation> results) {
@@ -77,17 +76,15 @@ public class InboxFragment extends Fragment {
 
     @OnItemClick(R.id.msgList)
     public void startSendMessageActivity(int position){
-        Toast.makeText(getActivity(), conversationList.get(position).getRecipient(), Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity(), conversationList.get(position).getContact().getName(), Toast.LENGTH_LONG).show();
         Intent intent = new Intent(getActivity(), NewMsgActivity.class);
-        intent.putExtra("msgTitle", conversationList.get(position).getRecipient());
+        intent.putExtra("msgTitle", conversationList.get(position).getContact().getName());
         startActivity(intent);
     }
 
     @OnItemLongClick(R.id.msgList)
     public boolean deleteConversation(int position){
-        //TODO: Lepiej kasowac konwersacje po id
-        conversationList.get(position).getId();
-        databaseManager.deleteConversationByRecipient(conversationList.get(position).getRecipient());
+        realm.where(Conversation.class).equalTo("contact.id", conversationList.get(position).getContact().getId()).findFirst().deleteFromRealm();
         conversationList.remove(position);
         arrayAdapter.notifyDataSetChanged();
         return true;

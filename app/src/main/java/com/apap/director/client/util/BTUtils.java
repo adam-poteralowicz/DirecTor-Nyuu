@@ -9,10 +9,6 @@ import com.apap.director.client.R;
 
 import java.util.List;
 
-/**
- * Created by Adam on 2016-12-13.
- */
-
 public class BTUtils {
     public static final int DISCOVER_DURATION = 300;
 

@@ -17,5 +17,10 @@ public class Contact extends RealmObject {
     private String name;
     private Conversation conversation;
     private RealmList<ContactKey> contactKeys;
+    private String image;
 
+    @Override
+    public String toString() {
+        return name;
+    }
 }

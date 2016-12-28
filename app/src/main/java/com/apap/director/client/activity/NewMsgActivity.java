@@ -12,15 +12,15 @@ import android.widget.TextView;
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.adapter.MessageAdapter;
-import com.apap.director.db.dao.model.Conversation;
-import com.apap.director.db.dao.model.Message;
 import com.apap.director.db.manager.DatabaseManager;
+import com.apap.director.db.realm.model.Contact;
+import com.apap.director.db.realm.model.Message;
+import com.apap.director.db.realm.model.Conversation;
 
 import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnItemLongClick;
@@ -37,6 +37,7 @@ public class NewMsgActivity extends Activity {
     ArrayAdapter<Message> arrayAdapter;
     private Long contactIdFromIntent;
     private List<Message> myMessages;
+    private Realm realm;
 
     //TODO: Split this method
 
@@ -46,6 +47,8 @@ public class NewMsgActivity extends Activity {
         ((App) getApplication()).getDaoComponent().inject(this);
         setContentView(R.layout.new_msg_view);
         ButterKnife.bind(this);
+        Realm.init(this);
+        realm = Realm.getDefaultInstance();
 
         if (getIntent().getStringExtra("recipient") != null) {
             recipient.setText(getIntent().getStringExtra("recipient"));
@@ -57,7 +60,7 @@ public class NewMsgActivity extends Activity {
         databaseManager = new DatabaseManager(this);
 
         contactIdFromIntent = getIntent().getLongExtra("contactId", 1L);
-        final Conversation conversation = databaseManager.getConversationByContactId(contactIdFromIntent);
+        final Conversation conversation = realm.where(Conversation.class).equalTo("contactId", contactIdFromIntent).findFirst();
         if (conversation == null)
             Log.d("conversation", "null");
         if (conversation.getMessages() != null)
@@ -66,12 +69,11 @@ public class NewMsgActivity extends Activity {
         if (myMessages != null) {
             arrayAdapter = new MessageAdapter(this, R.layout.item_chat_left, myMessages);
         }
-
         messagesView.setAdapter(arrayAdapter);
 
         Realm.init(this);
         Realm realm = Realm.getDefaultInstance();
-        final RealmResults<com.apap.director.db.realm.model.Message> messages = realm.where(com.apap.director.db.realm.model.Message.class).findAll();
+        final RealmResults<Message> messages = realm.where(Message.class).findAll();
         messages.addChangeListener(new RealmChangeListener<RealmResults<com.apap.director.db.realm.model.Message>>() {
             @Override
             public void onChange(RealmResults<com.apap.director.db.realm.model.Message> results) {
@@ -84,7 +86,9 @@ public class NewMsgActivity extends Activity {
     public boolean deleteMessage(int position){
         Log.v("DTOR/NewMsgActivity", "Deleting message, position: "+position);
         Long messageId = myMessages.get(position).getId();
-        databaseManager.deleteMessageById(messageId);
+        realm.beginTransaction();
+        realm.where(Message.class).equalTo("id", messageId).findFirst().deleteFromRealm();
+        realm.commitTransaction();
         myMessages.remove(position);
         arrayAdapter.notifyDataSetChanged();
         return true;
@@ -92,8 +96,9 @@ public class NewMsgActivity extends Activity {
 
     public void onClick(View view) {
 
-        Conversation conversation = databaseManager.getConversationByContactId(contactIdFromIntent);
-        Message message = new Message();
+        realm.beginTransaction();
+        Conversation conversation = realm.where(Conversation.class).equalTo("contactId", contactIdFromIntent).findFirst();
+        Message message = realm.createObject(Message.class);
         message.setRecipient(String.valueOf(recipient.getText()));
         message.setDate(new Date());
         message.setMine(true);
@@ -106,13 +111,10 @@ public class NewMsgActivity extends Activity {
             Log.v("Message sent", String.valueOf(newMessageField.getText()));
         }
 
-        conversation.setContactId(contactIdFromIntent);
-        conversation.setRecipient(message.getRecipient());
-        message.setConversationId(conversation.getId());
-
+        conversation.setContact(realm.where(Contact.class).equalTo("contactId", contactIdFromIntent).findFirst());
+        message.setConversation(conversation);
+        realm.commitTransaction();
         myMessages.add(message);
-        databaseManager.insertOrUpdateMessage(message);
-        databaseManager.insertOrUpdateConversation(conversation);
 
         arrayAdapter.notifyDataSetChanged();
         messagesView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);

@@ -19,9 +19,15 @@ public class Message extends RealmObject {
     private Date date;
     private Boolean mine;
     private Account account;
+    private Conversation conversation;
 
     public Boolean isMine() {
         return mine;
+    }
+
+    @Override
+    public String toString() {
+        return content;
     }
 }
 
