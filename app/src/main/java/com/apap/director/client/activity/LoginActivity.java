@@ -15,6 +15,8 @@ import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
+import com.apap.director.db.realm.model.Account;
+import com.apap.director.db.realm.model.Conversation;
 import com.apap.director.im.websocket.service.StompService;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
@@ -30,6 +32,9 @@ import cz.msebera.android.httpclient.impl.client.BasicResponseHandler;
 import info.guardianproject.netcipher.NetCipher;
 import info.guardianproject.netcipher.client.StrongBuilder;
 import info.guardianproject.netcipher.client.StrongHttpClientBuilder;
+import io.realm.Realm;
+import io.realm.RealmChangeListener;
+import io.realm.RealmResults;
 import ua.naiksoftware.stomp.Stomp;
 
 public class LoginActivity extends AppCompatActivity implements StrongBuilder.Callback<HttpClient> {
@@ -77,7 +82,15 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
         shimmer.start(shimmerTextView);
         getSupportActionBar().show();
 
-
+        Realm.init(this);
+        Realm realm = Realm.getDefaultInstance();
+        final RealmResults<Account> accounts = realm.where(Account.class).findAll();
+        accounts.addChangeListener(new RealmChangeListener<RealmResults<Account>>() {
+            @Override
+            public void onChange(RealmResults<Account> results) {
+                accounts.size();
+            }
+        });
 
     }
 

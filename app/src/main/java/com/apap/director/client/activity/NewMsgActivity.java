@@ -46,8 +46,6 @@ public class NewMsgActivity extends Activity {
         ((App) getApplication()).getDaoComponent().inject(this);
         setContentView(R.layout.new_msg_view);
         ButterKnife.bind(this);
-        Realm.init(this);
-        Realm realm = Realm.getDefaultInstance();
 
         if (getIntent().getStringExtra("recipient") != null) {
             recipient.setText(getIntent().getStringExtra("recipient"));
@@ -71,11 +69,12 @@ public class NewMsgActivity extends Activity {
 
         messagesView.setAdapter(arrayAdapter);
 
+        Realm.init(this);
+        Realm realm = Realm.getDefaultInstance();
         final RealmResults<com.apap.director.db.realm.model.Message> messages = realm.where(com.apap.director.db.realm.model.Message.class).findAll();
         messages.addChangeListener(new RealmChangeListener<RealmResults<com.apap.director.db.realm.model.Message>>() {
             @Override
             public void onChange(RealmResults<com.apap.director.db.realm.model.Message> results) {
-                // Query results are updated in real time
                 messages.size();
             }
         });

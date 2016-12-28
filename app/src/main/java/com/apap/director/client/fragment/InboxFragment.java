@@ -52,8 +52,6 @@ public class InboxFragment extends Fragment {
     public void onActivityCreated(final Bundle savedInstanceState) {
         ((App) getActivity().getApplication()).getDaoComponent().inject(this);
         super.onActivityCreated(savedInstanceState);
-        Realm.init(this.getContext());
-        Realm realm = Realm.getDefaultInstance();
 
         conversationList = databaseManager.listConversations();
         arrayAdapter = new ArrayAdapter<Conversation>(
@@ -65,12 +63,13 @@ public class InboxFragment extends Fragment {
 
         msgListView.setAdapter(arrayAdapter);
 
-        final RealmResults<Message> messages = realm.where(Message.class).findAll();
-        messages.addChangeListener(new RealmChangeListener<RealmResults<Message>>() {
+        Realm.init(this.getContext());
+        Realm realm = Realm.getDefaultInstance();
+        final RealmResults<com.apap.director.db.realm.model.Conversation> conversations = realm.where(com.apap.director.db.realm.model.Conversation.class).findAll();
+        conversations.addChangeListener(new RealmChangeListener<RealmResults<com.apap.director.db.realm.model.Conversation>>() {
             @Override
-            public void onChange(RealmResults<com.apap.director.db.realm.model.Message> results) {
-                // Query results are updated in real time
-                messages.size();
+            public void onChange(RealmResults<com.apap.director.db.realm.model.Conversation> results) {
+                conversations.size();
             }
         });
 
