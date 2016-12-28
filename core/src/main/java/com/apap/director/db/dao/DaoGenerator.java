@@ -34,6 +34,7 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
         Entity dbPreKeyRecord = addDbPreKey(schema);
         Entity dbSessionRecord = addDbSession(schema);
         Entity dbSignedPreKeyRecord = addDbSignedPreKey(schema);
+        Entity account = addAccount(schema);
 
         /* properties */
         Property contactIdForConversation = conversation.addLongProperty("contactId").notNull().getProperty();
@@ -146,5 +147,19 @@ public class DaoGenerator extends org.greenrobot.greendao.generator.DaoGenerator
         dbSignedPreKey.addByteArrayProperty("serialized");
         dbSignedPreKey.addStringProperty("identityName");
         return dbSignedPreKey;
+    }
+
+    /**
+     * Create account's Properties
+     *
+     * @Return Account entity
+     */
+    private static Entity addAccount(Schema schema) {
+        Entity account = schema.addEntity("Account");
+        account.addIdProperty().primaryKey().autoincrement();
+        account.addLongProperty("registrationId");
+        account.addStringProperty("identityName");
+        account.addStringProperty("identityKeyPair");
+        return account;
     }
 }

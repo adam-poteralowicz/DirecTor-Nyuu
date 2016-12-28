@@ -5,6 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
+import com.apap.director.db.dao.model.Account;
+import com.apap.director.db.dao.model.AccountDao;
 import com.apap.director.db.dao.model.Contact;
 import com.apap.director.db.dao.model.ContactDao;
 import com.apap.director.db.dao.model.Conversation;
@@ -1007,6 +1009,260 @@ public class DatabaseManager implements IDatabaseManager, AsyncOperationListener
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public synchronized Account insertAccount(Account account) {
+        try {
+            if (account != null) {
+                openWritableDb();
+                AccountDao accountDao = daoSession.getAccountDao();
+                accountDao.insert(account);
+                Log.d(TAG, "Inserted account with registration id: " + account.getRegistrationId() + " to the schema.");
+                daoSession.clear();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return account;
+    }
+
+    @Override
+    public synchronized Account insertOrUpdateAccount(Account account) {
+        try {
+            if (account != null) {
+                openWritableDb();
+                daoSession.insertOrReplace(account);
+                daoSession.clear();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return account;
+    }
+
+    @Override
+    public synchronized ArrayList<Account> listAccounts() {
+        List<Account> accounts = null;
+        try {
+            openReadableDb();
+            AccountDao accountDao = daoSession.getAccountDao();
+            accounts = accountDao.loadAll();
+
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (accounts != null) {
+            return new ArrayList<>(accounts);
+        }
+        return null;
+    }
+
+    @Override
+    public synchronized ArrayList<Account> listAccountsById(Long id) {
+        List<Account> accounts = null;
+        try {
+            openReadableDb();
+            AccountDao accountDao = daoSession.getAccountDao();
+            accounts = accountDao.queryBuilder().where(AccountDao.Properties.Id.eq(id)).list();
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (accounts != null) {
+            return new ArrayList<>(accounts);
+        }
+        return null;
+    }
+
+    @Override
+    public synchronized ArrayList<Account> listAccountsByRegistrationId(Long registrationId) {
+        List<Account> accounts = null;
+        try {
+            openReadableDb();
+            AccountDao accountDao = daoSession.getAccountDao();
+            accounts = accountDao.queryBuilder().where(AccountDao.Properties.RegistrationId.eq(registrationId)).list();
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (accounts != null) {
+            return new ArrayList<>(accounts);
+        }
+        return null;
+    }
+
+    @Override
+    public synchronized ArrayList<Account> listAccountsByIdentityName(String identityName) {
+        List<Account> accounts = null;
+        try {
+            openReadableDb();
+            AccountDao accountDao = daoSession.getAccountDao();
+            accounts = accountDao.queryBuilder().where(AccountDao.Properties.IdentityName.eq(identityName)).list();
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (accounts != null) {
+            return new ArrayList<>(accounts);
+        }
+        return null;
+    }
+
+    public synchronized ArrayList<Account> listAccountsByIdentityKeyPair(String identityKeyPair) {
+        List<Account> accounts = null;
+        try {
+            openReadableDb();
+            AccountDao accountDao = daoSession.getAccountDao();
+            accounts = accountDao.queryBuilder().where(AccountDao.Properties.IdentityKeyPair.eq(identityKeyPair)).list();
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (accounts != null) {
+            return new ArrayList<>(accounts);
+        }
+        return null;
+    }
+
+    @Override
+    public synchronized void updateAccount(Account account) {
+        try {
+            if (account != null) {
+                openWritableDb();
+                daoSession.update(account);
+                Log.d(TAG, "Updated account: " + account.getRegistrationId() + " from the schema.");
+                daoSession.clear();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public synchronized void deleteAccountById(Long id) {
+        try {
+            openWritableDb();
+            AccountDao dao = daoSession.getAccountDao();
+
+            QueryBuilder<Account> queryBuilder = dao.queryBuilder().where(AccountDao.Properties.Id.eq(id));
+            dao.deleteInTx(queryBuilder.list());
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public synchronized void deleteAccountByRegistrationId(Long registrationId) {
+        try {
+            openWritableDb();
+            AccountDao dao = daoSession.getAccountDao();
+
+            QueryBuilder<Account> queryBuilder = dao.queryBuilder().where(AccountDao.Properties.RegistrationId.eq(registrationId));
+            dao.deleteInTx(queryBuilder.list());
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public synchronized void deleteAccountByIdentityName(String identityName) {
+        try {
+            openWritableDb();
+            AccountDao dao = daoSession.getAccountDao();
+
+            QueryBuilder<Account> queryBuilder = dao.queryBuilder().where(AccountDao.Properties.IdentityName.eq(identityName));
+            dao.deleteInTx(queryBuilder.list());
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public synchronized void deleteAccountByIdentityKeyPair(String identityKeyPair) {
+        try {
+            openWritableDb();
+            AccountDao dao = daoSession.getAccountDao();
+
+            QueryBuilder<Account> queryBuilder = dao.queryBuilder().where(AccountDao.Properties.IdentityKeyPair.eq(identityKeyPair));
+            dao.deleteInTx(queryBuilder.list());
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public synchronized void deleteAccounts() {
+        try {
+            openWritableDb();
+            AccountDao accountDao = daoSession.getAccountDao();
+            accountDao.deleteAll();
+            daoSession.clear();
+            Log.d(TAG, "Delete all accounts from the schema.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public synchronized Account getAccountById(Long id) {
+        Account account = null;
+        try {
+            openReadableDb();
+            AccountDao accountDao = daoSession.getAccountDao();
+            account = accountDao.queryBuilder().where(AccountDao.Properties.Id.eq(id)).list().get(0);
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return account;
+    }
+
+    @Override
+    public synchronized Account getAccountByRegistrationId(Long registrationId) {
+        Account account = null;
+        try {
+            openReadableDb();
+            AccountDao accountDao = daoSession.getAccountDao();
+            account = accountDao.queryBuilder().where(AccountDao.Properties.RegistrationId.eq(registrationId)).list().get(0);
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return account;
+    }
+
+    @Override
+    public synchronized Account getAccountByIdentityName(String identityName) {
+        Account account = null;
+        try {
+            openReadableDb();
+            AccountDao accountDao = daoSession.getAccountDao();
+            account = accountDao.queryBuilder().where(AccountDao.Properties.IdentityName.eq(identityName)).list().get(0);
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return account;
+    }
+
+    @Override
+    public synchronized Account getAccountByIdentityKeyPair(String identityKeyPair) {
+        Account account = null;
+        try {
+            openReadableDb();
+            AccountDao accountDao = daoSession.getAccountDao();
+            account = accountDao.queryBuilder().where(AccountDao.Properties.IdentityKeyPair.eq(identityKeyPair)).list().get(0);
+            daoSession.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return account;
     }
 
 }

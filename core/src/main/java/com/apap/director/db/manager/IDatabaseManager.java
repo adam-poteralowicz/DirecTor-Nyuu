@@ -1,5 +1,6 @@
 package com.apap.director.db.manager;
 
+import com.apap.director.db.dao.model.Account;
 import com.apap.director.db.dao.model.Contact;
 import com.apap.director.db.dao.model.Conversation;
 import com.apap.director.db.dao.model.DbIdentityKey;
@@ -327,4 +328,38 @@ public interface IDatabaseManager {
     void deletePreKeyByIdentityName(String identityName);
 
     void deleteSignedPreKeyByIdentityName(String identityName);
+
+    Account insertAccount(Account account);
+
+    Account insertOrUpdateAccount(Account account);
+
+    ArrayList<Account> listAccounts();
+
+    ArrayList<Account> listAccountsById(Long id);
+
+    ArrayList<Account> listAccountsByRegistrationId(Long registrationId);
+
+    ArrayList<Account> listAccountsByIdentityName(String identityName);
+
+    ArrayList<Account> listAccountsByIdentityKeyPair(String identityKeyPair);
+
+    void updateAccount(Account account);
+
+    void deleteAccountById(Long id);
+
+    void deleteAccountByRegistrationId(Long registrationId);
+
+    void deleteAccountByIdentityName(String identityName);
+
+    void deleteAccountByIdentityKeyPair(String identityKeyPair);
+
+    void deleteAccounts();
+
+    Account getAccountById(Long id);
+
+    Account getAccountByRegistrationId(Long registrationId);
+
+    Account getAccountByIdentityName(String identityName);
+
+    Account getAccountByIdentityKeyPair(String identityKeyPair);
 }

@@ -56,6 +56,7 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(DbPreKeyDao.class);
         registerDaoClass(DbSignedPreKeyDao.class);
         registerDaoClass(DbSessionDao.class);
+        registerDaoClass(AccountDao.class);
     }
 
     public DaoSession newSession() {
