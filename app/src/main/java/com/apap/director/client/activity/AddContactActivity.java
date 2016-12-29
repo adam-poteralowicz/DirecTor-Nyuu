@@ -208,9 +208,12 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
         if ((String.valueOf(newContactName.getText()).matches(".*\\w.*")
                 && (String.valueOf(newContactName.getText().charAt(0))).trim().length() > 0)) {
             realm.beginTransaction();
-                Contact contact = realm.createObject(Contact.class);
+            // Objects with primary keys need to have primary key value specified
+                Contact contact = realm.createObject(Contact.class, generateContactId());
                 contact.setName(String.valueOf(newContactName.getText()));
+                realm.copyToRealmOrUpdate(contact);
             realm.commitTransaction();
+            Toast.makeText(this, contact.getName(), Toast.LENGTH_LONG).show();
 
             Intent selectedIntent = new Intent(AddContactActivity.this, AuthUserActivity.class);
             startActivityForResult(selectedIntent, 13);
@@ -222,6 +225,12 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
     public void onPause() {
         super.onPause();
         unregisterReceiver(receiver);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        realm.close();
     }
 
     /**
@@ -444,5 +453,19 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
             Toast.makeText(this, R.string.bt_cancelled, Toast.LENGTH_SHORT).show();
         }
     };
+
+    public long generateContactId() {
+        long id;
+        try {
+            if (realm.where(Contact.class).max("id") == null) {
+                id = 0;
+            } else {
+                id = realm.where(Contact.class).max("id").longValue() + 1;
+            }
+        } catch(ArrayIndexOutOfBoundsException ex) {
+            id = 0;
+        }
+        return id;
+    }
 
 }

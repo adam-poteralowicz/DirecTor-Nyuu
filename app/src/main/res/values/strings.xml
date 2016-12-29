@@ -28,5 +28,5 @@
     <string name="write_button_label">Write message</string>
     <string name="read_button_label">Read message</string>
     <string name="bt_not_found">Bluetooth not found</string>
-    <string name="bt_cancelled">Bluetooth canncelled</string>
+    <string name="bt_cancelled">Bluetooth cancelled</string>
 </resources>

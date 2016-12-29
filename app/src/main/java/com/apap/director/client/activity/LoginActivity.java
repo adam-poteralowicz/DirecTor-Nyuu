@@ -10,20 +10,30 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
+import com.apap.director.db.realm.AccountManager;
 import com.apap.director.db.realm.model.Account;
+import com.apap.director.db.realm.model.Contact;
+import com.apap.director.db.rest.service.UserService;
 import com.apap.director.im.websocket.service.StompService;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnItemClick;
+import butterknife.OnItemLongClick;
 import cz.msebera.android.httpclient.client.HttpClient;
 import cz.msebera.android.httpclient.client.methods.HttpGet;
 import cz.msebera.android.httpclient.impl.client.BasicResponseHandler;
@@ -43,12 +53,18 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
     @Inject
     StompService service;
 
+    @BindView(R.id.accountsView) ListView accountsListView;
+    private Realm realm;
+    private ArrayList<Account> accountList;
+    private AccountManager accountManager;
+    private UserService userService;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_view);
         ((App) getApplication()).getSignalComponent().inject(this);
-
+        ButterKnife.bind(this);
 
         try {
             StrongHttpClientBuilder builder = new StrongHttpClientBuilder(this);
@@ -79,7 +95,11 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
         shimmer.start(shimmerTextView);
         getSupportActionBar().show();
 
-        Realm realm = Realm.getDefaultInstance();
+        /**
+         * Account List View Attempt
+         */
+
+        realm = Realm.getDefaultInstance();
         final RealmResults<Account> accounts = realm.where(Account.class).findAll();
         accounts.addChangeListener(new RealmChangeListener<RealmResults<Account>>() {
             @Override
@@ -88,6 +108,44 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
             }
         });
 
+        accountManager = new AccountManager(userService);
+        accountList = new ArrayList<Account>();
+
+        ArrayList<Account> realmAccounts = accountManager.listAllAccounts();
+
+        if (!realmAccounts.isEmpty()) {
+            accountList = realmAccounts;
+        }
+
+        ArrayAdapter<Account> arrayAdapter = new ArrayAdapter<Account>(
+                App.getContext(),
+                android.R.layout.simple_list_item_single_choice,
+                accountList);
+        if (accountList.isEmpty())
+            Log.d("account list", "empty");
+        if (accountsListView == null)
+            Log.d("accounts list view", "null");
+        accountsListView.setAdapter(arrayAdapter);
+
+        /**                                                                                      **
+         * ------------------------------------------------------------------------------------- *
+         */
+
+    }
+
+    @OnItemLongClick(R.id.accountsView)
+    public boolean deleteAccount(int position) {
+        String name = accountList.get(position).getName();
+        accountManager.deleteAccount(name);
+        Toast.makeText(this, "Account " + name + " deleted", Toast.LENGTH_LONG).show();
+        return true;
+    }
+
+    @OnItemClick(R.id.accountsView)
+    public void chooseAccount(int position){
+        String name = accountList.get(position).getName();
+        accountManager.chooseAccount(name);
+        Toast.makeText(this, accountManager.getActiveAccountName(), Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -186,5 +244,11 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
                 finish();
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        realm.close();
     }
 }

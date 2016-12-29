@@ -28,4 +28,15 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignEnd="@+id/shimmer_tv"
+        android:layout_above="@+id/postLoginButton"
+        android:layout_below="@+id/shimmer_tv"
+        android:layout_alignStart="@+id/shimmer_tv"
+        android:id="@+id/accountsView"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp" />
+
 </RelativeLayout>

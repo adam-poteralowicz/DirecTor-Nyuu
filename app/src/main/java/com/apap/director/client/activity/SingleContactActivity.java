@@ -114,7 +114,12 @@ public class SingleContactActivity extends Activity {
 
         contactNameEditText.setSelectAllOnFocus(true);
 
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        realm.close();
     }
 
     @Override

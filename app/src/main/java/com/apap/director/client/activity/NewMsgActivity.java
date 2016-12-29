@@ -115,6 +115,12 @@ public class NewMsgActivity extends Activity {
         newMessageField.setText("");
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        realm.close();
+    }
+
 }
 
 

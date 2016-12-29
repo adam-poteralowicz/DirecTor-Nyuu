@@ -71,8 +71,9 @@ public class ContactsFragment extends Fragment {
      */
     private void refreshContactList() {
         RealmResults<Contact> contactResults = realm.where(Contact.class).findAll();
-        contactList.addAll(realm.copyFromRealm(contactResults));
-        // realm.close();
+        if (!contactResults.isEmpty())
+            contactList.addAll(realm.copyFromRealm(contactResults));
+
         if (contactList != null) {
             if (arrayAdapter == null) {
                 arrayAdapter = new ArrayAdapter<Contact>(
@@ -98,4 +99,15 @@ public class ContactsFragment extends Fragment {
             startActivityForResult(selectedIntent, 0010);
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        realm = Realm.getDefaultInstance();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        realm.close();
+    }
 }

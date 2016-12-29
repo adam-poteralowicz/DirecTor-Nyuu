@@ -50,8 +50,10 @@ public class InboxFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         realm = Realm.getDefaultInstance();
 
+        conversationList = new ArrayList<Conversation>();
         RealmResults<Conversation> conversationResults = realm.where(Conversation.class).findAll();
-        conversationList.addAll(realm.copyFromRealm(conversationResults));
+        if (!conversationResults.isEmpty())
+            conversationList.addAll(realm.copyFromRealm(conversationResults));
         arrayAdapter = new ArrayAdapter<Conversation>(
                 getActivity(),
                 android.R.layout.simple_list_item_1,
@@ -81,9 +83,23 @@ public class InboxFragment extends Fragment {
 
     @OnItemLongClick(R.id.msgList)
     public boolean deleteConversation(int position){
-        realm.where(Conversation.class).equalTo("contact.id", conversationList.get(position).getContact().getId()).findFirst().deleteFromRealm();
+        realm.beginTransaction();
+            realm.where(Conversation.class).equalTo("contact.id", conversationList.get(position).getContact().getId()).findFirst().deleteFromRealm();
+        realm.commitTransaction();
         conversationList.remove(position);
         arrayAdapter.notifyDataSetChanged();
         return true;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        realm = Realm.getDefaultInstance();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        realm.close();
     }
 }
