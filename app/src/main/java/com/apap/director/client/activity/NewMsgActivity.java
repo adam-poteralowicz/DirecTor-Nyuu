@@ -12,15 +12,13 @@ import android.widget.TextView;
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.adapter.MessageAdapter;
-import com.apap.director.db.manager.DatabaseManager;
 import com.apap.director.db.realm.model.Contact;
-import com.apap.director.db.realm.model.Message;
 import com.apap.director.db.realm.model.Conversation;
+import com.apap.director.db.realm.model.Message;
 
 import java.util.Date;
 import java.util.List;
 
-import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnItemLongClick;
@@ -33,7 +31,6 @@ public class NewMsgActivity extends Activity {
     @BindView(R.id.messengerField) EditText newMessageField;
     @BindView(R.id.newMsgRecipient) TextView recipient;
     @BindView(R.id.conversationView) ListView messagesView;
-    @Inject public DatabaseManager databaseManager;
     ArrayAdapter<Message> arrayAdapter;
     private Long contactIdFromIntent;
     private List<Message> myMessages;
@@ -47,7 +44,6 @@ public class NewMsgActivity extends Activity {
         ((App) getApplication()).getDaoComponent().inject(this);
         setContentView(R.layout.new_msg_view);
         ButterKnife.bind(this);
-        Realm.init(this);
         realm = Realm.getDefaultInstance();
 
         if (getIntent().getStringExtra("recipient") != null) {
@@ -55,9 +51,6 @@ public class NewMsgActivity extends Activity {
         } else {
             recipient.setText(getIntent().getStringExtra("msgTitle"));
         }
-
-        // init database manager
-        databaseManager = new DatabaseManager(this);
 
         contactIdFromIntent = getIntent().getLongExtra("contactId", 1L);
         final Conversation conversation = realm.where(Conversation.class).equalTo("contactId", contactIdFromIntent).findFirst();
@@ -87,7 +80,7 @@ public class NewMsgActivity extends Activity {
         Log.v("DTOR/NewMsgActivity", "Deleting message, position: "+position);
         Long messageId = myMessages.get(position).getId();
         realm.beginTransaction();
-        realm.where(Message.class).equalTo("id", messageId).findFirst().deleteFromRealm();
+            realm.where(Message.class).equalTo("id", messageId).findFirst().deleteFromRealm();
         realm.commitTransaction();
         myMessages.remove(position);
         arrayAdapter.notifyDataSetChanged();
@@ -97,22 +90,22 @@ public class NewMsgActivity extends Activity {
     public void onClick(View view) {
 
         realm.beginTransaction();
-        Conversation conversation = realm.where(Conversation.class).equalTo("contactId", contactIdFromIntent).findFirst();
-        Message message = realm.createObject(Message.class);
-        message.setRecipient(String.valueOf(recipient.getText()));
-        message.setDate(new Date());
-        message.setMine(true);
+            Conversation conversation = realm.where(Conversation.class).equalTo("contactId", contactIdFromIntent).findFirst();
+            Message message = realm.createObject(Message.class);
+            message.setRecipient(String.valueOf(recipient.getText()));
+            message.setDate(new Date());
+            message.setMine(true);
 
-        String messageText = String.valueOf(newMessageField.getText());
-        if ("".equals(messageText)) {
-            message.setContent("Sending empty message for fun!");
-        } else {
-            message.setContent(String.valueOf(newMessageField.getText()));
-            Log.v("Message sent", String.valueOf(newMessageField.getText()));
-        }
+            String messageText = String.valueOf(newMessageField.getText());
+            if ("".equals(messageText)) {
+                message.setContent("Sending empty message for fun!");
+            } else {
+                message.setContent(String.valueOf(newMessageField.getText()));
+                Log.v("Message sent", String.valueOf(newMessageField.getText()));
+            }
 
-        conversation.setContact(realm.where(Contact.class).equalTo("contactId", contactIdFromIntent).findFirst());
-        message.setConversation(conversation);
+            conversation.setContact(realm.where(Contact.class).equalTo("contactId", contactIdFromIntent).findFirst());
+            message.setConversation(conversation);
         realm.commitTransaction();
         myMessages.add(message);
 

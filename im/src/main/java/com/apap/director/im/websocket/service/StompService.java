@@ -3,10 +3,6 @@ package com.apap.director.im.websocket.service;
 import android.util.Log;
 
 import com.apap.director.im.config.IMConfig;
-import com.apap.director.im.signal.DirectorIdentityKeyStore;
-import com.apap.director.im.signal.DirectorPreKeyStore;
-import com.apap.director.im.signal.DirectorSessionStore;
-import com.apap.director.im.signal.DirectorSignedPreKeyStore;
 
 import org.java_websocket.WebSocket;
 
@@ -14,7 +10,6 @@ import javax.inject.Inject;
 
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.client.StompClient;
-import ua.naiksoftware.stomp.client.StompMessage;
 
 public class StompService {
 

@@ -17,4 +17,5 @@ public class ContactKey extends RealmObject {
     private Contact contact;
     private byte[] serialized;
     private int deviceId;
+    private String keyBase64;
 }

@@ -13,24 +13,19 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.activity.AddContactActivity;
 import com.apap.director.client.activity.SingleContactActivity;
-import com.apap.director.db.manager.DatabaseManager;
 import com.apap.director.db.realm.model.Contact;
 
 import java.util.ArrayList;
 
-import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnItemClick;
 import io.realm.Realm;
-import io.realm.RealmList;
 import io.realm.RealmResults;
 
 
 public class ContactsFragment extends Fragment {
-
-    @Inject DatabaseManager databaseManager;
 
     private ArrayList<Contact> contactList;
     private ArrayAdapter<Contact> arrayAdapter;
@@ -51,7 +46,6 @@ public class ContactsFragment extends Fragment {
 
         ((App) getActivity().getApplication()).getDaoComponent().inject(this);
         super.onActivityCreated(savedInstanceState);
-        Realm.init(this.getContext());
         realm = Realm.getDefaultInstance();
 
         contactList = new ArrayList<Contact>();
@@ -78,7 +72,7 @@ public class ContactsFragment extends Fragment {
     private void refreshContactList() {
         RealmResults<Contact> contactResults = realm.where(Contact.class).findAll();
         contactList.addAll(realm.copyFromRealm(contactResults));
-        // realm.close()
+        // realm.close();
         if (contactList != null) {
             if (arrayAdapter == null) {
                 arrayAdapter = new ArrayAdapter<Contact>(

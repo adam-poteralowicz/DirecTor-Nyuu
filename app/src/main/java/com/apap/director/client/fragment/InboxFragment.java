@@ -31,7 +31,6 @@ import io.realm.RealmResults;
 
 public class InboxFragment extends Fragment {
 
-    @Inject DatabaseManager databaseManager;
     private ArrayList<Conversation> conversationList;
     private ArrayAdapter<Conversation> arrayAdapter;
     private Realm realm;
@@ -39,8 +38,7 @@ public class InboxFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(
-                R.layout.inbox_view, container, false);
+        View rootView = inflater.inflate(R.layout.inbox_view, container, false);
         ButterKnife.bind(this, rootView);
 
         return rootView;
@@ -50,7 +48,6 @@ public class InboxFragment extends Fragment {
     public void onActivityCreated(final Bundle savedInstanceState) {
         ((App) getActivity().getApplication()).getDaoComponent().inject(this);
         super.onActivityCreated(savedInstanceState);
-        Realm.init(this.getContext());
         realm = Realm.getDefaultInstance();
 
         RealmResults<Conversation> conversationResults = realm.where(Conversation.class).findAll();

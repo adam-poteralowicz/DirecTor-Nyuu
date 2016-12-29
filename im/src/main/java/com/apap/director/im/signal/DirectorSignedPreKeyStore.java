@@ -1,8 +1,6 @@
 package com.apap.director.im.signal;
 
-
-import com.apap.director.db.dao.model.DbSignedPreKey;
-import com.apap.director.db.manager.DatabaseManager;
+import com.apap.director.db.realm.model.SignedKey;
 
 import org.whispersystems.libsignal.InvalidKeyIdException;
 import org.whispersystems.libsignal.state.SignedPreKeyRecord;
@@ -14,13 +12,15 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.realm.Realm;
+
 public class DirectorSignedPreKeyStore implements SignedPreKeyStore {
 
-    private DatabaseManager manager;
+    private Realm realm;
 
     @Inject
-    public DirectorSignedPreKeyStore(DatabaseManager manager) {
-        this.manager = manager;
+    public DirectorSignedPreKeyStore(Realm realm) {
+        this.realm = realm;
     }
 
     @Override
@@ -31,11 +31,11 @@ public class DirectorSignedPreKeyStore implements SignedPreKeyStore {
     @Override
     public List<SignedPreKeyRecord> loadSignedPreKeys() {
         try {
-            List<DbSignedPreKey> list = manager.listDbSignedPreKeys();
+            List<SignedKey> list = realm.where(SignedKey.class).findAll();
             List<SignedPreKeyRecord> records = new ArrayList<>(list.size());
 
-            for(DbSignedPreKey preKey : list){
-                    records.add(new SignedPreKeyRecord(preKey.getSerialized()));
+            for(SignedKey preKey : list){
+                    records.add(new SignedPreKeyRecord(preKey.getSerializedKey()));
             }
 
             return records;
@@ -48,22 +48,22 @@ public class DirectorSignedPreKeyStore implements SignedPreKeyStore {
 
     @Override
     public void storeSignedPreKey(int signedPreKeyId, SignedPreKeyRecord record) {
-        DbSignedPreKey dbSignedPreKey = new DbSignedPreKey();
-        dbSignedPreKey.setSerialized(record.serialize());
-        dbSignedPreKey.setDbSignedPreKeyId(signedPreKeyId);
-
-        manager.insertOrUpdateDbSignedPreKey(dbSignedPreKey);
+        realm.beginTransaction();
+            SignedKey signedKey = realm.createObject(SignedKey.class);
+            signedKey.setSerializedKey(record.serialize());
+            signedKey.setSignedKeyId(signedPreKeyId);
+        realm.commitTransaction();
 
     }
 
     @Override
     public boolean containsSignedPreKey(int signedPreKeyId) {
-        return manager.getDbSignedPreKeyByDbSignedPreKeyId(signedPreKeyId) == null ? false : true;
+        return realm.where(SignedKey.class).equalTo("signedKeyId", signedPreKeyId).findFirst() == null ? false : true;
     }
 
     @Override
     public void removeSignedPreKey(int signedPreKeyId) {
-        manager.deleteDbSignedPreKeyByDbSignedPreKeyId(signedPreKeyId);
+        realm.where(SignedKey.class).equalTo("signedKeyId", signedPreKeyId).findFirst().deleteFromRealm();
     }
 
 

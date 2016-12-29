@@ -20,23 +20,18 @@ import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.db.manager.DatabaseManager;
 import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.Conversation;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.Realm;
-import io.realm.RealmResults;
 
 public class SingleContactActivity extends Activity {
 
-    @Inject public DatabaseManager databaseManager;
     List<String> myOptionsList = null;
 
     @BindView(R.id.contactName) TextView contactNameView;
@@ -54,13 +49,9 @@ public class SingleContactActivity extends Activity {
         setContentView(R.layout.single_contact_view);
         ((App) getApplication()).getDaoComponent().inject(this);
         ButterKnife.bind(this);
-        Realm.init(this);
         realm = Realm.getDefaultInstance();
 
         super.onCreate(savedInstanceState);
-
-        // init database manager
-        databaseManager = new DatabaseManager(this);
 
         contactIdFromIntent = getIntent().getLongExtra("contactId", 1L);
         contactNameEditText = (EditText) findViewById(R.id.contactName);
@@ -91,8 +82,8 @@ public class SingleContactActivity extends Activity {
                     {
                         if (realm.where(Conversation.class).equalTo("contact.id", contactIdFromIntent).findFirst() == null) {
                             realm.beginTransaction();
-                            Conversation conversation = new Conversation();
-                            conversation.setContact(realm.where(Contact.class).equalTo("contactId", contactIdFromIntent).findFirst());
+                                Conversation conversation = new Conversation();
+                                conversation.setContact(realm.where(Contact.class).equalTo("contactId", contactIdFromIntent).findFirst());
                             realm.commitTransaction();
                         }
 
@@ -105,7 +96,7 @@ public class SingleContactActivity extends Activity {
                     case 1:
                     {
                         realm.beginTransaction();
-                        realm.where(Contact.class).equalTo("id", contactIdFromIntent).findFirst().deleteFromRealm();
+                            realm.where(Contact.class).equalTo("id", contactIdFromIntent).findFirst().deleteFromRealm();
                         realm.commitTransaction();
                         intent = new Intent(App.getContext(), AuthUserActivity.class);
                         startActivity(intent);
@@ -155,8 +146,8 @@ public class SingleContactActivity extends Activity {
             cursor.moveToFirst();
             String imagePath = cursor.getString(cursor.getColumnIndex(filePath[0]));
             realm.beginTransaction();
-            Contact contact = realm.where(Contact.class).equalTo("name", contactNameFromIntent).findFirst();
-            contact.setImage(imagePath);
+                Contact contact = realm.where(Contact.class).equalTo("name", contactNameFromIntent).findFirst();
+                contact.setImage(imagePath);
             realm.commitTransaction();
 
             BitmapFactory.Options options = new BitmapFactory.Options();

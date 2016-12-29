@@ -14,6 +14,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import io.realm.Realm;
 
 @Module
 public class SignalModule {
@@ -26,26 +27,26 @@ public class SignalModule {
 
     @Provides
     @ApplicationScope
-    public DirectorIdentityKeyStore provideIdentityKeyStore(DatabaseManager databaseManager){
-        return new DirectorIdentityKeyStore(context, databaseManager);
+    public DirectorIdentityKeyStore provideIdentityKeyStore(){
+        return new DirectorIdentityKeyStore(context, Realm.getDefaultInstance());
     }
 
     @Provides
     @ApplicationScope
-    public DirectorPreKeyStore providePreKeyStore(DatabaseManager databaseManager){
-        return new DirectorPreKeyStore(databaseManager);
+    public DirectorPreKeyStore providePreKeyStore(){
+        return new DirectorPreKeyStore(Realm.getDefaultInstance());
     }
 
     @Provides
     @ApplicationScope
-    public DirectorSessionStore provideSessionStore(DatabaseManager databaseManager){
-        return new DirectorSessionStore(databaseManager);
+    public DirectorSessionStore provideSessionStore(){
+        return new DirectorSessionStore(Realm.getDefaultInstance());
     }
 
     @Provides
     @ApplicationScope
-    public DirectorSignedPreKeyStore provideSignedPreKeyStore(DatabaseManager databaseManager){
-        return new DirectorSignedPreKeyStore(databaseManager);
+    public DirectorSignedPreKeyStore provideSignedPreKeyStore(){
+        return new DirectorSignedPreKeyStore(Realm.getDefaultInstance());
     }
 
     @Provides
@@ -56,7 +57,7 @@ public class SignalModule {
 
 
     @Provides
-    public MessageAction messageAction(DatabaseManager manager, DirectorPreKeyStore preKeyStore, DirectorSessionStore sessionStore, DirectorIdentityKeyStore identityKeyStore, DirectorSignedPreKeyStore signedPreKeyStore) {
-        return new MessageAction(manager, preKeyStore, identityKeyStore, sessionStore, signedPreKeyStore);
+    public MessageAction messageAction(DirectorPreKeyStore preKeyStore, DirectorSessionStore sessionStore, DirectorIdentityKeyStore identityKeyStore, DirectorSignedPreKeyStore signedPreKeyStore) {
+        return new MessageAction(preKeyStore, identityKeyStore, sessionStore, signedPreKeyStore);
     }
 }

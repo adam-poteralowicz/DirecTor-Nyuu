@@ -22,15 +22,13 @@ import ua.naiksoftware.stomp.client.StompMessage;
 
 public class MessageAction implements Action1<StompMessage> {
 
-    private DatabaseManager databaseManager;
     private DirectorPreKeyStore preKeyStore;
     private DirectorIdentityKeyStore identityKeyStore;
     private DirectorSessionStore sessionStore;
     private DirectorSignedPreKeyStore signedPreKeyStore;
 
     @Inject
-    public MessageAction(DatabaseManager databaseManager, DirectorPreKeyStore preKeyStore, DirectorIdentityKeyStore identityKeyStore, DirectorSessionStore sessionStore, DirectorSignedPreKeyStore signedPreKeyStore) {
-        this.databaseManager = databaseManager;
+    public MessageAction(DirectorPreKeyStore preKeyStore, DirectorIdentityKeyStore identityKeyStore, DirectorSessionStore sessionStore, DirectorSignedPreKeyStore signedPreKeyStore) {
         this.preKeyStore = preKeyStore;
         this.identityKeyStore = identityKeyStore;
         this.sessionStore = sessionStore;

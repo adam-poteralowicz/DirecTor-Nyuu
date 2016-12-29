@@ -1,7 +1,6 @@
 package com.apap.director.im.signal;
 
-import com.apap.director.db.dao.model.DbSession;
-import com.apap.director.db.manager.DatabaseManager;
+import com.apap.director.db.realm.model.Session;
 
 import org.whispersystems.libsignal.SignalProtocolAddress;
 import org.whispersystems.libsignal.state.SessionRecord;
@@ -13,23 +12,25 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.realm.Realm;
+
 
 public class DirectorSessionStore implements SessionStore {
 
-    private DatabaseManager manager;
+    private Realm realm;
 
     @Inject
-    public DirectorSessionStore(DatabaseManager manager) {
-        this.manager = manager;
+    public DirectorSessionStore(Realm realm) {
+        this.realm = realm;
     }
 
     @Override
     public SessionRecord loadSession(SignalProtocolAddress address) {
         try {
-            List<DbSession> list = manager.listDbSessionsByName(address.getName());
-            for (DbSession session : list) {
+            List<Session> list = realm.where(Session.class).equalTo("name", address.getName()).findAll();
+            for (Session session : list) {
                 if (session.getDeviceId() == address.getDeviceId())
-                    return new SessionRecord(session.getSerialized());
+                    return new SessionRecord(session.getSerializedKey());
             }
             return null;
         }
@@ -40,10 +41,10 @@ public class DirectorSessionStore implements SessionStore {
 
     @Override
     public List<Integer> getSubDeviceSessions(String name) {
-        List<DbSession> list = manager.listDbSessionsByName(name);
+        List<Session> list = realm.where(Session.class).equalTo("name", name).findAll();
         List<Integer> subDeviceSessions = new ArrayList<>(list.size());
 
-        for(DbSession session : list){
+        for(Session session : list){
             subDeviceSessions.add(session.getDeviceId());
         }
 
@@ -53,21 +54,21 @@ public class DirectorSessionStore implements SessionStore {
     @Override
     public void storeSession(SignalProtocolAddress address, SessionRecord record) {
 
-        DbSession session = new DbSession();
-        session.setName(address.getName());
-        session.setDeviceId(address.getDeviceId());
-        session.setSerialized(record.serialize());
-
-        manager.insertOrUpdateDbSession(session);
+        realm.beginTransaction();
+            Session session = realm.createObject(Session.class);
+            session.setName(address.getName());
+            session.setDeviceId(address.getDeviceId());
+            session.setSerializedKey(record.serialize());
+        realm.commitTransaction();
 
     }
 
     @Override
     public boolean containsSession(SignalProtocolAddress address) {
 
-        List<DbSession> sessions = manager.listDbSessionsByName(address.getName());
-        for(DbSession session : sessions){
-            if(session.getDeviceId()==address.getDeviceId()) return true;
+        List<Session> sessions = realm.where(Session.class).equalTo("name", address.getName()).findAll();
+        for(Session session : sessions){
+            if(session.getDeviceId() == address.getDeviceId()) return true;
         }
 
         return false;
@@ -76,11 +77,15 @@ public class DirectorSessionStore implements SessionStore {
 
     @Override
     public void deleteSession(SignalProtocolAddress address) {
-        manager.deleteDbSessionByDeviceIdAndName(address.getDeviceId(), address.getName());
+        realm.beginTransaction();
+            realm.where(Session.class).equalTo("deviceId", address.getDeviceId()).equalTo("name", address.getName()).findFirst().deleteFromRealm();
+        realm.commitTransaction();
     }
 
     @Override
     public void deleteAllSessions(String name) {
-        manager.deleteDbSessionByName(name);
+        realm.beginTransaction();
+            realm.where(Session.class).equalTo("name", name).findAll().deleteAllFromRealm();
+        realm.commitTransaction();
     }
 }

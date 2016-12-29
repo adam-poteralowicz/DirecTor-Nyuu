@@ -27,30 +27,24 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.fragment.DeviceDetailFragment;
 import com.apap.director.client.fragment.DeviceListFragment;
-import com.apap.director.db.manager.DatabaseManager;
+import com.apap.director.client.util.BTUtils;
+import com.apap.director.client.util.NFCUtils;
+import com.apap.director.client.util.keyExchange.WiFiDirectBroadcastReceiver;
+import com.apap.director.db.realm.model.Contact;
 
-import javax.inject.Inject;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
 
-import com.apap.director.client.util.BTUtils;
-import com.apap.director.client.util.NFCUtils;
-import com.apap.director.client.util.keyExchange.WiFiDirectBroadcastReceiver;
-import com.apap.director.db.realm.model.Contact;
-
-
-import java.util.List;
-
 public class AddContactActivity extends AppCompatActivity implements WifiP2pManager.ChannelListener, DeviceListFragment.DeviceActionListener {
-
-    @Inject public DatabaseManager databaseManager;
 
     @BindView(R.id.newContactName) EditText newContactName;
     public static final String TAG = "DirecTor";
@@ -78,13 +72,11 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_contact_view);
         ButterKnife.bind(this);
-        Realm.init(this);
         realm = Realm.getDefaultInstance();
 
         newContactName = (EditText) findViewById(R.id.newContactName);
         newContactName.setHint("CONTACT NAME");
         ((App) getApplication()).getDaoComponent().inject(this);
-        databaseManager = new DatabaseManager(this);
         getSupportActionBar().show();
         initP2P();
         initNFC();

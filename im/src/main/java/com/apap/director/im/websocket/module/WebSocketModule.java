@@ -6,12 +6,10 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import lombok.NoArgsConstructor;
 
 @Module
+@NoArgsConstructor
 public class WebSocketModule {
-
-    public WebSocketModule(){
-    }
-
 
 }

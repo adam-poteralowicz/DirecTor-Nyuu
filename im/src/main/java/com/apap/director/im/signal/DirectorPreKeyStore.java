@@ -1,7 +1,6 @@
 package com.apap.director.im.signal;
 
-import com.apap.director.db.dao.model.DbPreKey;
-import com.apap.director.db.manager.DatabaseManager;
+import com.apap.director.db.realm.model.OneTimeKey;
 
 import org.whispersystems.libsignal.InvalidKeyIdException;
 import org.whispersystems.libsignal.state.PreKeyRecord;
@@ -11,26 +10,27 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
+import io.realm.Realm;
 
 
 public class DirectorPreKeyStore implements PreKeyStore {
 
 
-    private DatabaseManager manager;
+    private Realm realm;
 
     @Inject
-    public DirectorPreKeyStore(DatabaseManager manager) {
-        this.manager = manager;
+    public DirectorPreKeyStore(Realm realm) {
+        this.realm = realm;
     }
 
     @Override
     public PreKeyRecord loadPreKey(int preKeyId) throws InvalidKeyIdException {
         try {
-            DbPreKey preKey = manager.getDbPreKeyByDbPreKeyId(preKeyId);
+            OneTimeKey preKey = realm.where(OneTimeKey.class).equalTo("oneTimeKeyId", preKeyId).findFirst();
 
             if ( preKey == null ) throw new InvalidKeyIdException("No such key id");
 
-            return new PreKeyRecord(preKey.getSerialized());
+            return new PreKeyRecord(preKey.getSerializedKey());
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -39,24 +39,27 @@ public class DirectorPreKeyStore implements PreKeyStore {
 
     @Override
     public void storePreKey(int preKeyId, PreKeyRecord record) {
-        DbPreKey preKey = new DbPreKey();
-        preKey.setSerialized(record.serialize());
-        preKey.setDbPreKeyId(preKeyId);
-        manager.insertOrUpdateDbPreKey(preKey);
+        realm.beginTransaction();
+            OneTimeKey oneTimeKey = realm.createObject(OneTimeKey.class);
+            oneTimeKey.setSerializedKey(record.serialize());
+            oneTimeKey.setOneTimeKeyId(preKeyId);
+        realm.commitTransaction();
 
     }
 
     @Override
     public boolean containsPreKey(int preKeyId) {
 
-        return manager.getDbPreKeyByDbPreKeyId(preKeyId) == null ? false : true;
+        return realm.where(OneTimeKey.class).equalTo("oneTimeKeyId", preKeyId).findFirst() == null ? false : true;
 
     }
 
     @Override
     public void removePreKey(int preKeyId) {
 
-        manager.deleteDbPreKeyByDbPreKeyId(preKeyId);
+        realm.beginTransaction();
+            realm.where(OneTimeKey.class).equalTo("oneTimeKeyId", preKeyId).findFirst().deleteFromRealm();
+        realm.commitTransaction();
 
     }
 }

@@ -1,6 +1,5 @@
 package com.apap.director.client.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -16,7 +15,6 @@ import android.widget.Toast;
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.db.realm.model.Account;
-import com.apap.director.db.realm.model.Conversation;
 import com.apap.director.im.websocket.service.StompService;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
@@ -35,7 +33,6 @@ import info.guardianproject.netcipher.client.StrongHttpClientBuilder;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
-import ua.naiksoftware.stomp.Stomp;
 
 public class LoginActivity extends AppCompatActivity implements StrongBuilder.Callback<HttpClient> {
 
@@ -82,7 +79,6 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
         shimmer.start(shimmerTextView);
         getSupportActionBar().show();
 
-        Realm.init(this);
         Realm realm = Realm.getDefaultInstance();
         final RealmResults<Account> accounts = realm.where(Account.class).findAll();
         accounts.addChangeListener(new RealmChangeListener<RealmResults<Account>>() {

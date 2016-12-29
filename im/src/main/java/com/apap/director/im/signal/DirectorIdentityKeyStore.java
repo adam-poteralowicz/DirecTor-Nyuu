@@ -2,8 +2,7 @@ package com.apap.director.im.signal;
 
 import android.content.Context;
 
-import com.apap.director.db.dao.model.DbIdentityKey;
-import com.apap.director.db.manager.DatabaseManager;
+import com.apap.director.db.realm.model.ContactKey;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.whispersystems.libsignal.IdentityKey;
@@ -16,20 +15,22 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
+
 public class DirectorIdentityKeyStore implements IdentityKeyStore {
 
-    private DatabaseManager manager;
-
     private Context context;
+    private Realm realm;
 
     public static final String IDENTITY_PREF = "com.apap.director.identity.pref";
     public static final String KEY_PAIR = "key_pair";
     public static final String LOCAL_ID = "local_id";
 
     @Inject
-    public DirectorIdentityKeyStore(Context context, DatabaseManager manager){
+    public DirectorIdentityKeyStore(Context context, Realm realm){
         this.context = context;
-        this.manager = manager;
+        this.realm = realm;
     }
 
     @Override
@@ -52,18 +53,19 @@ public class DirectorIdentityKeyStore implements IdentityKeyStore {
 
     @Override
     public void saveIdentity(SignalProtocolAddress address, IdentityKey identityKey) {
-        DbIdentityKey dbKey = new DbIdentityKey();
-        dbKey.setName(address.getName());
-        dbKey.setDeviceId(address.getDeviceId());
-        manager.insertOrUpdateDbIdentityKey(dbKey);
+        realm.beginTransaction();
+            ContactKey contactKey = realm.createObject(ContactKey.class);
+            contactKey.setDeviceId(address.getDeviceId());
+            contactKey.setKeyBase64(address.getName());
+        realm.commitTransaction();
     }
 
     @Override
     public boolean isTrustedIdentity(SignalProtocolAddress address, IdentityKey identityKey) {
 
-        List<DbIdentityKey> list = manager.listDbIdentityKeysByName(address.getName());
+        List<ContactKey> list = realm.where(ContactKey.class).equalTo("keyBase64", address.getName()).findAll();
 
-        for(DbIdentityKey key : list) {
+        for(ContactKey key : list) {
             if (key.getDeviceId() == address.getDeviceId()) return true;
         }
 
