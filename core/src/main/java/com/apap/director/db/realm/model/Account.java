@@ -18,10 +18,13 @@ public class Account extends RealmObject {
     private byte[] keyPair;
     private int registrationId;
 
+    private String keyBase64;
+
     private RealmList<Contact> contacts;
     private RealmList<OneTimeKey> oneTimeKeys;
     private SignedKey signedKey;
     private RealmList<Session> sessions;
+    private boolean registered;
     private boolean active;
 
     public RealmList<Contact> getContacts() {
