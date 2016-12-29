@@ -82,6 +82,37 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
         initNFC();
     }
 
+    @OnClick(R.id.addContactButton)
+    public void onClick() {
+        if ((String.valueOf(newContactName.getText()).matches(".*\\w.*")
+                && (String.valueOf(newContactName.getText().charAt(0))).trim().length() > 0)) {
+            realm.beginTransaction();
+            // Objects with primary keys need to have primary key value specified
+                Contact contact = realm.createObject(Contact.class, generateContactId());
+                contact.setName(String.valueOf(newContactName.getText()));
+                realm.copyToRealmOrUpdate(contact);
+            realm.commitTransaction();
+            Toast.makeText(this, contact.getName(), Toast.LENGTH_LONG).show();
+
+            Intent selectedIntent = new Intent(AddContactActivity.this, AuthUserActivity.class);
+            startActivityForResult(selectedIntent, 13);
+        }
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        realm.close();
+        unregisterReceiver(receiver);
+    }
+
     public void initP2P() {
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
@@ -201,36 +232,6 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
         Toast.makeText(this, "Public key : " + msgs.get(0), Toast.LENGTH_LONG).show();
         ((App) getApplication()).getDaoComponent().inject(this);
         getSupportActionBar().show();
-    }
-
-    @OnClick(R.id.addContactButton)
-    public void onClick() {
-        if ((String.valueOf(newContactName.getText()).matches(".*\\w.*")
-                && (String.valueOf(newContactName.getText().charAt(0))).trim().length() > 0)) {
-            realm.beginTransaction();
-            // Objects with primary keys need to have primary key value specified
-                Contact contact = realm.createObject(Contact.class, generateContactId());
-                contact.setName(String.valueOf(newContactName.getText()));
-                realm.copyToRealmOrUpdate(contact);
-            realm.commitTransaction();
-            Toast.makeText(this, contact.getName(), Toast.LENGTH_LONG).show();
-
-            Intent selectedIntent = new Intent(AddContactActivity.this, AuthUserActivity.class);
-            startActivityForResult(selectedIntent, 13);
-        }
-    }
-
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        unregisterReceiver(receiver);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        realm.close();
     }
 
     /**
@@ -454,6 +455,16 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
         }
     };
 
+    @Override
+    public void onBackPressed() {
+        Intent selectedIntent = new Intent(AddContactActivity.this, AuthUserActivity.class);
+        startActivity(selectedIntent);
+    }
+
+    /**
+     *
+     * @return id for new Realm Contact object
+     */
     public long generateContactId() {
         long id;
         try {

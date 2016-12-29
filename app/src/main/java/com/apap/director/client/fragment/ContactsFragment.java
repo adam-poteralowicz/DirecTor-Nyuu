@@ -3,6 +3,7 @@ package com.apap.director.client.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,9 +71,11 @@ public class ContactsFragment extends Fragment {
      * Display all the users from the DB into the listView
      */
     private void refreshContactList() {
+        Log.d("DTOR","REFRESHING CONTACTS");
         RealmResults<Contact> contactResults = realm.where(Contact.class).findAll();
-        if (!contactResults.isEmpty())
+        if (!contactResults.isEmpty()) {
             contactList.addAll(realm.copyFromRealm(contactResults));
+        }
 
         if (contactList != null) {
             if (arrayAdapter == null) {
@@ -81,16 +84,17 @@ public class ContactsFragment extends Fragment {
                         android.R.layout.simple_list_item_1,
                         contactList);
                 contactsListView.setAdapter(arrayAdapter);
-                if (contactList.isEmpty())
-                    ;
             } else {
                 contactsListView.setAdapter(null);
                 arrayAdapter.clear();
+                contactList = new ArrayList<Contact>();
+                contactList.addAll(realm.copyFromRealm(contactResults));
                 arrayAdapter.addAll(contactList);
                 arrayAdapter.notifyDataSetChanged();
                 contactsListView.setAdapter(arrayAdapter);
             }
         }
+
     }
 
     @OnClick(R.id.addNewContactButton)

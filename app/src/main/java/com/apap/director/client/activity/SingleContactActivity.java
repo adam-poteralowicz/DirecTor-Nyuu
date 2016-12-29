@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
+import com.apap.director.client.fragment.ContactsFragment;
 import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.Conversation;
 
@@ -83,7 +84,8 @@ public class SingleContactActivity extends Activity {
                         if (realm.where(Conversation.class).equalTo("contact.id", contactIdFromIntent).findFirst() == null) {
                             realm.beginTransaction();
                                 Conversation conversation = new Conversation();
-                                conversation.setContact(realm.where(Contact.class).equalTo("contactId", contactIdFromIntent).findFirst());
+                                conversation.setContact(realm.where(Contact.class).equalTo("id", contactIdFromIntent).findFirst());
+                                realm.copyToRealmOrUpdate(conversation);
                             realm.commitTransaction();
                         }
 

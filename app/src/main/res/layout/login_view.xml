@@ -37,6 +37,7 @@
         android:layout_alignStart="@+id/shimmer_tv"
         android:id="@+id/accountsView"
         android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp" />
+        android:layout_marginTop="10dp"
+        android:background="#6666ff"/>
 
 </RelativeLayout>

@@ -22,6 +22,5 @@ public class Conversation extends RealmObject {
     @Override
     public String toString() {
         return getContact().toString();
-        //return getContact().getName();
     }
 }

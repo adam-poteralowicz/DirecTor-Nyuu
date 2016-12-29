@@ -1,7 +1,10 @@
 package com.apap.director.db.realm;
 
 
+import android.util.Log;
+
 import com.apap.director.db.realm.model.Account;
+import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.ContactKey;
 import com.apap.director.db.realm.model.Conversation;
 import com.apap.director.db.realm.model.Message;
@@ -42,10 +45,11 @@ public class AccountManager {
         int registrationId  = KeyHelper.generateRegistrationId(false);
 
         realm.beginTransaction();
-            Account account = realm.createObject(Account.class);
+            Account account = realm.createObject(Account.class, generateAccountId());
             account.setKeyPair(identityKeyPair.serialize());
             account.setName(name);
             account.setRegistrationId(registrationId);
+            realm.copyToRealmOrUpdate(account);
         realm.commitTransaction();
 
         return true;
@@ -105,7 +109,11 @@ public class AccountManager {
 
             RealmResults<ContactKey> contactKeys = realm.where(ContactKey.class).equalTo("account.name", name).findAll();
             contactKeys.deleteAllFromRealm();
+
+            realm.where(Account.class).equalTo("name", name).findFirst().deleteFromRealm();
         realm.commitTransaction();
+        Log.d("DTOR", "DELETING ACCOUNT "+name);
+        Log.d("DTOR/Accounts", realm.where(Account.class).findAll().toString());
 
         return true;
     }
@@ -117,6 +125,24 @@ public class AccountManager {
 
     public boolean logIn(){
         return false;
+    }
+
+    /**
+     *
+     * @return id for new Realm Account object
+     */
+    public long generateAccountId() {
+        long id;
+        try {
+            if (realm.where(Account.class).max("id") == null) {
+                id = 0;
+            } else {
+                id = realm.where(Account.class).max("id").longValue() + 1;
+            }
+        } catch(ArrayIndexOutOfBoundsException ex) {
+            id = 0;
+        }
+        return id;
     }
 
 

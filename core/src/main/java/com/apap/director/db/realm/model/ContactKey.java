@@ -14,6 +14,7 @@ public class ContactKey extends RealmObject {
     @PrimaryKey
     private long id;
 
+    private Account account;
     private Contact contact;
     private byte[] serialized;
     private int deviceId;

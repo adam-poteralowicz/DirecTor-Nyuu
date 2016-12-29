@@ -28,8 +28,13 @@ public class AuthUserActivity extends FragmentActivity {
         viewPager.setAdapter(direcTorPagerAdapter);
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent selectedIntent = new Intent(AuthUserActivity.this, LoginActivity.class);
+        startActivity(selectedIntent);
+    }
 
-//    @OnClick(R.id.addNewContactButton)
+    //    @OnClick(R.id.addNewContactButton)
 //    public void onClick(View view) {
 //            Intent selectedIntent = new Intent(AuthUserActivity.this, AddContactActivity.class);
 //            startActivityForResult(selectedIntent, 0010);

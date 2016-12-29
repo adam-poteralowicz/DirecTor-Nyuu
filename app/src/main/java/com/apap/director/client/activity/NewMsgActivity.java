@@ -53,7 +53,10 @@ public class NewMsgActivity extends Activity {
         }
 
         contactIdFromIntent = getIntent().getLongExtra("contactId", 1L);
-        final Conversation conversation = realm.where(Conversation.class).equalTo("contactId", contactIdFromIntent).findFirst();
+        Conversation myConversation = realm.where(Conversation.class).equalTo("contact.id", contactIdFromIntent).findFirst();
+        if (myConversation == null)
+            Log.d("DTOR","MY CONVERSATION IS NULL");
+        final Conversation conversation = realm.where(Conversation.class).equalTo("contact.id", contactIdFromIntent).findFirst();
         if (conversation == null)
             Log.d("conversation", "null");
         if (conversation.getMessages() != null)
@@ -82,7 +85,6 @@ public class NewMsgActivity extends Activity {
         realm.beginTransaction();
             realm.where(Message.class).equalTo("id", messageId).findFirst().deleteFromRealm();
         realm.commitTransaction();
-        myMessages.remove(position);
         arrayAdapter.notifyDataSetChanged();
         return true;
     }
@@ -90,8 +92,8 @@ public class NewMsgActivity extends Activity {
     public void onClick(View view) {
 
         realm.beginTransaction();
-            Conversation conversation = realm.where(Conversation.class).equalTo("contactId", contactIdFromIntent).findFirst();
-            Message message = realm.createObject(Message.class);
+            Conversation conversation = realm.where(Conversation.class).equalTo("contact.id", contactIdFromIntent).findFirst();
+            Message message = realm.createObject(Message.class, generateMessageId());
             message.setRecipient(String.valueOf(recipient.getText()));
             message.setDate(new Date());
             message.setMine(true);
@@ -104,10 +106,12 @@ public class NewMsgActivity extends Activity {
                 Log.v("Message sent", String.valueOf(newMessageField.getText()));
             }
 
-            conversation.setContact(realm.where(Contact.class).equalTo("contactId", contactIdFromIntent).findFirst());
+            conversation.setContact(realm.where(Contact.class).equalTo("id", contactIdFromIntent).findFirst());
             message.setConversation(conversation);
-        realm.commitTransaction();
+            realm.copyToRealmOrUpdate(conversation);
+            realm.copyToRealmOrUpdate(message);
         myMessages.add(message);
+        realm.commitTransaction();
 
         arrayAdapter.notifyDataSetChanged();
         messagesView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
@@ -119,6 +123,24 @@ public class NewMsgActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         realm.close();
+    }
+
+    /**
+     *
+     * @return id for new Realm Message object
+     */
+    public long generateMessageId() {
+        long id;
+        try {
+            if (realm.where(Message.class).max("id") == null) {
+                id = 0;
+            } else {
+                id = realm.where(Message.class).max("id").longValue() + 1;
+            }
+        } catch(ArrayIndexOutOfBoundsException ex) {
+            id = 0;
+        }
+        return id;
     }
 
 }

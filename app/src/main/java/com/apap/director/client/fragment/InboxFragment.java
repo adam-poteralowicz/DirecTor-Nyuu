@@ -77,6 +77,7 @@ public class InboxFragment extends Fragment {
     public void startSendMessageActivity(int position){
         Toast.makeText(getActivity(), conversationList.get(position).getContact().getName(), Toast.LENGTH_LONG).show();
         Intent intent = new Intent(getActivity(), NewMsgActivity.class);
+        intent.putExtra("contactId", conversationList.get(position).getContact().getId());
         intent.putExtra("msgTitle", conversationList.get(position).getContact().getName());
         startActivity(intent);
     }
