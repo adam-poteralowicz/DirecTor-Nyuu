@@ -19,8 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.apap.director.client.App;
+import com.apap.director.client.manager.ContactManager;
 import com.apap.director.client.R;
-import com.apap.director.client.fragment.ContactsFragment;
 import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.Conversation;
 
@@ -44,6 +44,7 @@ public class SingleContactActivity extends Activity {
     Long contactIdFromIntent;
     EditText contactNameEditText;
     private Realm realm;
+    private ContactManager contactManager;
 
     public void onCreate(Bundle savedInstanceState) {
 
@@ -97,9 +98,7 @@ public class SingleContactActivity extends Activity {
                     }
                     case 1:
                     {
-                        realm.beginTransaction();
-                            realm.where(Contact.class).equalTo("id", contactIdFromIntent).findFirst().deleteFromRealm();
-                        realm.commitTransaction();
+                        contactManager.deleteContact(contactNameFromIntent);
                         intent = new Intent(App.getContext(), AuthUserActivity.class);
                         startActivity(intent);
                         break;
@@ -115,6 +114,7 @@ public class SingleContactActivity extends Activity {
         });
 
         contactNameEditText.setSelectAllOnFocus(true);
+        contactManager = new ContactManager();
 
     }
 
@@ -152,10 +152,7 @@ public class SingleContactActivity extends Activity {
             assert cursor != null;
             cursor.moveToFirst();
             String imagePath = cursor.getString(cursor.getColumnIndex(filePath[0]));
-            realm.beginTransaction();
-                Contact contact = realm.where(Contact.class).equalTo("name", contactNameFromIntent).findFirst();
-                contact.setImage(imagePath);
-            realm.commitTransaction();
+            contactManager.updateContact(contactNameFromIntent, imagePath, null, null);
 
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inPreferredConfig = Bitmap.Config.ARGB_8888;

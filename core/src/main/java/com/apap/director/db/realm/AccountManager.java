@@ -131,7 +131,7 @@ public class AccountManager {
      *
      * @return id for new Realm Account object
      */
-    public long generateAccountId() {
+    private long generateAccountId() {
         long id;
         try {
             if (realm.where(Account.class).max("id") == null) {
