@@ -32,10 +32,10 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.fragment.DeviceDetailFragment;
 import com.apap.director.client.fragment.DeviceListFragment;
+import com.apap.director.client.manager.ContactManager;
 import com.apap.director.client.util.BTUtils;
 import com.apap.director.client.util.NFCUtils;
 import com.apap.director.client.util.keyExchange.WiFiDirectBroadcastReceiver;
-import com.apap.director.db.realm.model.Contact;
 
 import java.util.List;
 
@@ -62,6 +62,7 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
     private final String _MIME_TYPE = "text/plain";
     private String publicKey = "myUltraAwesomePublicKey";
     private Realm realm;
+    private ContactManager contactManager;
 
 
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
@@ -73,6 +74,7 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
         setContentView(R.layout.add_contact_view);
         ButterKnife.bind(this);
         realm = Realm.getDefaultInstance();
+        contactManager = new ContactManager();
 
         newContactName = (EditText) findViewById(R.id.newContactName);
         newContactName.setHint("CONTACT NAME");
@@ -84,15 +86,13 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
 
     @OnClick(R.id.addContactButton)
     public void onClick() {
-        if ((String.valueOf(newContactName.getText()).matches(".*\\w.*")
-                && (String.valueOf(newContactName.getText().charAt(0))).trim().length() > 0)) {
-            realm.beginTransaction();
-            // Objects with primary keys need to have primary key value specified
-                Contact contact = realm.createObject(Contact.class, generateContactId());
-                contact.setName(String.valueOf(newContactName.getText()));
-                realm.copyToRealmOrUpdate(contact);
-            realm.commitTransaction();
-            Toast.makeText(this, contact.getName(), Toast.LENGTH_LONG).show();
+        String name = String.valueOf(newContactName.getText());
+        if (name.matches(".*\\w.*")
+                && (name.matches("\\w.*")))
+        {
+            //TODO Extract received key
+            contactManager.addContact(name, "keyBase64");
+            Toast.makeText(this, name, Toast.LENGTH_LONG).show();
 
             Intent selectedIntent = new Intent(AddContactActivity.this, AuthUserActivity.class);
             startActivityForResult(selectedIntent, 13);
@@ -387,7 +387,6 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
 
     @Override
     public void onChannelDisconnected() {
-        // we will try once more
         if (manager != null && !retryChannel) {
             Toast.makeText(this, "Channel lost. Trying again", Toast.LENGTH_LONG).show();
             resetData();
@@ -458,24 +457,6 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
     public void onBackPressed() {
         Intent selectedIntent = new Intent(AddContactActivity.this, AuthUserActivity.class);
         startActivity(selectedIntent);
-    }
-
-    /**
-     *
-     * @return id for new Realm Contact object
-     */
-    public long generateContactId() {
-        long id;
-        try {
-            if (realm.where(Contact.class).max("id") == null) {
-                id = 0;
-            } else {
-                id = realm.where(Contact.class).max("id").longValue() + 1;
-            }
-        } catch(ArrayIndexOutOfBoundsException ex) {
-            id = 0;
-        }
-        return id;
     }
 
 }

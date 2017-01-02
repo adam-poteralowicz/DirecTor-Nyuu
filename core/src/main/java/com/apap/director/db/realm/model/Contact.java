@@ -15,10 +15,12 @@ public class Contact extends RealmObject {
 
     @PrimaryKey
     private long id;
+
     private String name;
     private Conversation conversation;
     private RealmList<ContactKey> contactKeys;
     private String image;
+    private String oneTimeKey;
 
     @Override
     public String toString() {
