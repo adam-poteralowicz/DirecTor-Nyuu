@@ -76,7 +76,7 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
 
         newContactName = (EditText) findViewById(R.id.newContactName);
         newContactName.setHint("CONTACT NAME");
-        ((App) getApplication()).getDaoComponent().inject(this);
+        ((App) getApplication()).getComponent().inject(this);
         getSupportActionBar().show();
         initP2P();
         initNFC();
@@ -230,7 +230,6 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
         List<String> msgs = NFCUtils.getStringsFromNfcIntent(_intent);
 
         Toast.makeText(this, "Public key : " + msgs.get(0), Toast.LENGTH_LONG).show();
-        ((App) getApplication()).getDaoComponent().inject(this);
         getSupportActionBar().show();
     }
 

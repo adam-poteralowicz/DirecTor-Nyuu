@@ -46,7 +46,7 @@ public class InboxFragment extends Fragment {
 
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
-        ((App) getActivity().getApplication()).getDaoComponent().inject(this);
+        ((App) getActivity().getApplication()).getComponent().inject(this);
         super.onActivityCreated(savedInstanceState);
         realm = Realm.getDefaultInstance();
 

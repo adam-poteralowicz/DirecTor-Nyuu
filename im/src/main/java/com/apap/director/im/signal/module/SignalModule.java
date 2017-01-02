@@ -2,13 +2,16 @@ package com.apap.director.im.signal.module;
 
 import android.content.Context;
 
-import com.apap.director.db.manager.DatabaseManager;
+import com.apap.director.db.account.AccountManager;
+import com.apap.director.db.account.ApplicationScope;
 import com.apap.director.im.signal.DirectorIdentityKeyStore;
 import com.apap.director.im.signal.DirectorPreKeyStore;
 import com.apap.director.im.signal.DirectorSessionStore;
 import com.apap.director.im.signal.DirectorSignedPreKeyStore;
 import com.apap.director.im.websocket.service.MessageAction;
 import com.apap.director.im.websocket.service.StompService;
+
+import org.whispersystems.curve25519.Curve25519;
 
 import javax.inject.Singleton;
 
@@ -25,38 +28,46 @@ public class SignalModule {
         this.context = context;
     }
 
+
     @Provides
-    @ApplicationScope
-    public DirectorIdentityKeyStore provideIdentityKeyStore(){
-        return new DirectorIdentityKeyStore(context, Realm.getDefaultInstance());
+    @Singleton
+    public Curve25519 provideCurve25519(){
+        return Curve25519.getInstance(Curve25519.BEST);
     }
 
     @Provides
-    @ApplicationScope
-    public DirectorPreKeyStore providePreKeyStore(){
-        return new DirectorPreKeyStore(Realm.getDefaultInstance());
+    @Singleton
+    public DirectorIdentityKeyStore provideIdentityKeyStore(Realm realm, AccountManager manager){
+        return new DirectorIdentityKeyStore(realm, manager);
     }
 
     @Provides
-    @ApplicationScope
-    public DirectorSessionStore provideSessionStore(){
-        return new DirectorSessionStore(Realm.getDefaultInstance());
+    @Singleton
+    public DirectorPreKeyStore providePreKeyStore(Realm realm){
+        return new DirectorPreKeyStore(realm);
     }
 
     @Provides
-    @ApplicationScope
-    public DirectorSignedPreKeyStore provideSignedPreKeyStore(){
-        return new DirectorSignedPreKeyStore(Realm.getDefaultInstance());
+    @Singleton
+    public DirectorSessionStore provideSessionStore(Realm realm){
+        return new DirectorSessionStore(realm);
     }
 
     @Provides
-    @ApplicationScope
+    @Singleton
+    public DirectorSignedPreKeyStore provideSignedPreKeyStore(Realm realm){
+        return new DirectorSignedPreKeyStore(realm);
+    }
+
+    @Provides
+    @Singleton
     public StompService stompService(MessageAction messageAction){
         return new StompService(messageAction);
     }
 
 
     @Provides
+    @Singleton
     public MessageAction messageAction(DirectorPreKeyStore preKeyStore, DirectorSessionStore sessionStore, DirectorIdentityKeyStore identityKeyStore, DirectorSignedPreKeyStore signedPreKeyStore) {
         return new MessageAction(preKeyStore, identityKeyStore, sessionStore, signedPreKeyStore);
     }

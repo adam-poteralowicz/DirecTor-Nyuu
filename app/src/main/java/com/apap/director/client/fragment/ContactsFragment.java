@@ -45,7 +45,7 @@ public class ContactsFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
 
-        ((App) getActivity().getApplication()).getDaoComponent().inject(this);
+        ((App) getActivity().getApplication()).getComponent().inject(this);
         super.onActivityCreated(savedInstanceState);
         realm = Realm.getDefaultInstance();
 

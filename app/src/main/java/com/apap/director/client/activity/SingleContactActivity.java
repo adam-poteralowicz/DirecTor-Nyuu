@@ -48,7 +48,7 @@ public class SingleContactActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
 
         setContentView(R.layout.single_contact_view);
-        ((App) getApplication()).getDaoComponent().inject(this);
+        ((App) getApplication()).getComponent().inject(this);
         ButterKnife.bind(this);
         realm = Realm.getDefaultInstance();
 

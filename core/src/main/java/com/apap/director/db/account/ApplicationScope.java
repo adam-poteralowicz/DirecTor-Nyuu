@@ -1,4 +1,4 @@
-package com.apap.director.im.signal.module;
+package com.apap.director.db.account;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

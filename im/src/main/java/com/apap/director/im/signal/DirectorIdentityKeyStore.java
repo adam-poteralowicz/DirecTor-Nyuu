@@ -1,12 +1,17 @@
 package com.apap.director.im.signal;
 
 import android.content.Context;
+import android.util.Log;
 
+import com.apap.director.db.account.AccountManager;
+import com.apap.director.db.realm.model.Account;
+import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.ContactKey;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.whispersystems.libsignal.IdentityKey;
 import org.whispersystems.libsignal.IdentityKeyPair;
+import org.whispersystems.libsignal.InvalidKeyException;
 import org.whispersystems.libsignal.SignalProtocolAddress;
 import org.whispersystems.libsignal.state.IdentityKeyStore;
 
@@ -20,56 +25,59 @@ import io.realm.RealmResults;
 
 public class DirectorIdentityKeyStore implements IdentityKeyStore {
 
-    private Context context;
     private Realm realm;
-
-    public static final String IDENTITY_PREF = "com.apap.director.identity.pref";
-    public static final String KEY_PAIR = "key_pair";
-    public static final String LOCAL_ID = "local_id";
+    private AccountManager accountManager;
 
     @Inject
-    public DirectorIdentityKeyStore(Context context, Realm realm){
-        this.context = context;
+    public DirectorIdentityKeyStore(Realm realm, AccountManager accountManager){
         this.realm = realm;
+        this.accountManager = accountManager;
     }
 
     @Override
     public IdentityKeyPair getIdentityKeyPair() {
-
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(context.getSharedPreferences(IDENTITY_PREF, Context.MODE_PRIVATE).getString(KEY_PAIR,null), IdentityKeyPair.class);
-        } catch (IOException e) {
-            e.printStackTrace();
+            return new IdentityKeyPair(accountManager.getActiveAccount().getKeyPair());
+        } catch (InvalidKeyException e) {
+            Log.v("HAI/IdentityKeyStore", "Identity key pair not found");
             return null;
         }
-
     }
 
     @Override
     public int getLocalRegistrationId() {
-        return context.getSharedPreferences(IDENTITY_PREF, 0).getInt(LOCAL_ID, -1);
+        return accountManager.getActiveAccount().getRegistrationId();
     }
 
     @Override
     public void saveIdentity(SignalProtocolAddress address, IdentityKey identityKey) {
+
         realm.beginTransaction();
+
             ContactKey contactKey = realm.createObject(ContactKey.class);
             contactKey.setDeviceId(address.getDeviceId());
             contactKey.setKeyBase64(address.getName());
+
+            Contact contact = realm.where(Contact.class)
+                                .equalTo("id", Long.valueOf(address.getName()))
+                                .findFirst();
+
+            contact.getContactKeys().add(contactKey);
+            contactKey.setContact(contact);
+
         realm.commitTransaction();
     }
 
     @Override
     public boolean isTrustedIdentity(SignalProtocolAddress address, IdentityKey identityKey) {
 
-        List<ContactKey> list = realm.where(ContactKey.class).equalTo("keyBase64", address.getName()).findAll();
+        ContactKey contactKey = realm.where(ContactKey.class)
+                .equalTo("keyBase64", address.getName())
+                .equalTo("deviceId", address.getDeviceId())
+                .findFirst();
 
-        for(ContactKey key : list) {
-            if (key.getDeviceId() == address.getDeviceId()) return true;
-        }
+        return contactKey == null ? false : true;
 
-        return false;
     }
 
 }

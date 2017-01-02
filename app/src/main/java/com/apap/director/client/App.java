@@ -3,22 +3,20 @@ package com.apap.director.client;
 import android.app.Application;
 import android.content.Context;
 
-
-import com.apap.director.client.component.DaggerDaoComponent;
-import com.apap.director.client.component.DaggerSignalComponent;
-import com.apap.director.client.component.DaoComponent;
-import com.apap.director.client.component.SignalComponent;
+import com.apap.director.client.component.DaggerMainComponent;
+import com.apap.director.client.component.MainComponent;
+import com.apap.director.db.account.AccountModule;
 import com.apap.director.db.dao.module.DaoModule;
+import com.apap.director.db.rest.module.RestModule;
 import com.apap.director.im.signal.module.SignalModule;
-import com.apap.director.im.websocket.module.WebSocketModule;
+
 import info.guardianproject.netcipher.proxy.OrbotHelper;
 import io.realm.Realm;
 
 public class App extends Application {
 
         private static Context mContext;
-        private SignalComponent signalComponent;
-        private DaoComponent daoComponent;
+        private MainComponent mainComponent;
 
         @Override
         public void onCreate() {
@@ -26,24 +24,34 @@ public class App extends Application {
             mContext = App.this;
 
             Realm.init(this);
+//
+//            daoComponent = DaggerDaoComponent.builder()
+//                    .daoModule(new DaoModule(this))
+//                    .build();
+//
+//            signalComponent = DaggerSignalComponent.builder()
+//                    .signalModule(new SignalModule(this))
+//                    .webSocketModule(new WebSocketModule())
+//                    .daoComponent(daoComponent)
+//                    .build();
 
-            daoComponent = DaggerDaoComponent.builder()
+            mainComponent = DaggerMainComponent.builder()
+                    .accountModule(new AccountModule())
                     .daoModule(new DaoModule(this))
+                    .restModule(new RestModule())
+                    .signalModule(new SignalModule(this))
                     .build();
 
-            signalComponent = DaggerSignalComponent.builder()
-                    .signalModule(new SignalModule(this))
-                    .webSocketModule(new WebSocketModule())
-                    .daoComponent(daoComponent)
-                    .build();
+
+
 
             OrbotHelper.get(this).init();
             //OrbotHelper.requestStartTor(this);
             OrbotHelper.get(this).requestStatus(this);
         }
 
-        public SignalComponent getSignalComponent() { return signalComponent; }
-        public DaoComponent getDaoComponent() { return daoComponent; }
+
+        public MainComponent getComponent() { return mainComponent; }
         public static Context getContext(){
             return mContext;
         }

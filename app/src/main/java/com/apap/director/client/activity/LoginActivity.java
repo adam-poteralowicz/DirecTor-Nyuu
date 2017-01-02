@@ -17,9 +17,10 @@ import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.db.realm.AccountManager;
+//import com.apap.director.db.account.AccountManager;
+import com.apap.director.db.account.AccountManager;
 import com.apap.director.db.realm.model.Account;
-import com.apap.director.db.realm.model.Contact;
+import com.apap.director.db.realm.util.ArrayAdapterChangeListener;
 import com.apap.director.db.rest.service.UserService;
 import com.apap.director.im.websocket.service.StompService;
 import com.romainpiel.shimmer.Shimmer;
@@ -55,36 +56,54 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
     StompService service;
 
     @BindView(R.id.accountsView) ListView accountsListView;
-    private Realm realm;
+
+    @Inject
+    Realm realm;
+
     private ArrayList<Account> accountList;
-    private AccountManager accountManager;
-    private UserService userService;
+    private RealmResults<Account> realmAccounts;
+    private ArrayAdapterChangeListener<Account, RealmResults<Account>> listener;
+
+    @Inject
+    AccountManager accountManager;
+
+    @Inject
+    UserService userService;
+
     private ArrayAdapter<Account> arrayAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_view);
-        ((App) getApplication()).getSignalComponent().inject(this);
+
+        ((App) getApplication()).getComponent().inject(this);
         ButterKnife.bind(this);
-        accountManager = new AccountManager(userService);
 
-        try {
-            StrongHttpClientBuilder builder = new StrongHttpClientBuilder(this);
-            StrongHttpClientBuilder
-                    .forMaxSecurity(this)
-                    .withTorValidation()
-                    .build(this);
-            Log.d("Builder status", String.valueOf(builder.supportsHttpProxy())+"\n"+String.valueOf(builder.supportsSocksProxy())+"\n"+builder.toString());
-        }
-        catch (Exception e) {
-            Toast.makeText(this, R.string.msg_crash, Toast.LENGTH_LONG)
-                    .show();
-            Log.e(getClass().getSimpleName(),
-                    "Exception loading hidden service", e);
-            finish();
-        }
+        shimmer();
 
+        /**
+         * Account List View
+         */
+        realmAccounts = realm.where(Account.class).findAll();
+
+        accountList = new ArrayList<Account>();
+        arrayAdapter = new ArrayAdapter<Account>(
+                App.getContext(),
+                android.R.layout.simple_list_item_single_choice,
+                accountList);
+        accountsListView.setAdapter(arrayAdapter);
+
+        arrayAdapter.addAll(realmAccounts);
+        arrayAdapter.notifyDataSetChanged();
+
+        listener = new ArrayAdapterChangeListener<>(arrayAdapter);
+        realmAccounts.addChangeListener(listener);
+
+
+    }
+
+    private void shimmer(){
         ShimmerTextView shimmerTextView = (ShimmerTextView) findViewById(R.id.shimmer_tv);
         shimmerTextView.setTextColor(new ColorStateList(
                 new int[][]{
@@ -97,28 +116,6 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
         shimmer = new Shimmer();
         shimmer.start(shimmerTextView);
         getSupportActionBar().show();
-
-        /**
-         * Account List View
-         */
-
-        realm = Realm.getDefaultInstance();
-        final RealmResults<Account> accounts = realm.where(Account.class).findAll();
-        accounts.addChangeListener(new RealmChangeListener<RealmResults<Account>>() {
-            @Override
-            public void onChange(RealmResults<Account> results) {
-                accounts.size();
-            }
-        });
-
-        accountList = new ArrayList<Account>();
-        arrayAdapter = new ArrayAdapter<Account>(
-                App.getContext(),
-                android.R.layout.simple_list_item_single_choice,
-                accountList);
-        accountsListView.setAdapter(arrayAdapter);
-
-        refreshAccountList();
     }
 
     @Override
@@ -128,14 +125,11 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
     @OnItemLongClick(R.id.accountsView)
     public boolean deleteAccount(int position) {
         String name = accountList.get(position).getName();
-        accountManager.deleteAccount(name);
-        realm.beginTransaction();
-            accountList.remove(position);
-        realm.commitTransaction();
-        arrayAdapter.notifyDataSetChanged();
-        refreshAccountList();
+        boolean deleted = accountManager.deleteAccount(name);
+        if(deleted == false) Log.v("HAI/LoginActivity", "Account "+name+ " failed to delete itself");
+        else Log.v("HAI/LoginActivity", "Account "+name+ " deleted");
         Toast.makeText(this, "Account " + name + " deleted", Toast.LENGTH_LONG).show();
-        return true;
+        return false;
     }
 
     @OnItemClick(R.id.accountsView)
@@ -164,10 +158,9 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
                 NetCipher.clearProxy();
                 return true;
             case R.id.swapId:
-                accountManager = new AccountManager(userService);
-                accountManager.createAccount("Bres");
-                arrayAdapter.notifyDataSetChanged();
-                refreshAccountList();
+                Log.v("HAI/LoginActivity", "Swap Id pressed");
+                Account testAccount = accountManager.createAccount("Bres");
+                accountManager.signUp(testAccount);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -177,6 +170,15 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
     @OnClick(R.id.postLoginButton)
     public void onClick(View view) {
         // TODO: Save new user upon first login
+
+        Account active = accountManager.getActiveAccount();
+        if(active == null){
+            Toast.makeText(this, "Choose an account", Toast.LENGTH_SHORT);
+            return;
+        }
+
+        accountManager.logIn();
+
         service.connect();
 
         shimmer.cancel();
@@ -192,6 +194,7 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
                 try {
                     Log.d("HS_URL", HS_URL);
                     HttpGet get = new HttpGet(HS_URL);
+
                     String result = httpClient.execute(get, new BasicResponseHandler());
 
                     System.out.println(result);
@@ -251,35 +254,35 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        realm.close();
+        realmAccounts.removeChangeListener(listener);
     }
 
-    private void refreshAccountList() {
-        Log.d("DTOR","REFRESHING ACCOUNTS");
-        RealmResults<Account> accountResults = realm.where(Account.class).findAll();
-        if (!accountResults.isEmpty()) {
-            accountList.addAll(realm.copyFromRealm(accountResults));
-        }
-
-        if (accountList != null) {
-            if (arrayAdapter == null) {
-                arrayAdapter = new ArrayAdapter<Account>(
-                        App.getContext(),
-                        android.R.layout.simple_list_item_single_choice,
-                        accountList);
-                accountsListView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
-                accountsListView.setAdapter(arrayAdapter);
-            } else {
-                accountsListView.setAdapter(null);
-                arrayAdapter.clear();
-                accountList = new ArrayList<Account>();
-                accountList.addAll(realm.copyFromRealm(accountResults));
-                Log.d("ADDING ACCOUNTS", accountList.toString());
-                arrayAdapter.addAll(accountList);
-                arrayAdapter.notifyDataSetChanged();
-                accountsListView.setAdapter(arrayAdapter);
-            }
-        }
-
-    }
+//    private void refreshAccountList() {
+//        Log.d("DTOR","REFRESHING ACCOUNTS");
+//        RealmResults<Account> accountResults = realm.where(Account.class).findAll();
+//        if (!accountResults.isEmpty()) {
+//            accountList.addAll(realm.copyFromRealm(accountResults));
+//        }
+//
+//        if (accountList != null) {
+//            if (arrayAdapter == null) {
+//                arrayAdapter = new ArrayAdapter<Account>(
+//                        App.getContext(),
+//                        android.R.layout.simple_list_item_single_choice,
+//                        accountList);
+//                accountsListView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
+//                accountsListView.setAdapter(arrayAdapter);
+//            } else {
+//                accountsListView.setAdapter(null);
+//                arrayAdapter.clear();
+//                accountList = new ArrayList<Account>();
+//                accountList.addAll(realm.copyFromRealm(accountResults));
+//                Log.d("ADDING ACCOUNTS", accountList.toString());
+//                arrayAdapter.addAll(accountList);
+//                arrayAdapter.notifyDataSetChanged();
+//                accountsListView.setAdapter(arrayAdapter);
+//            }
+//        }
+//
+//    }
 }

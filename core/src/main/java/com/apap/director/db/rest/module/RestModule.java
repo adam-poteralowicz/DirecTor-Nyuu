@@ -1,0 +1,40 @@
+package com.apap.director.db.rest.module;
+
+import com.apap.director.db.account.ApplicationScope;
+import com.apap.director.db.rest.service.KeyService;
+import com.apap.director.db.rest.service.UserService;
+
+import javax.inject.Singleton;
+
+import dagger.Module;
+import dagger.Provides;
+import retrofit2.Retrofit;
+import retrofit2.converter.jackson.JacksonConverterFactory;
+
+@Module
+public class RestModule {
+
+    private Retrofit retrofit;
+    private final String baseUrl = "http://localhost:7500";
+
+    public RestModule(){
+        this.retrofit = new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .addConverterFactory(JacksonConverterFactory.create())
+                .build();
+    }
+
+    @Provides
+    @Singleton
+    public UserService provideUserService(){
+        return retrofit.create(UserService.class);
+    }
+
+    @Provides
+    @Singleton
+    public KeyService provideKeyService(){
+        return retrofit.create(KeyService.class);
+    }
+
+
+}

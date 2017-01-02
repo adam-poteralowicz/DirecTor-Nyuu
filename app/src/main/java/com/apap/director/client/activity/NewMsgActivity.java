@@ -41,7 +41,7 @@ public class NewMsgActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ((App) getApplication()).getDaoComponent().inject(this);
+        ((App) getApplication()).getComponent().inject(this);
         setContentView(R.layout.new_msg_view);
         ButterKnife.bind(this);
         realm = Realm.getDefaultInstance();
