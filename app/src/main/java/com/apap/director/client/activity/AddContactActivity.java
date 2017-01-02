@@ -32,12 +32,14 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.fragment.DeviceDetailFragment;
 import com.apap.director.client.fragment.DeviceListFragment;
-import com.apap.director.client.manager.ContactManager;
+import com.apap.director.manager.ContactManager;
 import com.apap.director.client.util.BTUtils;
 import com.apap.director.client.util.NFCUtils;
 import com.apap.director.client.util.keyExchange.WiFiDirectBroadcastReceiver;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -61,8 +63,12 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
     public IntentFilter[] _readIntentFilters, _writeIntentFilters;
     private final String _MIME_TYPE = "text/plain";
     private String publicKey = "myUltraAwesomePublicKey";
-    private Realm realm;
-    private ContactManager contactManager;
+
+    @Inject
+    Realm realm;
+
+    @Inject
+    ContactManager contactManager;
 
 
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
@@ -73,8 +79,6 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_contact_view);
         ButterKnife.bind(this);
-        realm = Realm.getDefaultInstance();
-        contactManager = new ContactManager();
 
         newContactName = (EditText) findViewById(R.id.newContactName);
         newContactName.setHint("CONTACT NAME");

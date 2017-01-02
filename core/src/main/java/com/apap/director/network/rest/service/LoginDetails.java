@@ -1,4 +1,4 @@
-package com.apap.director.db.rest.service;
+package com.apap.director.network.rest.service;
 
 public class LoginDetails{
 

@@ -7,7 +7,7 @@
 //import com.apap.director.client.fragment.ContactsFragment;
 //import com.apap.director.client.fragment.InboxFragment;
 //import com.apap.director.db.dao.module.DaoModule;
-//import com.apap.director.db.rest.service.UserService;
+//import com.apap.director.network.rest.service.UserService;
 //
 //import javax.inject.Singleton;
 //

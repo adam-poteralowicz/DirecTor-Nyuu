@@ -19,13 +19,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.apap.director.client.App;
-import com.apap.director.client.manager.ContactManager;
+import com.apap.director.manager.ContactManager;
 import com.apap.director.client.R;
 import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.Conversation;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,15 +45,18 @@ public class SingleContactActivity extends Activity {
     String contactNameFromIntent;
     Long contactIdFromIntent;
     EditText contactNameEditText;
-    private Realm realm;
-    private ContactManager contactManager;
+
+    @Inject
+    Realm realm;
+
+    @Inject
+    ContactManager contactManager;
 
     public void onCreate(Bundle savedInstanceState) {
 
         setContentView(R.layout.single_contact_view);
         ((App) getApplication()).getComponent().inject(this);
         ButterKnife.bind(this);
-        realm = Realm.getDefaultInstance();
 
         super.onCreate(savedInstanceState);
 
@@ -114,7 +119,6 @@ public class SingleContactActivity extends Activity {
         });
 
         contactNameEditText.setSelectAllOnFocus(true);
-        contactManager = new ContactManager();
 
     }
 

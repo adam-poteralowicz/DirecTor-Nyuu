@@ -1,23 +1,20 @@
-package com.apap.director.client.manager;
+package com.apap.director.manager;
 
-import com.apap.director.db.realm.AccountManager;
 import com.apap.director.db.realm.model.Conversation;
 import com.apap.director.db.realm.model.Message;
-import com.apap.director.db.rest.service.UserService;
+
 import java.util.ArrayList;
 import java.util.Date;
-import javax.inject.Inject;
+
 import io.realm.Realm;
 
 public class MessageManager {
     private Realm realm;
     private AccountManager accountManager;
-    private UserService userService;
 
-    @Inject
-    public MessageManager() {
-        this.realm = Realm.getDefaultInstance();
-        this.accountManager = new AccountManager(userService);
+    public MessageManager(Realm realm, AccountManager accountManager) {
+        this.realm = realm;
+        this.accountManager = accountManager;
     }
 
     public ArrayList<Message> listAllMessages(Conversation conversation) {

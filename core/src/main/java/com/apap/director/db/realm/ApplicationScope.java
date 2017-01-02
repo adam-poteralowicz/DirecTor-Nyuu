@@ -1,4 +1,4 @@
-package com.apap.director.db.account;
+package com.apap.director.db.realm;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

@@ -2,14 +2,13 @@ package com.apap.director.im.signal.module;
 
 import android.content.Context;
 
-import com.apap.director.db.account.AccountManager;
-import com.apap.director.db.account.ApplicationScope;
 import com.apap.director.im.signal.DirectorIdentityKeyStore;
 import com.apap.director.im.signal.DirectorPreKeyStore;
 import com.apap.director.im.signal.DirectorSessionStore;
 import com.apap.director.im.signal.DirectorSignedPreKeyStore;
 import com.apap.director.im.websocket.service.MessageAction;
 import com.apap.director.im.websocket.service.StompService;
+import com.apap.director.manager.AccountManager;
 
 import org.whispersystems.curve25519.Curve25519;
 

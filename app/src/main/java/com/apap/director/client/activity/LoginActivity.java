@@ -10,18 +10,17 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-//import com.apap.director.db.account.AccountManager;
-import com.apap.director.db.account.AccountManager;
+//import com.apap.director.manager.AccountManager;
+import com.apap.director.manager.AccountManager;
 import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.util.ArrayAdapterChangeListener;
-import com.apap.director.db.rest.service.UserService;
+import com.apap.director.network.rest.service.UserService;
 import com.apap.director.im.websocket.service.StompService;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
@@ -41,9 +40,7 @@ import cz.msebera.android.httpclient.client.methods.HttpGet;
 import cz.msebera.android.httpclient.impl.client.BasicResponseHandler;
 import info.guardianproject.netcipher.NetCipher;
 import info.guardianproject.netcipher.client.StrongBuilder;
-import info.guardianproject.netcipher.client.StrongHttpClientBuilder;
 import io.realm.Realm;
-import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
 public class LoginActivity extends AppCompatActivity implements StrongBuilder.Callback<HttpClient> {

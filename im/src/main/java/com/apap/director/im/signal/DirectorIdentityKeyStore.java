@@ -1,13 +1,10 @@
 package com.apap.director.im.signal;
 
-import android.content.Context;
 import android.util.Log;
 
-import com.apap.director.db.account.AccountManager;
-import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.ContactKey;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.apap.director.manager.AccountManager;
 
 import org.whispersystems.libsignal.IdentityKey;
 import org.whispersystems.libsignal.IdentityKeyPair;
@@ -15,13 +12,9 @@ import org.whispersystems.libsignal.InvalidKeyException;
 import org.whispersystems.libsignal.SignalProtocolAddress;
 import org.whispersystems.libsignal.state.IdentityKeyStore;
 
-import java.io.IOException;
-import java.util.List;
-
 import javax.inject.Inject;
 
 import io.realm.Realm;
-import io.realm.RealmResults;
 
 public class DirectorIdentityKeyStore implements IdentityKeyStore {
 

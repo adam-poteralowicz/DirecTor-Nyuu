@@ -1,19 +1,18 @@
-package com.apap.director.db.account;
+package com.apap.director.manager;
 
 
 import android.util.Base64;
 import android.util.Log;
 
 import com.apap.director.db.realm.model.Account;
-import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.ContactKey;
 import com.apap.director.db.realm.model.Conversation;
 import com.apap.director.db.realm.model.Message;
 import com.apap.director.db.realm.model.OneTimeKey;
 import com.apap.director.db.realm.model.Session;
 import com.apap.director.db.realm.model.SignedKey;
-import com.apap.director.db.rest.service.LoginDetails;
-import com.apap.director.db.rest.service.UserService;
+import com.apap.director.network.rest.service.LoginDetails;
+import com.apap.director.network.rest.service.UserService;
 
 import org.whispersystems.curve25519.Curve25519;
 import org.whispersystems.libsignal.IdentityKeyPair;
@@ -27,7 +26,6 @@ import javax.inject.Inject;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,7 +35,6 @@ import retrofit2.Response;
 public class AccountManager {
 
     private Realm realm;
-
     private UserService userService;
     private Curve25519 curve25519;
 
@@ -45,6 +42,7 @@ public class AccountManager {
     public AccountManager(Realm realm, UserService userService, Curve25519 curve25519) {
         this.realm = realm;
         this.userService = userService;
+        this.curve25519 = curve25519;
     }
 
     public ArrayList<Account> listAllAccounts(){

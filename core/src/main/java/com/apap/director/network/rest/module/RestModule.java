@@ -1,8 +1,7 @@
-package com.apap.director.db.rest.module;
+package com.apap.director.network.rest.module;
 
-import com.apap.director.db.account.ApplicationScope;
-import com.apap.director.db.rest.service.KeyService;
-import com.apap.director.db.rest.service.UserService;
+import com.apap.director.network.rest.service.KeyService;
+import com.apap.director.network.rest.service.UserService;
 
 import javax.inject.Singleton;
 

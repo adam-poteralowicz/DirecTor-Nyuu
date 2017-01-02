@@ -6,20 +6,18 @@ import com.apap.director.client.activity.NewMsgActivity;
 import com.apap.director.client.activity.SingleContactActivity;
 import com.apap.director.client.fragment.ContactsFragment;
 import com.apap.director.client.fragment.InboxFragment;
-import com.apap.director.db.account.AccountModule;
+import com.apap.director.manager.ManagerModule;
 import com.apap.director.db.dao.module.DaoModule;
-import com.apap.director.db.rest.module.RestModule;
+import com.apap.director.network.rest.module.RestModule;
 import com.apap.director.im.signal.module.SignalModule;
 import com.apap.director.im.websocket.module.WebSocketModule;
-
-import org.java_websocket.WebSocket;
 
 import javax.inject.Singleton;
 
 import dagger.Component;
 
 @Singleton
-@Component(modules = {AccountModule.class, DaoModule.class, RestModule.class, SignalModule.class, WebSocketModule.class})
+@Component(modules = {ManagerModule.class, DaoModule.class, RestModule.class, SignalModule.class, WebSocketModule.class})
 public interface MainComponent {
 
     void inject(AddContactActivity addContactActivity);

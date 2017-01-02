@@ -1,10 +1,9 @@
-package com.apap.director.client.manager;
+package com.apap.director.manager;
 
-import com.apap.director.db.realm.AccountManager;
 import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.ContactKey;
 import com.apap.director.db.realm.model.Conversation;
-import com.apap.director.db.rest.service.UserService;
+import com.apap.director.network.rest.service.UserService;
 import java.util.ArrayList;
 import javax.inject.Inject;
 import io.realm.Realm;
@@ -18,9 +17,9 @@ public class ContactManager {
     private UserService userService;
 
     @Inject
-    public ContactManager() {
-        this.realm = Realm.getDefaultInstance();
-        this.accountManager = new AccountManager(userService);
+    public ContactManager(Realm realm, AccountManager manager) {
+        this.realm = realm;
+        this.accountManager = manager;
     }
 
     public ArrayList<Contact> listAllContacts() {
@@ -29,10 +28,7 @@ public class ContactManager {
     }
 
     public Contact getContact(String name) {
-        Contact contact = realm.where(Contact.class).equalTo("name", name).findFirst();
-        if (contact != null) {
-            return contact;
-        } else return null;
+        return realm.where(Contact.class).equalTo("name", name).findFirst();
     }
 
     public boolean addContact(String name, String keyBase64) {

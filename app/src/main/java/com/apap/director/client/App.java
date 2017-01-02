@@ -5,10 +5,11 @@ import android.content.Context;
 
 import com.apap.director.client.component.DaggerMainComponent;
 import com.apap.director.client.component.MainComponent;
-import com.apap.director.db.account.AccountModule;
 import com.apap.director.db.dao.module.DaoModule;
-import com.apap.director.db.rest.module.RestModule;
 import com.apap.director.im.signal.module.SignalModule;
+import com.apap.director.manager.ManagerModule;
+import com.apap.director.network.rest.module.RestModule;
+
 
 import info.guardianproject.netcipher.proxy.OrbotHelper;
 import io.realm.Realm;
@@ -24,26 +25,13 @@ public class App extends Application {
             mContext = App.this;
 
             Realm.init(this);
-//
-//            daoComponent = DaggerDaoComponent.builder()
-//                    .daoModule(new DaoModule(this))
-//                    .build();
-//
-//            signalComponent = DaggerSignalComponent.builder()
-//                    .signalModule(new SignalModule(this))
-//                    .webSocketModule(new WebSocketModule())
-//                    .daoComponent(daoComponent)
-//                    .build();
 
             mainComponent = DaggerMainComponent.builder()
-                    .accountModule(new AccountModule())
+                    .managerModule(new ManagerModule())
                     .daoModule(new DaoModule(this))
                     .restModule(new RestModule())
                     .signalModule(new SignalModule(this))
                     .build();
-
-
-
 
             OrbotHelper.get(this).init();
             //OrbotHelper.requestStartTor(this);

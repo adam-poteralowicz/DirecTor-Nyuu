@@ -12,13 +12,14 @@ import android.widget.TextView;
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.adapter.MessageAdapter;
-import com.apap.director.client.manager.MessageManager;
+import com.apap.director.manager.MessageManager;
 import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.Conversation;
 import com.apap.director.db.realm.model.Message;
 
-import java.util.Date;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,8 +36,12 @@ public class NewMsgActivity extends Activity {
     ArrayAdapter<Message> arrayAdapter;
     private Long contactIdFromIntent;
     private List<Message> myMessages;
-    private Realm realm;
-    private MessageManager messageManager;
+
+    @Inject
+    Realm realm;
+
+    @Inject
+    MessageManager messageManager;
 
     //TODO: Split this method
 
@@ -46,7 +51,6 @@ public class NewMsgActivity extends Activity {
         ((App) getApplication()).getComponent().inject(this);
         setContentView(R.layout.new_msg_view);
         ButterKnife.bind(this);
-        realm = Realm.getDefaultInstance();
 
         if (getIntent().getStringExtra("recipient") != null) {
             recipient.setText(getIntent().getStringExtra("recipient"));
@@ -63,8 +67,6 @@ public class NewMsgActivity extends Activity {
         }
         messagesView.setAdapter(arrayAdapter);
 
-        Realm.init(this);
-        Realm realm = Realm.getDefaultInstance();
         final RealmResults<Message> messages = realm.where(Message.class).findAll();
         messages.addChangeListener(new RealmChangeListener<RealmResults<com.apap.director.db.realm.model.Message>>() {
             @Override
@@ -73,7 +75,6 @@ public class NewMsgActivity extends Activity {
             }
         });
 
-        messageManager = new MessageManager();
     }
 
     @OnItemLongClick(R.id.conversationView)
