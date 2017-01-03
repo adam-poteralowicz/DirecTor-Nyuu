@@ -231,9 +231,10 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
 
     public void _readMessage() {
         List<String> msgs = NFCUtils.getStringsFromNfcIntent(_intent);
-
-        Toast.makeText(this, "Public key : " + msgs.get(0), Toast.LENGTH_LONG).show();
-        getSupportActionBar().show();
+        if (msgs != null) {
+            Toast.makeText(this, "Public key : " + msgs.get(0), Toast.LENGTH_LONG).show();
+            getSupportActionBar().show();
+        }
     }
 
     /**
