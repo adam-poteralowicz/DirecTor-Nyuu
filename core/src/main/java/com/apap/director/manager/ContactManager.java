@@ -41,11 +41,11 @@ public class ContactManager {
             contact.setOneTimeKey(keyBase64);
             realm.insertOrUpdate(contact);
         realm.commitTransaction();
-        addContactKey(name);
+        addContactKey(name, contact);
         return true;
     }
 
-    private boolean addContactKey(String name) {
+    private boolean addContactKey(String name, Contact contact) {
         realm.beginTransaction();
             ContactKey contactKey = realm.createObject(ContactKey.class, generateContactKeyId());
             contactKey.setContact(realm.where(Contact.class).equalTo("name", name).findFirst());

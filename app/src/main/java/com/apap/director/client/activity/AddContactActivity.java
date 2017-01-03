@@ -114,7 +114,6 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
     protected void onDestroy() {
         super.onDestroy();
         realm.close();
-        unregisterReceiver(receiver);
     }
 
     public void initP2P() {
