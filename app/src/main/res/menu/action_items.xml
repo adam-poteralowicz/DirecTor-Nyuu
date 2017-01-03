@@ -25,14 +25,6 @@
         android:title="@string/nfc_button"
         app:showAsAction="ifRoom"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        />
-    <item
-        android:id="@+id/atn_bluetooth"
-        android:icon="@drawable/ic_bluetooth"
-        android:title="@string/bt_button"
-        app:showAsAction="ifRoom"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        />
+        android:layout_height="wrap_content" />
+
 </menu>

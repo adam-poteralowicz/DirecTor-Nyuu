@@ -32,8 +32,8 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.fragment.DeviceDetailFragment;
 import com.apap.director.client.fragment.DeviceListFragment;
+import com.apap.director.manager.AccountManager;
 import com.apap.director.manager.ContactManager;
-import com.apap.director.client.util.BTUtils;
 import com.apap.director.client.util.NFCUtils;
 import com.apap.director.client.util.keyExchange.WiFiDirectBroadcastReceiver;
 
@@ -63,13 +63,16 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
     public PendingIntent _pendingIntent;
     public IntentFilter[] _readIntentFilters, _writeIntentFilters;
     private final String _MIME_TYPE = "text/plain";
-    private String publicKey;
+    private byte[] publicKey;
 
     @Inject
     Realm realm;
 
     @Inject
     ContactManager contactManager;
+
+    @Inject
+    AccountManager accountManager;
 
 
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
@@ -160,8 +163,8 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
     // Exchange public key with another user
     private void _enableNdefExchangeMode()
     {
-        publicKey = contactManager.generateOneTimeKey();
-        NdefMessage message = NFCUtils.getNewMessage(_MIME_TYPE, publicKey.getBytes());
+        publicKey = accountManager.getActiveAccount().getOneTimeKeys().first().getSerializedKey();
+        NdefMessage message = NFCUtils.getNewMessage(_MIME_TYPE, publicKey);
 
         if (_nfcAdapter != null) {
             // Automatically beams the message when two devices are in close enough proximity.
@@ -198,6 +201,7 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id)
                                 {
+                                    // todo
                                     _writeMessage();
                                 }
                             })
@@ -205,6 +209,7 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id)
                                 {
+                                    // todo
                                     _readMessage();
                                 }
                             });
@@ -216,7 +221,7 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
 
     public NdefMessage _getNdefMessage() {
 
-        return NFCUtils.getNewMessage(_MIME_TYPE, publicKey.getBytes());
+        return NFCUtils.getNewMessage(_MIME_TYPE, publicKey);
     }
 
     public void _writeMessage() {
@@ -332,15 +337,6 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
                     Toast.makeText(this, "NFC feature not supported", Toast.LENGTH_LONG).show();
                 }
                 return true;
-
-            case R.id.atn_bluetooth:
-                BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-                if (bluetoothAdapter == null) {
-                    Toast.makeText(this, R.string.bt_not_found, Toast.LENGTH_LONG).show();
-                } else {
-                    startActivityForResult(BTUtils.getBluetoothDiscoveryPermissionIntent(), 1);
-                }
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -441,23 +437,6 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
         }
 
     }
-
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == BTUtils.DISCOVER_DURATION && requestCode == 1) {
-
-            Intent intent = new Intent();
-            intent.setAction(Intent.ACTION_SEND);
-            intent.setType("text/plain");
-            intent.putExtra("Public_Key", publicKey);
-            PackageManager pmbt = getPackageManager();
-            List<ResolveInfo> appsList = pmbt.queryIntentActivities(intent, 0);
-            startActivity(BTUtils.selectBluetooth(intent, appsList));
-        }
-
-        else {
-            Toast.makeText(this, R.string.bt_cancelled, Toast.LENGTH_SHORT).show();
-        }
-    };
 
     @Override
     public void onBackPressed() {
