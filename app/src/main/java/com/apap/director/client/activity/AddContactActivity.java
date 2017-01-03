@@ -44,6 +44,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.realm.OneTimeKeyRealmProxy;
 import io.realm.Realm;
 
 public class AddContactActivity extends AppCompatActivity implements WifiP2pManager.ChannelListener, DeviceListFragment.DeviceActionListener {
@@ -62,7 +63,7 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
     public PendingIntent _pendingIntent;
     public IntentFilter[] _readIntentFilters, _writeIntentFilters;
     private final String _MIME_TYPE = "text/plain";
-    private String publicKey = "myUltraAwesomePublicKey";
+    private String publicKey;
 
     @Inject
     Realm realm;
@@ -159,6 +160,7 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
     // Exchange public key with another user
     private void _enableNdefExchangeMode()
     {
+        publicKey = contactManager.generateOneTimeKey();
         NdefMessage message = NFCUtils.getNewMessage(_MIME_TYPE, publicKey.getBytes());
 
         if (_nfcAdapter != null) {

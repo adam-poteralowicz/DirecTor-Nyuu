@@ -4,6 +4,8 @@ import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.ContactKey;
 import com.apap.director.db.realm.model.Conversation;
 import com.apap.director.network.rest.service.UserService;
+
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import javax.inject.Inject;
 import io.realm.Realm;
@@ -114,5 +116,17 @@ public class ContactManager {
             id = 0;
         }
         return id;
+    }
+
+    public String generateOneTimeKey() {
+        SecureRandom sr = new SecureRandom();
+        String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        String otk = "";
+        int x;
+        for (int i = 0; i < 32; i++) {
+            x = sr.nextInt(alphabet.length()-1);
+            otk += alphabet.charAt(x);
+        }
+        return otk;
     }
 }
