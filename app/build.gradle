@@ -59,5 +59,6 @@ dependencies {
     compile 'com.romainpiel.shimmer:library:1.4.0@aar'
     compile project(':im')
     compile project(':core')
+
     testCompile 'junit:junit:4.12'
 }
