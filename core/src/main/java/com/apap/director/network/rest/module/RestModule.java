@@ -1,5 +1,6 @@
 package com.apap.director.network.rest.module;
 
+import com.apap.director.network.rest.Paths;
 import com.apap.director.network.rest.service.KeyService;
 import com.apap.director.network.rest.service.UserService;
 
@@ -14,7 +15,7 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 public class RestModule {
 
     private Retrofit retrofit;
-    private final String baseUrl = "http://localhost:7500";
+    private final String baseUrl = "http://"+Paths.SERVER_IP+":"+Paths.SERVER_PORT;
 
     public RestModule(){
         this.retrofit = new Retrofit.Builder()

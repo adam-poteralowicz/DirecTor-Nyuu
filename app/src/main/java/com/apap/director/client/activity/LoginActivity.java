@@ -3,6 +3,7 @@ package com.apap.director.client.activity;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -27,6 +28,7 @@ import com.romainpiel.shimmer.ShimmerTextView;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
@@ -46,13 +48,14 @@ import io.realm.RealmResults;
 public class LoginActivity extends AppCompatActivity implements StrongBuilder.Callback<HttpClient> {
 
     Shimmer shimmer;
-//    String HS_URL = "http://3zk5ak4bcbfvwgha.onion";
+    //    String HS_URL = "http://3zk5ak4bcbfvwgha.onion";
     String HS_URL = "http://www.wp.pl/static.html";
 
     @Inject
     StompService service;
 
-    @BindView(R.id.accountsView) ListView accountsListView;
+    @BindView(R.id.accountsView)
+    ListView accountsListView;
 
     @Inject
     Realm realm;
@@ -100,13 +103,13 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
 
     }
 
-    private void shimmer(){
+    private void shimmer() {
         ShimmerTextView shimmerTextView = (ShimmerTextView) findViewById(R.id.shimmer_tv);
         shimmerTextView.setTextColor(new ColorStateList(
                 new int[][]{
                         new int[]{}
                 },
-                new int[] {
+                new int[]{
                         Color.argb(255, 102, 102, 255)
                 }
         ));
@@ -123,14 +126,15 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
     public boolean deleteAccount(int position) {
         String name = accountList.get(position).getName();
         boolean deleted = accountManager.deleteAccount(name);
-        if(deleted == false) Log.v("HAI/LoginActivity", "Account "+name+ " failed to delete itself");
-        else Log.v("HAI/LoginActivity", "Account "+name+ " deleted");
+        if (deleted == false)
+            Log.v("HAI/LoginActivity", "Account " + name + " failed to delete itself");
+        else Log.v("HAI/LoginActivity", "Account " + name + " deleted");
         Toast.makeText(this, "Account " + name + " deleted", Toast.LENGTH_LONG).show();
         return false;
     }
 
     @OnItemClick(R.id.accountsView)
-    public void chooseAccount(int position){
+    public void chooseAccount(int position) {
         String name = accountList.get(position).getName();
         accountManager.chooseAccount(name);
         accountsListView.setSelection(position);
@@ -166,21 +170,28 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
 
     @OnClick(R.id.postLoginButton)
     public void onClick(View view) {
-        // TODO: Save new user upon first login
+        try {
 
-        Account active = accountManager.getActiveAccount();
-        if(active == null){
-            Toast.makeText(this, "Choose an account", Toast.LENGTH_SHORT);
-            return;
+
+            AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    accountManager.logIn();
+                    return null;
+                }
+            };
+
+            asyncTask.execute().get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
         }
-
-        accountManager.logIn();
-
         service.connect();
 
         shimmer.cancel();
-            Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);
-            startActivity(selectedIntent);
+        Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);
+        startActivity(selectedIntent);
     }
 
     @Override
@@ -211,7 +222,7 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
             @Override
             public void run() {
                 Toast.makeText(LoginActivity.this, R.string.msg_crash,
-                                Toast.LENGTH_LONG)
+                        Toast.LENGTH_LONG)
                         .show();
                 finish();
             }
@@ -253,33 +264,4 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
         super.onDestroy();
         realmAccounts.removeChangeListener(listener);
     }
-
-//    private void refreshAccountList() {
-//        Log.d("DTOR","REFRESHING ACCOUNTS");
-//        RealmResults<Account> accountResults = realm.where(Account.class).findAll();
-//        if (!accountResults.isEmpty()) {
-//            accountList.addAll(realm.copyFromRealm(accountResults));
-//        }
-//
-//        if (accountList != null) {
-//            if (arrayAdapter == null) {
-//                arrayAdapter = new ArrayAdapter<Account>(
-//                        App.getContext(),
-//                        android.R.layout.simple_list_item_single_choice,
-//                        accountList);
-//                accountsListView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
-//                accountsListView.setAdapter(arrayAdapter);
-//            } else {
-//                accountsListView.setAdapter(null);
-//                arrayAdapter.clear();
-//                accountList = new ArrayList<Account>();
-//                accountList.addAll(realm.copyFromRealm(accountResults));
-//                Log.d("ADDING ACCOUNTS", accountList.toString());
-//                arrayAdapter.addAll(accountList);
-//                arrayAdapter.notifyDataSetChanged();
-//                accountsListView.setAdapter(arrayAdapter);
-//            }
-//        }
-//
-//    }
 }

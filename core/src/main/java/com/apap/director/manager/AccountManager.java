@@ -17,6 +17,7 @@ import com.apap.director.network.rest.service.UserService;
 import org.whispersystems.curve25519.Curve25519;
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.InvalidKeyException;
+import org.whispersystems.libsignal.util.ByteUtil;
 import org.whispersystems.libsignal.util.KeyHelper;
 
 import java.io.IOException;
@@ -58,11 +59,14 @@ public class AccountManager {
         IdentityKeyPair identityKeyPair = KeyHelper.generateIdentityKeyPair();
         int registrationId  = KeyHelper.generateRegistrationId(false);
 
+
         Account account = new Account();
         account.setId(generateAccountId());
         account.setKeyPair(identityKeyPair.serialize());
         account.setName(name);
-        account.setKeyBase64(Base64.encodeToString(identityKeyPair.getPublicKey().serialize(), Base64.DEFAULT));
+        Log.v("HAI/AccountManager", "Length before split "+identityKeyPair.getPublicKey().serialize().length);
+        byte[][] typeAndKey = ByteUtil.split(identityKeyPair.getPublicKey().serialize(), 1, 32);
+        account.setKeyBase64(Base64.encodeToString(typeAndKey[1], Base64.URL_SAFE | Base64.NO_WRAP));
         account.setRegistrationId(registrationId);
 
         realm.beginTransaction();
@@ -144,11 +148,24 @@ public class AccountManager {
     public void signUp(final Account account){
 
         Call<ResponseBody> call = userService.signUp(account.getKeyBase64());
+        Log.v("HAI/AccountManager", "Sign up call to : " + call.request().url());
+        Log.v("HAI/AccountManager", "Sign up method : " + call.request().method());
+
+
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                account.setRegistered(true);
-                Log.v("HAI/AccountManager", "Account "+account.getName()+" registered");
+
+                Log.v("HAI/AccountManager", "Sign up response: " + response.message());
+                Log.v("HAI/AccountManager", "Sign up response code: " + response.code());
+
+                if(response.isSuccessful()) {
+                    realm.beginTransaction();
+                        account.setRegistered(true);
+                        realm.insertOrUpdate(account);
+                    realm.commitTransaction();
+                    Log.v("HAI/AccountManager", "Account " + account.getName() + " registered");
+                }
             }
 
             @Override
@@ -163,23 +180,50 @@ public class AccountManager {
 
         try {
 
+            Realm realm = Realm.getDefaultInstance();
+
             Account active = realm.where(Account.class).equalTo("active", true).equalTo("registered", true).findFirst();
             if(active == null) return false;
 
             Call<String> requestCodeCall = userService.requestCode(active.getKeyBase64());
             Response<String> codeCallResponse = requestCodeCall.execute();
 
-            if(!codeCallResponse.isSuccessful()) return false;
+            Log.v("HAI/AccountManager", "request code url " + requestCodeCall.request().url());
+
+            if(!codeCallResponse.isSuccessful()){
+                Log.v("HAI/AccountManager", "Failed to fetch code");
+                return false;
+            }
+
+            Log.v("HAI/AccountManager", "Fetched code " + codeCallResponse.body());
+            Log.v("HAI/AccountManager", "Fetching status " + codeCallResponse.code());
 
             IdentityKeyPair keyPair = new IdentityKeyPair(active.getKeyPair());
-            byte[] signature = curve25519.calculateSignature(keyPair.getPrivateKey().serialize(), codeCallResponse.message().getBytes());
 
-            LoginDetails loginDetails = new LoginDetails(active.getKeyBase64(), Base64.encodeToString(signature, Base64.DEFAULT));
+            byte[] signature = curve25519.calculateSignature(keyPair.getPrivateKey().serialize(), codeCallResponse.body().getBytes());
+
+            Log.v("HAI/AccountManager", new String(signature));
+
+
+
+            LoginDetails loginDetails = new LoginDetails(active.getKeyBase64(), Base64.encodeToString(signature, Base64.URL_SAFE | Base64.NO_WRAP));
+
+
+
             Call<ResponseBody> loginCall = userService.login(loginDetails);
             Response<ResponseBody> loginCallResponse = loginCall.execute();
 
-            if(loginCallResponse.isSuccessful()) return false;
+            Log.v("HAI/AccountManager", "login call code:" + loginCallResponse.code());
+            Log.v("HAI/AccountManager", "login call account:" + new String(Base64.decode(active.getKeyBase64(), Base64.NO_WRAP | Base64.URL_SAFE), 32));
 
+            realm.close();
+
+            if(!loginCallResponse.isSuccessful()){
+                Log.v("HAI/AccountManager", "Failed to login");
+                return false;
+            }
+
+            Log.v("HAI/AccountManager", "Login successful");
             return true;
 
         } catch (IOException e) {
