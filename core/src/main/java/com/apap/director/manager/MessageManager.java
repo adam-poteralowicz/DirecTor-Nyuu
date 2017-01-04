@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 
 public class MessageManager {
     private Realm realm;
@@ -37,17 +38,24 @@ public class MessageManager {
         return null;
     }
 
-    public boolean addMessage(Conversation conversation, String msg, String recipient) {
-        if (conversation == null) return false;
+    public Message addMessage(Conversation conv, String msg, String recipient, Boolean owned) {
+        if (conv == null) return null;
         realm.beginTransaction();
+        Conversation conversation = realm.copyFromRealm(conv);
             Message message = realm.createObject(Message.class, generateMessageId());
-            message.setConversation(conversation);
+            message.setConversation(conv);
             message.setContent(msg);
             message.setDate(new Date());
             message.setRecipient(recipient);
             message.setAccount(accountManager.getActiveAccount());
+            message.setMine(owned);
+            RealmList<Message> conversationMsg = conversation.getMessages();
+            conversationMsg.add(message);
+            conversation.setMessages(conversationMsg);
+            realm.copyToRealmOrUpdate(message);
+            realm.copyToRealmOrUpdate(conversation);
         realm.commitTransaction();
-        return true;
+        return message;
     }
 
     public boolean deleteMessage(Long id) {

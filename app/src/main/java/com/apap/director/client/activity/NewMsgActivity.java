@@ -26,6 +26,7 @@ import butterknife.ButterKnife;
 import butterknife.OnItemLongClick;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 
 public class NewMsgActivity extends Activity {
@@ -90,19 +91,18 @@ public class NewMsgActivity extends Activity {
 
         String newMessage = String.valueOf(newMessageField.getText());
         String to = String.valueOf(recipient.getText());
+        if ("".equals(newMessage))
+            return false;
+
         realm.beginTransaction();
             Conversation conversation = realm.where(Conversation.class).equalTo("contact.id", contactIdFromIntent).findFirst();
             conversation.setContact(realm.where(Contact.class).equalTo("id", contactIdFromIntent).findFirst());
-            if ("".equals(newMessage))
-                return false;
-
-            messageManager.addMessage(conversation, newMessage, to);
-            Long msgId = realm.where(Message.class).findAll().get(messageManager.listAllMessages(conversation).size()-1).getId();
-            messageManager.updateMessage(msgId, true);
-
-            Message message = messageManager.getMessage(msgId);
-            message.setConversation(conversation);
             realm.copyToRealmOrUpdate(conversation);
+        realm.commitTransaction();
+
+        Message message = messageManager.addMessage(conversation, newMessage, to, true);
+
+        realm.beginTransaction();
             myMessages.add(message);
         realm.commitTransaction();
 

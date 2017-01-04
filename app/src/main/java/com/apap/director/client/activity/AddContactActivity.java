@@ -42,6 +42,7 @@ import com.apap.director.client.util.keyExchange.WiFiDirectBroadcastReceiver;
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.InvalidKeyException;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -93,7 +94,7 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
         newContactName.setHint("CONTACT NAME");
         ((App) getApplication()).getComponent().inject(this);
         getSupportActionBar().show();
-        initP2P();
+        //initP2P();
         initNFC();
     }
 
@@ -103,9 +104,9 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
         if (name.matches(".*\\w.*")
                 && (name.matches("\\w.*")))
         {
-            //TODO Extract received key
-            contactManager.addContact(name, "keyBase64");
-            Toast.makeText(this, name, Toast.LENGTH_LONG).show();
+            String keyBase64 = Base64.encodeToString(publicKey, Base64.URL_SAFE | Base64.NO_WRAP);
+            contactManager.addContact(name, keyBase64);
+            Toast.makeText(this, keyBase64, Toast.LENGTH_LONG).show();
 
             Intent selectedIntent = new Intent(AddContactActivity.this, AuthUserActivity.class);
             startActivityForResult(selectedIntent, 13);
@@ -250,6 +251,8 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
             Toast.makeText(this, "Public key : " + msgs.get(0), Toast.LENGTH_LONG).show();
             getSupportActionBar().show();
         }
+
+
     }
 
     /**
