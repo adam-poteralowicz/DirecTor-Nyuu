@@ -173,25 +173,28 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
         try {
 
 
-            AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+            AsyncTask<Void, Void, Boolean> asyncTask = new AsyncTask<Void, Void, Boolean>() {
                 @Override
-                protected Void doInBackground(Void... params) {
-                    accountManager.logIn();
-                    return null;
+                protected Boolean doInBackground(Void... params) {
+                    return accountManager.logIn();
                 }
             };
 
-            asyncTask.execute().get();
+            boolean loggedIn =asyncTask.execute().get();
+            Log.v("HAI/LoginActivity", "Logged in: "+loggedIn);
+
+            service.connect(accountManager.getActiveAccount().getCookie(), accountManager.getActiveAccountName());
+
+            shimmer.cancel();
+            Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);
+            startActivity(selectedIntent);
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-        service.connect();
 
-        shimmer.cancel();
-        Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);
-        startActivity(selectedIntent);
     }
 
     @Override

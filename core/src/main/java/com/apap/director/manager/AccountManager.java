@@ -216,6 +216,17 @@ public class AccountManager {
             Log.v("HAI/AccountManager", "login call code:" + loginCallResponse.code());
             Log.v("HAI/AccountManager", "login call account:" + new String(Base64.decode(active.getKeyBase64(), Base64.NO_WRAP | Base64.URL_SAFE), 32));
 
+            for(String name: loginCallResponse.headers().names()){
+                Log.v("HAI/AccountManager", name+" : "+ loginCallResponse.headers().get(name));
+            }
+
+            realm.beginTransaction();
+                Log.v("HAI/AccountManager", "Cookie "+loginCallResponse.headers().get("Set-Cookie"));
+                Log.v("HAI/AccountManager", "Cookie "+loginCallResponse.headers().get("Set-Cookie").split(";")[0]);
+                active.setCookie(loginCallResponse.headers().get("Set-Cookie").split(";")[0]);
+                realm.insertOrUpdate(active);
+            realm.commitTransaction();
+
             realm.close();
 
             if(!loginCallResponse.isSuccessful()){

@@ -26,6 +26,9 @@ public class Account extends RealmObject {
     private RealmList<Session> sessions;
     private boolean registered;
     private boolean active;
+    private String cookie;
+
+
 
     public RealmList<Contact> getContacts() {
         return contacts;
@@ -65,6 +68,10 @@ public class Account extends RealmObject {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public String getCookie(){
+        return cookie;
     }
 
     @Override
