@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,10 +33,14 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.fragment.DeviceDetailFragment;
 import com.apap.director.client.fragment.DeviceListFragment;
+import com.apap.director.db.realm.model.Account;
 import com.apap.director.manager.AccountManager;
 import com.apap.director.manager.ContactManager;
 import com.apap.director.client.util.NFCUtils;
 import com.apap.director.client.util.keyExchange.WiFiDirectBroadcastReceiver;
+
+import org.whispersystems.libsignal.IdentityKeyPair;
+import org.whispersystems.libsignal.InvalidKeyException;
 
 import java.util.List;
 
@@ -161,9 +166,12 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
     }
 
     // Exchange public key with another user
-    private void _enableNdefExchangeMode()
-    {
-        publicKey = accountManager.getActiveAccount().getOneTimeKeys().first().getSerializedKey();
+    private void _enableNdefExchangeMode() throws InvalidKeyException {
+        Account account = accountManager.getActiveAccount();
+        IdentityKeyPair keyPair = new IdentityKeyPair(account.getKeyPair());
+        byte[] key = keyPair.getPublicKey().serialize();
+        publicKey = Base64.encode(key, Base64.NO_WRAP | Base64.URL_SAFE);
+
         NdefMessage message = NFCUtils.getNewMessage(_MIME_TYPE, publicKey);
 
         if (_nfcAdapter != null) {
@@ -255,7 +263,11 @@ public class AddContactActivity extends AppCompatActivity implements WifiP2pMana
         receiver = new WiFiDirectBroadcastReceiver(manager, channel, this);
         registerReceiver(receiver, intentFilter);
 
-        _enableNdefExchangeMode();
+        try {
+            _enableNdefExchangeMode();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
         _enableTagWriteMode();
     }
 
