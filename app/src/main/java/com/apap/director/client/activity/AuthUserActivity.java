@@ -10,7 +10,10 @@ import android.view.View;
 import com.apap.director.client.R;
 import com.apap.director.client.adapter.DirecTorPagerAdapter;
 import com.apap.director.db.realm.model.Account;
+import com.apap.director.im.websocket.service.StompService;
 import com.apap.director.manager.AccountManager;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -22,6 +25,9 @@ public class AuthUserActivity extends FragmentActivity {
     AccountManager accountManager;
     Realm realm;
     @BindView(R.id.pager) ViewPager viewPager;
+
+    @Inject
+    StompService service;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,6 +49,7 @@ public class AuthUserActivity extends FragmentActivity {
             active.setActive(false);
             realm.copyToRealmOrUpdate(active);
         realm.commitTransaction();
+        service.disconnect();
         Intent selectedIntent = new Intent(AuthUserActivity.this, LoginActivity.class);
         startActivity(selectedIntent);
     }
