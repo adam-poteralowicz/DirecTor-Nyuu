@@ -7,6 +7,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 
 @Module
 public class DaoModule {
@@ -27,7 +28,16 @@ public class DaoModule {
     @Provides
     @Singleton
     public Realm provideRealm(){
-        return Realm.getDefaultInstance();
+        Realm realm = Realm.getDefaultInstance();
+//
+//        realm.addChangeListener(new RealmChangeListener<Realm>() {
+//            @Override
+//            public void onChange(Realm element) {
+//                this.realm = element;
+//            }
+//        });
+        realm.setAutoRefresh(true);
+        return realm;
     }
 
 }

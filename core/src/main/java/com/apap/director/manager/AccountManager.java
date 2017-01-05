@@ -104,11 +104,12 @@ public class AccountManager {
 
             for(Account account : activeAccounts){
                 account.setActive(false);
+                realm.copyToRealmOrUpdate(account);
             }
 
             Account chosenAccount = realm.where(Account.class).equalTo("name", name).findFirst();
             chosenAccount.setActive(true);
-
+            realm.copyToRealmOrUpdate(chosenAccount);
         realm.commitTransaction();
 
         return true;
@@ -178,19 +179,21 @@ public class AccountManager {
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Log.v("HAI/AccountManager", "Account "+account.getName()+" failed to sign up");
+                Log.v("HAI", t.getMessage() + " " +t.getCause() + " ");
+                t.printStackTrace();
             }
         });
 
     }
 
-    public boolean logIn(){
+    public String logIn(){
 
         try {
 
             Realm realm = Realm.getDefaultInstance();
 
             Account active = realm.where(Account.class).equalTo("active", true).equalTo("registered", true).findFirst();
-            if(active == null) return false;
+            if(active == null) return null;
 
             Call<String> requestCodeCall = userService.requestCode(active.getKeyBase64());
             Response<String> codeCallResponse = requestCodeCall.execute();
@@ -199,7 +202,7 @@ public class AccountManager {
 
             if(!codeCallResponse.isSuccessful()){
                 Log.v("HAI/AccountManager", "Failed to fetch code");
-                return false;
+                return null;
             }
 
             Log.v("HAI/AccountManager", "Fetched code " + codeCallResponse.body());
@@ -227,29 +230,31 @@ public class AccountManager {
                 Log.v("HAI/AccountManager", name+" : "+ loginCallResponse.headers().get(name));
             }
 
+            String cookie = loginCallResponse.headers().get("Set-Cookie").split(";")[0];
+
             realm.beginTransaction();
-                Log.v("HAI/AccountManager", "Cookie "+loginCallResponse.headers().get("Set-Cookie"));
-                Log.v("HAI/AccountManager", "Cookie "+loginCallResponse.headers().get("Set-Cookie").split(";")[0]);
-                active.setCookie(loginCallResponse.headers().get("Set-Cookie").split(";")[0]);
-                realm.insertOrUpdate(active);
+                Account active2 = realm.where(Account.class).equalTo("active", true).findFirst();
+                Log.v("HAI/AccountManager", "Cookie "+cookie);
+                active2.setCookie(cookie);
+                realm.copyToRealmOrUpdate(active2);
             realm.commitTransaction();
 
-            realm.close();
 
             if(!loginCallResponse.isSuccessful()){
                 Log.v("HAI/AccountManager", "Failed to login");
-                return false;
+                return null;
             }
 
             Log.v("HAI/AccountManager", "Login successful");
-            return true;
+            realm.close();
+            return cookie;
 
         } catch (IOException e) {
             e.printStackTrace();
-            return false;
+            return null;
         } catch (InvalidKeyException e) {
             e.printStackTrace();
-            return false;
+            return null;
         }
 
     }

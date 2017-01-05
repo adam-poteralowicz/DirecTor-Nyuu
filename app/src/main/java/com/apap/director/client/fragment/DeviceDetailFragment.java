@@ -38,7 +38,7 @@ import java.net.Socket;
  */
 public class DeviceDetailFragment extends Fragment implements ConnectionInfoListener {
 
-    public static final String IP_SERVER = "192.168.49.1";
+    public static final String IP_SERVER = "192.168.43.188";
     public static int PORT = 8988;
     private static boolean server_running = false;
 

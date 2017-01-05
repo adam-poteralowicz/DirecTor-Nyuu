@@ -5,6 +5,7 @@ import android.util.Base64;
 import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.ContactKey;
 import com.apap.director.db.realm.model.Conversation;
+import com.apap.director.network.rest.service.KeyService;
 import com.apap.director.network.rest.service.UserService;
 
 import org.whispersystems.libsignal.util.ByteUtil;
@@ -21,9 +22,10 @@ public class ContactManager {
     private Contact contact;
     private AccountManager accountManager;
     private UserService userService;
+    private KeyService keyService;
 
     @Inject
-    public ContactManager(Realm realm, AccountManager manager) {
+    public ContactManager(Realm realm, AccountManager manager, KeyService service) {
         this.realm = realm;
         this.accountManager = manager;
     }
@@ -41,7 +43,12 @@ public class ContactManager {
         Contact sameName = realm.where(Contact.class).equalTo("name", name).findFirst();
         if (sameName != null) return false;
 
-        realm.beginTransaction();
+
+
+        Realm localRealm = Realm.getDefaultInstance();
+
+
+        localRealm.beginTransaction();
             Contact contact = realm.createObject(Contact.class, generateContactId());
             contact.setName(name);
 
@@ -60,8 +67,8 @@ public class ContactManager {
             keys.add(contactKey);
             contact.setContactKeys(keys);
 
-            realm.insertOrUpdate(contact);
-        realm.commitTransaction();
+            localRealm.insertOrUpdate(contact);
+        localRealm.commitTransaction();
         return true;
     }
 
