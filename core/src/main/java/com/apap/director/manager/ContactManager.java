@@ -1,9 +1,13 @@
 package com.apap.director.manager;
 
+import android.util.Base64;
+
 import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.ContactKey;
 import com.apap.director.db.realm.model.Conversation;
 import com.apap.director.network.rest.service.UserService;
+
+import org.whispersystems.libsignal.util.ByteUtil;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -40,24 +44,38 @@ public class ContactManager {
         realm.beginTransaction();
             Contact contact = realm.createObject(Contact.class, generateContactId());
             contact.setName(name);
-            contact.setOneTimeKey(keyBase64);
+
+            RealmList<ContactKey> keys = new RealmList<>();
+            ContactKey contactKey = realm.createObject(ContactKey.class);
+            contactKey.setContact(contact);
+            contactKey.setId(generateContactKeyId());
+            contactKey.setAccount(accountManager.getActiveAccount());
+
+            byte[] decodedKey = Base64.decode(keyBase64, Base64.NO_WRAP | Base64.URL_SAFE);
+            contactKey.setSerialized(decodedKey);
+            String splitted = Base64.encodeToString(ByteUtil.split(decodedKey, 1, 32)[1], Base64.NO_WRAP | Base64.URL_SAFE);
+            contactKey.setKeyBase64(splitted);
+
+            contactKey.setDeviceId(0);
+            keys.add(contactKey);
+            contact.setContactKeys(keys);
+
             realm.insertOrUpdate(contact);
         realm.commitTransaction();
-        addContactKey(name, contact);
         return true;
     }
 
-    private boolean addContactKey(String name, Contact contact) {
-        realm.beginTransaction();
-            ContactKey contactKey = realm.createObject(ContactKey.class, generateContactKeyId());
-            contactKey.setContact(realm.where(Contact.class).equalTo("name", name).findFirst());
-            contactKey.setKeyBase64(contact.getOneTimeKey());
-            contactKey.setAccount(accountManager.getActiveAccount());
-            //contactKey.setDeviceId();
-            realm.insertOrUpdate(contactKey);
-        realm.commitTransaction();
-        return true;
-    }
+//    private boolean addContactKey(String owner, String keyBase64) {
+//        realm.beginTransaction();
+//            ContactKey contactKey = realm.createObject(ContactKey.class, generateContactKeyId());
+//            contactKey.setContact(realm.where(Contact.class).equalTo("name", name).findFirst());
+//            contactKey.setKeyBase64(contact.getOneTimeKey());
+//            contactKey.setAccount(accountManager.getActiveAccount());
+//            //contactKey.setDeviceId();
+//            realm.insertOrUpdate(contactKey);
+//        realm.commitTransaction();
+//        return true;
+//    }
 
     public boolean deleteContact(String name) {
         Contact contactToDelete = realm.where(Contact.class).equalTo("name", name).findFirst();

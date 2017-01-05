@@ -1,12 +1,13 @@
 package com.apap.director.db.realm.to;
 
+import android.util.Base64;
+
 import com.apap.director.db.realm.model.OneTimeKey;
 
 public class OneTimeKeyTO {
 
     private long keyId;
     private String keyBase64;
-    private OneTimeKey oneTimeKey;
 
 
     public long getKeyId() {
@@ -18,6 +19,7 @@ public class OneTimeKeyTO {
     }
 
     public OneTimeKeyTO(OneTimeKey oneTimeKey) {
-        this.oneTimeKey = oneTimeKey;
+        this.keyId = oneTimeKey.getId();
+        this.keyBase64 = Base64.encodeToString(oneTimeKey.getSerializedKey(), Base64.NO_WRAP);
     }
 }

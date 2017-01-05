@@ -1,17 +1,18 @@
 package com.apap.director.db.realm.to;
 
+import android.util.Base64;
+
 import com.apap.director.db.realm.model.SignedKey;
 
 public class SignedKeyTO {
 
     private String keyBase64;
-    private SignedKey signedKey;
 
     public String getKeyBase64() {
         return keyBase64;
     }
 
     public SignedKeyTO(SignedKey signedKey) {
-        this.signedKey = signedKey;
+        this.keyBase64 = Base64.encodeToString(signedKey.getSerializedKey(), Base64.NO_WRAP);
     }
 }

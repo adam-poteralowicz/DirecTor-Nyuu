@@ -70,10 +70,11 @@ public class AccountManager {
         account.setId(generateAccountId());
         account.setKeyPair(identityKeyPair.serialize());
         account.setName(name);
-        Log.v("HAI/AccountManager", "Length before split "+identityKeyPair.getPublicKey().serialize().length);
         byte[][] typeAndKey = ByteUtil.split(identityKeyPair.getPublicKey().serialize(), 1, 32);
         account.setKeyBase64(Base64.encodeToString(typeAndKey[1], Base64.URL_SAFE | Base64.NO_WRAP));
         account.setRegistrationId(registrationId);
+
+        
 
         realm.beginTransaction();
             realm.copyToRealmOrUpdate(account);

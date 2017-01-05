@@ -11,6 +11,6 @@ import lombok.Getter;
 public class MessageTO {
 
     public String from;
-    public CiphertextMessage message;
+    public String message;
 
 }
