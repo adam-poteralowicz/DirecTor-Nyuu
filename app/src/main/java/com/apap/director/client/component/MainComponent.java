@@ -2,6 +2,7 @@ package com.apap.director.client.component;
 
 import com.apap.director.client.activity.AddContactActivity;
 import com.apap.director.client.activity.LoginActivity;
+import com.apap.director.client.activity.NewAccountActivity;
 import com.apap.director.client.activity.NewMsgActivity;
 import com.apap.director.client.activity.SingleContactActivity;
 import com.apap.director.client.fragment.ContactsFragment;
@@ -26,5 +27,6 @@ public interface MainComponent {
     void inject(InboxFragment inboxFragment);
     void inject(NewMsgActivity newMsgActivity);
     void inject(LoginActivity loginActivity);
+    void inject(NewAccountActivity newAccountActivity);
 
 }

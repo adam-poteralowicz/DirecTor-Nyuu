@@ -4,17 +4,6 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Login"
-        android:id="@+id/postLoginButton"
-        android:clickable="true"
-        android:onClick="onClick"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="133dp" />
-
     <com.romainpiel.shimmer.ShimmerTextView
         android:id="@+id/shimmer_tv"
         android:text="DirecTor"
@@ -28,16 +17,46 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        android:id="@+id/postLoginButton"
+        android:clickable="true"
+        android:onClick="onClick"
+        android:layout_marginBottom="87dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        android:id="@+id/button"
+        android:clickable="true"
+        android:onClick="onClick"
+        android:layout_alignStart="@+id/postLoginButton"
+        android:layout_alignBottom="@+id/postLoginButton" />
+
+    <Button
+        android:text="New Account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/newAccButton"
+        android:layout_above="@+id/postLoginButton"
+        android:layout_centerHorizontal="true"
+        android:onClick="newAccount"/>
+
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignEnd="@+id/shimmer_tv"
-        android:layout_above="@+id/postLoginButton"
-        android:layout_below="@+id/shimmer_tv"
-        android:layout_alignStart="@+id/shimmer_tv"
         android:id="@+id/accountsView"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp"
-        android:background="#6666ff"/>
+        android:background="#6666ff"
+        android:layout_above="@+id/newAccButton"
+        android:layout_alignStart="@+id/shimmer_tv"
+        android:layout_below="@+id/shimmer_tv"
+        android:layout_alignEnd="@+id/shimmer_tv"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp"/>
 
 </RelativeLayout>

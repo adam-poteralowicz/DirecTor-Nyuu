@@ -26,6 +26,7 @@
         <activity android:name=".activity.InboxActivity"></activity>
         <activity android:name=".activity.NewMsgActivity"></activity>
         <activity android:name=".activity.AddContactActivity"></activity>
+        <activity android:name=".activity.NewAccountActivity"></activity>
         <activity android:name=".activity.SingleContactActivity"
             android:configChanges="orientation|screenSize" />
     </application>
