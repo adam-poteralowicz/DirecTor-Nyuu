@@ -1,6 +1,7 @@
 package com.apap.director.client.activity;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -76,6 +77,7 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_view);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         ((App) getApplication()).getComponent().inject(this);
         ButterKnife.bind(this);
@@ -192,6 +194,12 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
         shimmer.cancel();
         Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);
         startActivity(selectedIntent);
+    }
+
+    @OnClick(R.id.newAccButton)
+    public void newAccount(View view) {
+        Intent newAccIntent = new Intent(LoginActivity.this, NewAccountActivity.class);
+        startActivity(newAccIntent);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.apap.director.client.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -55,6 +56,7 @@ public class SingleContactActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
 
         setContentView(R.layout.single_contact_view);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ((App) getApplication()).getComponent().inject(this);
         ButterKnife.bind(this);
 

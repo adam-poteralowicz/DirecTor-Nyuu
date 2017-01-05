@@ -1,6 +1,7 @@
 package com.apap.director.client.activity;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -51,6 +52,7 @@ public class NewMsgActivity extends Activity {
 
         ((App) getApplication()).getComponent().inject(this);
         setContentView(R.layout.new_msg_view);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ButterKnife.bind(this);
 
         if (getIntent().getStringExtra("recipient") != null) {
