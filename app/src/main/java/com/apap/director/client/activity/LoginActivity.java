@@ -137,10 +137,7 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
 
     @OnItemClick(R.id.accountsView)
     public void chooseAccount(int position) {
-        String name = accountList.get(position).getName();
-        accountManager.chooseAccount(name);
-        accountsListView.setSelection(position);
-        accountsListView.setItemChecked(position, true);
+        accountManager.signUp(accountList.get(position));
         Toast.makeText(this, accountManager.getActiveAccountName(), Toast.LENGTH_LONG).show();
     }
 
