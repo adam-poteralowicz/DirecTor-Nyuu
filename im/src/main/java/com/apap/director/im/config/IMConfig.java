@@ -6,7 +6,7 @@ package com.apap.director.im.config;
 
 public class IMConfig {
 
-    public static final String SERVER_IP = "10.0.0.68";
+    public static final String SERVER_IP = "192.168.43.188";
     public static final String WEBSOCKET_ENDPOINT = "/ws";
 
 }

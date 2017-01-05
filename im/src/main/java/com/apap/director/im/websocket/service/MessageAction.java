@@ -7,6 +7,7 @@ import com.apap.director.db.manager.DatabaseManager;
 import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.ContactKey;
+import com.apap.director.db.realm.model.Conversation;
 import com.apap.director.db.realm.model.Message;
 import com.apap.director.db.realm.to.MessageTO;
 import com.apap.director.im.signal.DirectorIdentityKeyStore;
@@ -61,19 +62,30 @@ public class MessageAction implements Action1<StompMessage> {
             ObjectMapper mapper = new ObjectMapper();
             MessageTO messageTO = mapper.readValue(stompMessage.getPayload(), MessageTO.class);
 
+            Account owner = realm.where(Account.class).equalTo("active", true).findFirst();
+
             realm.beginTransaction();
-            ContactKey key = realm.where(ContactKey.class).equalTo("name", messageTO.getFrom()).findFirst();
-            Contact contact = realm.where(Contact.class).equalTo("name", messageTO.getFrom()).findFirst();
+            ContactKey key = realm.where(ContactKey.class).equalTo("keyBase64", messageTO.getFrom()).findFirst();
+            Contact contact = key.getContact();
+
+            Conversation existingConversation = realm.where(Conversation.class).equalTo("contact.name", contact.getName()).findFirst();
+            if(existingConversation == null){
+                existingConversation = realm.createObject(Conversation.class);
+                existingConversation.setAccount(owner);
+                existingConversation.setContact(contact);
+                existingConversation.setId(realm.where(Conversation.class).max("id").longValue()+1);
+                contact.setConversation(existingConversation);
+            }
 
             long lastId = realm.where(Message.class).max("id").longValue();
 
             Message newMessage = realm.createObject(Message.class);
             newMessage.setId(lastId+1);
             newMessage.setContent(messageTO.getMessage());
-
-            Account owner = realm.where(Account.class).equalTo("active", true).findFirst();
+            newMessage.setConversation(existingConversation);
             newMessage.setAccount(owner);
 
+            realm.commitTransaction();
 
         } catch (IOException e) {
             Log.v("HAI/MessageAction", "Incorrect message frame");

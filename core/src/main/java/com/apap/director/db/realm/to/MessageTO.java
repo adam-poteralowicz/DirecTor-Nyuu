@@ -6,7 +6,7 @@ import org.whispersystems.libsignal.protocol.CiphertextMessage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor
+@AllArgsConstructor(suppressConstructorProperties = true)
 @Getter
 public class MessageTO {
 
