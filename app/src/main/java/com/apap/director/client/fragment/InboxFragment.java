@@ -16,6 +16,7 @@ import com.apap.director.client.R;
 import com.apap.director.client.activity.NewMsgActivity;
 import com.apap.director.db.manager.DatabaseManager;
 import com.apap.director.db.realm.model.Conversation;
+import com.apap.director.manager.ConversationManager;
 
 import java.util.ArrayList;
 
@@ -36,6 +37,9 @@ public class InboxFragment extends Fragment {
     private Realm realm;
     @BindView(R.id.msgList) ListView msgListView;
 
+    @Inject
+    ConversationManager conversationManager;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.inbox_view, container, false);
@@ -51,7 +55,7 @@ public class InboxFragment extends Fragment {
         realm = Realm.getDefaultInstance();
 
         conversationList = new ArrayList<Conversation>();
-        RealmResults<Conversation> conversationResults = realm.where(Conversation.class).findAll();
+        ArrayList<Conversation> conversationResults = conversationManager.listAllConversations();
         if (!conversationResults.isEmpty())
             conversationList.addAll(realm.copyFromRealm(conversationResults));
         arrayAdapter = new ArrayAdapter<Conversation>(
@@ -84,9 +88,7 @@ public class InboxFragment extends Fragment {
 
     @OnItemLongClick(R.id.msgList)
     public boolean deleteConversation(int position){
-        realm.beginTransaction();
-            realm.where(Conversation.class).equalTo("contact.id", conversationList.get(position).getContact().getId()).findFirst().deleteFromRealm();
-        realm.commitTransaction();
+        conversationManager.deleteConversationByContactId(conversationList.get(position).getContact().getId());
         conversationList.remove(position);
         arrayAdapter.notifyDataSetChanged();
         return true;

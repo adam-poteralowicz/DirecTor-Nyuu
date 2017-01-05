@@ -14,6 +14,7 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.adapter.MessageAdapter;
 import com.apap.director.db.realm.util.ArrayAdapterChangeListener;
+import com.apap.director.manager.ConversationManager;
 import com.apap.director.manager.MessageManager;
 import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.Conversation;
@@ -46,6 +47,9 @@ public class NewMsgActivity extends Activity {
     @Inject
     MessageManager messageManager;
 
+    @Inject
+    ConversationManager conversationManager;
+
     //TODO: Split this method
 
     public void onCreate(Bundle savedInstanceState) {
@@ -64,7 +68,7 @@ public class NewMsgActivity extends Activity {
         }
 
         contactIdFromIntent = getIntent().getLongExtra("contactId", 1L);
-        final Conversation conversation = realm.where(Conversation.class).equalTo("contact.id", contactIdFromIntent).findFirst();
+        final Conversation conversation = conversationManager.getConversationByContactId(contactIdFromIntent);
 
         myMessages = messageManager.getMessages(conversation);
         if (myMessages != null) {
@@ -102,7 +106,7 @@ public class NewMsgActivity extends Activity {
             return false;
 
         realm.beginTransaction();
-            Conversation conversation = realm.where(Conversation.class).equalTo("contact.id", contactIdFromIntent).findFirst();
+            Conversation conversation = conversationManager.getConversationByContactId(contactIdFromIntent);
             realm.copyToRealmOrUpdate(conversation);
         realm.commitTransaction();
 

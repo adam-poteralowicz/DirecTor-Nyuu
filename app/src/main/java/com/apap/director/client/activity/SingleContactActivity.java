@@ -25,6 +25,7 @@ import com.apap.director.manager.ContactManager;
 import com.apap.director.client.R;
 import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.Conversation;
+import com.apap.director.manager.ConversationManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +57,9 @@ public class SingleContactActivity extends Activity {
 
     @Inject
     AccountManager accountManager;
+
+    @Inject
+    ConversationManager conversationManager;
 
     public void onCreate(Bundle savedInstanceState) {
 
@@ -93,11 +97,13 @@ public class SingleContactActivity extends Activity {
                 switch (position) {
                     case 0:
                     {
-                        if (realm.where(Conversation.class).equalTo("contact.id", contactIdFromIntent).findFirst() == null) {
+                        Conversation conv = conversationManager.getConversationByContactId(contactIdFromIntent);
+                        if (conv == null) {
                             realm.beginTransaction();
-                                Conversation conversation = new Conversation();
+                                Conversation conversation = realm.createObject(Conversation.class, conversationManager.generateConversationId());
                                 conversation.setContact(realm.where(Contact.class).equalTo("id", contactIdFromIntent).findFirst());
                                 conversation.setAccount(accountManager.getActiveAccount());
+                                //TODO - conversation.setSessions();
                                 realm.copyToRealmOrUpdate(conversation);
                             realm.commitTransaction();
                         }
