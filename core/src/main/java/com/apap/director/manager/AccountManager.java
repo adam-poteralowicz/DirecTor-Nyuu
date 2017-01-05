@@ -11,6 +11,9 @@ import com.apap.director.db.realm.model.Message;
 import com.apap.director.db.realm.model.OneTimeKey;
 import com.apap.director.db.realm.model.Session;
 import com.apap.director.db.realm.model.SignedKey;
+import com.apap.director.db.realm.to.OneTimeKeyTO;
+import com.apap.director.db.realm.to.SignedKeyTO;
+import com.apap.director.network.rest.service.KeyService;
 import com.apap.director.network.rest.service.LoginDetails;
 import com.apap.director.network.rest.service.UserService;
 
@@ -22,6 +25,8 @@ import org.whispersystems.libsignal.util.KeyHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -38,6 +43,7 @@ public class AccountManager {
     private Realm realm;
     private UserService userService;
     private Curve25519 curve25519;
+    private KeyService keyService;
 
     @Inject
     public AccountManager(Realm realm, UserService userService, Curve25519 curve25519) {
@@ -245,6 +251,66 @@ public class AccountManager {
             return false;
         }
 
+    }
+
+    public boolean updateKeys() {
+        try {
+            Realm realm = Realm.getDefaultInstance();
+            Account active = realm.where(Account.class).equalTo("active", true).equalTo("registered", true).findFirst();
+
+            // postOneTimeKeys(keys)
+            List<OneTimeKey> otkeys = new ArrayList<>(active.getOneTimeKeys());
+            List<OneTimeKeyTO> otkeysTO = new ArrayList<>();
+            for (OneTimeKey otk : otkeys) {
+                otkeysTO.add(new OneTimeKeyTO(otk));
+            }
+            Call<ResponseBody> postOneTimeKeysCall = keyService.postOneTimeKeys(otkeysTO);
+            Response<ResponseBody> postOneTimeKeysResponse = postOneTimeKeysCall.execute();
+
+            Log.v("HAI/AccountManager", "post one time keys call code:" + postOneTimeKeysResponse.code());
+            Log.v("HAI/AccountManager", "post one time keys call keys:" + otkeysTO);
+
+            for(String name: postOneTimeKeysResponse.headers().names()){
+                Log.v("HAI/AccountManager", name+" : "+ postOneTimeKeysResponse.headers().get(name));
+            }
+
+            if(!postOneTimeKeysResponse.isSuccessful()){
+                Log.v("HAI/AccountManager", "Failed to post one time keys");
+                return false;
+            }
+
+            Log.v("HAI/AccountManager", "PostOneTimeKeys successful");
+
+            // postSignedKey(key)
+            List<SignedKey> sk = new ArrayList<SignedKey>();
+            sk.add(active.getSignedKey());
+            List<SignedKeyTO> signedKeyTO = new ArrayList<>();
+            for (SignedKey signedKey : sk) {
+                signedKeyTO.add(new SignedKeyTO(signedKey));
+            }
+            Call<ResponseBody> postSignedKeysCall = keyService.postSignedKeys(signedKeyTO);
+            Response<ResponseBody> postSignedKeysResponse = postSignedKeysCall.execute();
+
+            Log.v("HAI/AccountManager", "post signed keys call code:" + postSignedKeysResponse.code());
+            Log.v("HAI/AccountManager", "post signed keys call keys:" + signedKeyTO);
+
+            for(String name: postSignedKeysResponse.headers().names()){
+                Log.v("HAI/AccountManager", name+" : "+ postSignedKeysResponse.headers().get(name));
+            }
+
+            if(!postSignedKeysResponse.isSuccessful()){
+                Log.v("HAI/AccountManager", "Failed to post signed keys");
+                return false;
+            }
+
+            Log.v("HAI/AccountManager", "PostSignedKeys successful");
+            return true;
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /**

@@ -24,7 +24,7 @@ public interface KeyService {
 
     @POST(value = "/key/signed")
     @Headers("Content-Type: application/json")
-    Call<ResponseBody> postSignedKey(@Body List<SignedKeyTO> keys);
+    Call<ResponseBody> postSignedKeys(@Body List<SignedKeyTO> keys);
 
     @GET(value = "/key/one_time/{ownerId}")
     Call<OneTimeKey> getOneTimeKey(@Path("ownerId") String ownerId);
