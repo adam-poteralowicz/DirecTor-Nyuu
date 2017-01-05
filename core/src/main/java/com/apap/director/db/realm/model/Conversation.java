@@ -2,6 +2,7 @@ package com.apap.director.db.realm.model;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
+import io.realm.RealmResults;
 import io.realm.annotations.PrimaryKey;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +17,7 @@ public class Conversation extends RealmObject {
     private long id;
     private Contact contact;
     private RealmList<Message> messages;
-    private Session session;
+    private RealmList<Session> sessions;
     private Account account;
 
     @Override

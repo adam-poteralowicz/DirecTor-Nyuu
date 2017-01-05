@@ -54,7 +54,7 @@ public class AccountManager {
 
     public ArrayList<Account> listAllAccounts(){
         RealmResults<Account> accounts = realm.where(Account.class).findAll();
-        return new ArrayList<Account>(accounts);
+        return new ArrayList<>(accounts);
     }
 
     public Account createAccount(String name){
