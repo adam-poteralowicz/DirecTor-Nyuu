@@ -12,15 +12,19 @@ import com.apap.director.db.realm.model.Message;
 
 import java.util.List;
 
+import io.realm.Realm;
+
 
 public class MessageAdapter extends ArrayAdapter<Message> {
     private Activity activity;
     private List<Message> messages;
+    private Realm realm;
 
     public MessageAdapter(Activity context, int resource, List<Message> objects) {
         super(context, resource, objects);
         this.activity = context;
-        this.messages = objects;
+        realm = Realm.getDefaultInstance();
+
     }
 
     @Override
@@ -35,7 +39,10 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         if (chatMessage.isMine()) {
             layoutResource = R.layout.item_chat_right;
         } else {
-            chatMessage.setMine(false);
+            realm.beginTransaction();
+                chatMessage.setMine(false);
+                realm.copyToRealmOrUpdate(chatMessage);
+            realm.commitTransaction();
             layoutResource = R.layout.item_chat_left;
         }
 

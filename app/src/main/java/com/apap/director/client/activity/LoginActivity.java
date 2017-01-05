@@ -64,14 +64,14 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
     private ArrayList<Account> accountList;
     private RealmResults<Account> realmAccounts;
     private ArrayAdapterChangeListener<Account, RealmResults<Account>> listener;
+    private ArrayAdapter<Account> arrayAdapter;
+    private String newAccName;
 
     @Inject
     AccountManager accountManager;
 
     @Inject
     UserService userService;
-
-    private ArrayAdapter<Account> arrayAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -102,7 +102,8 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
         listener = new ArrayAdapterChangeListener<>(arrayAdapter);
         realmAccounts.addChangeListener(listener);
 
-
+        if (getIntent().getStringExtra("accountName") != null)
+           newAccName = getIntent().getStringExtra("accountName");
     }
 
     private void shimmer() {
@@ -159,7 +160,7 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
                 return true;
             case R.id.swapId:
                 Log.v("HAI/LoginActivity", "Swap Id pressed");
-                Account testAccount = accountManager.createAccount("Bres");
+                Account testAccount = accountManager.createAccount(newAccName);
                 accountManager.signUp(testAccount);
                 return true;
             default:
@@ -182,7 +183,7 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
             boolean loggedIn =asyncTask.execute().get();
             Log.v("HAI/LoginActivity", "Logged in: "+loggedIn);
 
-            service.connect(accountManager.getActiveAccount().getCookie(), accountManager.getActiveAccountName());
+            service.connect(accountManager.getActiveAccount().getCookie());
 
             shimmer.cancel();
             Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);
