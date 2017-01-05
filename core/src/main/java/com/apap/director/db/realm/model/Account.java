@@ -74,6 +74,10 @@ public class Account extends RealmObject {
         return cookie;
     }
 
+    public void setCookie(String cookie){
+        this.cookie = cookie;
+    }
+
     @Override
     public String toString() {
         return name;

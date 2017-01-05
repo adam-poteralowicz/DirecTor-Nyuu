@@ -1,5 +1,6 @@
 package com.apap.director.manager;
 
+import com.apap.director.network.rest.service.KeyService;
 import com.apap.director.network.rest.service.UserService;
 
 import org.whispersystems.curve25519.Curve25519;
@@ -21,8 +22,8 @@ public class ManagerModule {
 
     @Provides
     @Singleton
-    ContactManager provideContactManager(Realm realm, AccountManager manager) {
-        return new ContactManager(realm, manager);
+    ContactManager provideContactManager(Realm realm, AccountManager manager, KeyService keyService) {
+        return new ContactManager(realm, manager, keyService);
     }
 
     @Provides

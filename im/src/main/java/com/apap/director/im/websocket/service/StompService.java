@@ -2,14 +2,12 @@ package com.apap.director.im.websocket.service;
 
 import android.util.Log;
 
-import com.apap.director.im.config.IMConfig;
+import com.apap.director.db.realm.to.MessageTO;
+import com.apap.director.network.rest.Paths;
 
 import org.java_websocket.WebSocket;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 
 import javax.inject.Inject;
@@ -37,7 +35,7 @@ public class StompService {
         HashMap<String, String> connectionHeaders = new HashMap<>();
         connectionHeaders.put("Cookie", cookie);
 
-        client = Stomp.over(WebSocket.class, "ws://"+ IMConfig.SERVER_IP+":7500" + IMConfig.WEBSOCKET_ENDPOINT+"/websocket", connectionHeaders);
+        client = Stomp.over(WebSocket.class, "ws://"+ Paths.SERVER_IP+":"+Paths.SERVER_PORT + Paths.WEBSOCKET_ENDPOINT+"/websocket", connectionHeaders);
 
         Log.v("HAI", "Connecting to websocket with cookie "+ cookie+"...");
         StompHeader cookieHeader = new StompHeader("Cookie", cookie);
@@ -50,11 +48,13 @@ public class StompService {
         client.disconnect();
     }
 
-    public void sendMessage(String recipientKeyBase64, String text){
+    public void sendMessage(String recipientKeyBase64, String text, String from){
         // TODO: Encode the message and send via stomp client
 
         StompHeader cookieHeader = new StompHeader("Cookie", cookie);
-        StompHeader destinationHeader = new StompHeader("destination", "/app/message/"+recipientKeyBase64);
+        StompHeader destinationHeader = new StompHeader("destination", "/app/message/test"+recipientKeyBase64);
+        MessageTO frame = new MessageTO(from, text);
+
         client.send(new StompMessage("SEND", Arrays.asList(destinationHeader, cookieHeader), "hai"));
 
     }

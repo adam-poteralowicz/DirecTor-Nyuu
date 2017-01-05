@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.apap.director.client.App;
+import com.apap.director.manager.AccountManager;
 import com.apap.director.manager.ContactManager;
 import com.apap.director.client.R;
 import com.apap.director.db.realm.model.Contact;
@@ -52,6 +53,9 @@ public class SingleContactActivity extends Activity {
 
     @Inject
     ContactManager contactManager;
+
+    @Inject
+    AccountManager accountManager;
 
     public void onCreate(Bundle savedInstanceState) {
 
@@ -93,6 +97,7 @@ public class SingleContactActivity extends Activity {
                             realm.beginTransaction();
                                 Conversation conversation = new Conversation();
                                 conversation.setContact(realm.where(Contact.class).equalTo("id", contactIdFromIntent).findFirst());
+                                conversation.setAccount(accountManager.getActiveAccount());
                                 realm.copyToRealmOrUpdate(conversation);
                             realm.commitTransaction();
                         }

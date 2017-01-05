@@ -138,8 +138,8 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
 
     @OnItemClick(R.id.accountsView)
     public void chooseAccount(int position) {
-        accountManager.signUp(accountList.get(position));
-        Toast.makeText(this, accountManager.getActiveAccountName(), Toast.LENGTH_LONG).show();
+        boolean success = accountManager.chooseAccount(accountList.get(position).getName());
+        Toast.makeText(this, accountManager.getActiveAccountName() + " " +success, Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -173,18 +173,25 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
         try {
 
 
-            AsyncTask<Void, Void, Boolean> asyncTask = new AsyncTask<Void, Void, Boolean>() {
+            AsyncTask<Void, Void, String> asyncTask = new AsyncTask<Void, Void, String>() {
                 @Override
-                protected Boolean doInBackground(Void... params) {
+                protected String doInBackground(Void... params) {
                     return accountManager.logIn();
                 }
             };
 
-            boolean loggedIn =asyncTask.execute().get();
-            Log.v("HAI/LoginActivity", "Logged in: "+loggedIn);
+            String cookie=asyncTask.execute().get();
+            Log.v("HAI/LoginActivity", "Logged in");
 
-            service.connect(accountManager.getActiveAccount().getCookie());
+            Log.v("HAI/LoginActivity", "Choosen account: "+accountManager.getActiveAccount()+ " cookie" +accountManager.getActiveAccount().getCookie());
 
+            realm.beginTransaction();
+                Account account = realm.where(Account.class).equalTo("active", true).findFirst();
+                String cookie2 = account.getCookie();
+                Log.v("HAI/LoginActivity", "cookie2 "+cookie2);
+            realm.commitTransaction();
+
+            service.connect(cookie);
             shimmer.cancel();
             Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);
             startActivity(selectedIntent);
