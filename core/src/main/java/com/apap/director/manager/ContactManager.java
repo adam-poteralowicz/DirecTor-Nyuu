@@ -53,7 +53,7 @@ public class ContactManager {
             contact.setName(name);
 
             RealmList<ContactKey> keys = new RealmList<>();
-            ContactKey contactKey = realm.createObject(ContactKey.class);
+            ContactKey contactKey = realm.createObject(ContactKey.class, generateContactKeyId());
             contactKey.setContact(contact);
             contactKey.setId(generateContactKeyId());
             contactKey.setAccount(accountManager.getActiveAccount());
@@ -67,7 +67,7 @@ public class ContactManager {
             keys.add(contactKey);
             contact.setContactKeys(keys);
 
-            localRealm.insertOrUpdate(contact);
+            localRealm.copyToRealmOrUpdate(contact);
         localRealm.commitTransaction();
         return true;
     }
