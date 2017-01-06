@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.adapter.MessageAdapter;
+import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.util.ArrayAdapterChangeListener;
 import com.apap.director.manager.ConversationManager;
 import com.apap.director.manager.MessageManager;
@@ -80,12 +81,7 @@ public class NewMsgActivity extends Activity {
         changeListener = new ArrayAdapterChangeListener<>(arrayAdapter);
 
         final RealmResults<Message> messages = realm.where(Message.class).findAll();
-        messages.addChangeListener(new RealmChangeListener<RealmResults<com.apap.director.db.realm.model.Message>>() {
-            @Override
-            public void onChange(RealmResults<com.apap.director.db.realm.model.Message> results) {
-                messages.size();
-            }
-        });
+        messages.addChangeListener(changeListener);
 
     }
 

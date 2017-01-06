@@ -7,6 +7,8 @@ import com.apap.director.db.realm.model.Session;
 
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
@@ -15,6 +17,7 @@ public class ConversationManager {
     private Realm realm;
     private AccountManager accountManager;
 
+    @Inject
     public ConversationManager(Realm realm, AccountManager accountManager) {
         this.realm = realm;
         this.accountManager = accountManager;
@@ -41,27 +44,28 @@ public class ConversationManager {
     }
 
     public Conversation getConversationByContactId(Long contactId) {
-        Conversation conversation = realm.where(Conversation.class).equalTo("contact.id", contactId).findFirst();
-        if (conversation != null) {
-            return conversation;
-        } else return null;
+        return realm.where(Conversation.class).equalTo("contact.id", contactId).findFirst();
+
     }
 
     public Conversation getConversationByAccountId(Long accountId) {
-        Conversation conversation = realm.where(Conversation.class).equalTo("account.id", accountId).findFirst();
-        if (conversation != null) {
-            return conversation;
-        } else return null;
+        return realm.where(Conversation.class).equalTo("account.id", accountId).findFirst();
     }
 
     public Conversation addConversation(Contact contact, Session session) {
         if (contact == null) return null;
+
         realm.beginTransaction();
+            Contact managedContact = realm.copyToRealmOrUpdate(contact);
             Conversation conversation = realm.createObject(Conversation.class, generateConversationId());
             conversation.setContact(contact);
-            conversation.setSessions(new RealmList<Session>());
+            RealmList<Session> sessions =  new RealmList<Session>();
+            sessions.add(session);
+            conversation.setSessions(sessions);
             conversation.setMessages(new RealmList<Message>());
             conversation.setAccount(accountManager.getActiveAccount());
+
+            managedContact.setConversation(conversation);
             realm.copyToRealmOrUpdate(conversation);
         realm.commitTransaction();
         return conversation;

@@ -14,7 +14,9 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.activity.AddContactActivity;
 import com.apap.director.client.activity.SingleContactActivity;
+import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.Contact;
+import com.apap.director.db.realm.util.ArrayAdapterChangeListener;
 
 import java.util.ArrayList;
 
@@ -31,6 +33,8 @@ public class ContactsFragment extends Fragment {
     private ArrayList<Contact> contactList;
     private ArrayAdapter<Contact> arrayAdapter;
     private Realm realm;
+    private ArrayAdapterChangeListener<Contact, RealmResults<Contact>> changeListener;
+    private RealmResults<Contact> allContacts;
     @BindView(R.id.contactsView) ListView contactsListView;
 
 
@@ -49,15 +53,27 @@ public class ContactsFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         realm = Realm.getDefaultInstance();
 
-        contactList = new ArrayList<Contact>();
+        Account active = realm.where(Account.class).equalTo("active", true).findFirst();
+
+        allContacts = realm.where(Contact.class).equalTo("account.id", active.getId()).findAll();
+
+        contactList = new ArrayList<Contact>(allContacts);
         arrayAdapter = new ArrayAdapter<Contact>(
                 App.getContext(),
                 android.R.layout.simple_list_item_1,
                 contactList);
         contactsListView.setAdapter(arrayAdapter);
 
-        refreshContactList();
+        changeListener = new ArrayAdapterChangeListener<Contact, RealmResults<Contact>>(arrayAdapter);
+        allContacts.addChangeListener(changeListener);
     }
+
+    @Override
+    public void onDestroy() {
+        allContacts.removeChangeListener(changeListener);
+        super.onDestroy();
+    }
+
 
     @OnItemClick(R.id.contactsView)
     public void showContactDetails(int position){
@@ -67,35 +83,6 @@ public class ContactsFragment extends Fragment {
         startActivity(intent);
     }
 
-    /**
-     * Display all the users from the DB into the listView
-     */
-    private void refreshContactList() {
-        Log.d("DTOR","REFRESHING CONTACTS");
-        RealmResults<Contact> contactResults = realm.where(Contact.class).findAll();
-        if (!contactResults.isEmpty()) {
-            contactList.addAll(realm.copyFromRealm(contactResults));
-        }
-
-        if (contactList != null) {
-            if (arrayAdapter == null) {
-                arrayAdapter = new ArrayAdapter<Contact>(
-                        App.getContext(),
-                        android.R.layout.simple_list_item_1,
-                        contactList);
-                contactsListView.setAdapter(arrayAdapter);
-            } else {
-                contactsListView.setAdapter(null);
-                arrayAdapter.clear();
-                contactList = new ArrayList<Contact>();
-                contactList.addAll(realm.copyFromRealm(contactResults));
-                arrayAdapter.addAll(contactList);
-                arrayAdapter.notifyDataSetChanged();
-                contactsListView.setAdapter(arrayAdapter);
-            }
-        }
-
-    }
 
     @OnClick(R.id.addNewContactButton)
     public void onClick(View view) {

@@ -40,13 +40,11 @@ public class ContactManager {
     }
 
     public boolean addContact(String name, String keyBase64) {
-        Contact sameName = realm.where(Contact.class).equalTo("name", name).findFirst();
-        if (sameName != null) return false;
-
-
 
         Realm localRealm = Realm.getDefaultInstance();
 
+        Contact sameName = localRealm.where(Contact.class).equalTo("name", name).findFirst();
+        if (sameName != null) return false;
 
         localRealm.beginTransaction();
             Contact contact = realm.createObject(Contact.class, generateContactId());
@@ -65,6 +63,7 @@ public class ContactManager {
             contactKey.setDeviceId(0);
             keys.add(contactKey);
             contact.setContactKeys(keys);
+            contact.setAccount(accountManager.getActiveAccount());
 
             localRealm.copyToRealmOrUpdate(contact);
         localRealm.commitTransaction();
