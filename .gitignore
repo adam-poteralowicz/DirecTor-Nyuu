@@ -44,9 +44,9 @@ proguard/
 captures/
 
 # Intellij
-*.iml
 .idea/workspace.xml
 
 # Keystore files
 *.jks
 
+/core/src/main/java/com/apap/director/network/rest/Paths.java

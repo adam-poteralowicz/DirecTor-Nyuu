@@ -27,14 +27,14 @@ public class DirectorSessionStore implements SessionStore {
     @Override
     public SessionRecord loadSession(SignalProtocolAddress address) {
         try {
-            List<Session> list = realm.where(Session.class).equalTo("name", address.getName()).findAll();
-            for (Session session : list) {
-                if (session.getDeviceId() == address.getDeviceId())
-                    return new SessionRecord(session.getSerializedKey());
-            }
-            return null;
-        }
-        catch(IOException exception){
+            Session session = realm.where(Session.class)
+                    .equalTo("name", address.getName())
+                    .equalTo("deviceId", address.getDeviceId())
+                    .findFirst();
+
+            return new SessionRecord(session.getSerializedKey());
+        } catch (IOException e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -66,12 +66,12 @@ public class DirectorSessionStore implements SessionStore {
     @Override
     public boolean containsSession(SignalProtocolAddress address) {
 
-        List<Session> sessions = realm.where(Session.class).equalTo("name", address.getName()).findAll();
-        for(Session session : sessions){
-            if(session.getDeviceId() == address.getDeviceId()) return true;
-        }
+        Session session =  realm.where(Session.class)
+                .equalTo("name", address.getName())
+                .equalTo("deviceId", address.getDeviceId())
+                .findFirst();
 
-        return false;
+        return session == null? false : true;
 
     }
 
