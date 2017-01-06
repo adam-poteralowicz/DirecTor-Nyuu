@@ -57,7 +57,7 @@ public class ContactsFragment extends Fragment {
 
         allContacts = realm.where(Contact.class).equalTo("account.id", active.getId()).findAll();
 
-        contactList = new ArrayList<Contact>();
+        contactList = new ArrayList<Contact>(allContacts);
         arrayAdapter = new ArrayAdapter<Contact>(
                 App.getContext(),
                 android.R.layout.simple_list_item_1,
