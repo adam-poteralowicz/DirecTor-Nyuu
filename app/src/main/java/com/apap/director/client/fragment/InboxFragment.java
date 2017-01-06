@@ -37,6 +37,7 @@ public class InboxFragment extends Fragment {
     private Realm realm;
     @BindView(R.id.msgList) ListView msgListView;
 
+    @Inject
     ConversationManager conversationManager;
 
     @Override
@@ -54,7 +55,7 @@ public class InboxFragment extends Fragment {
         realm = Realm.getDefaultInstance();
 
         conversationList = new ArrayList<Conversation>();
-        ArrayList<Conversation> conversationResults = conversationManager.listAllConversations();
+        RealmResults<Conversation> conversationResults = realm.where(Conversation.class).findAll();
         if (!conversationResults.isEmpty())
             conversationList.addAll(realm.copyFromRealm(conversationResults));
         arrayAdapter = new ArrayAdapter<Conversation>(

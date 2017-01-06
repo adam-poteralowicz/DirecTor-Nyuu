@@ -47,6 +47,7 @@ public class NewMsgActivity extends Activity {
     @Inject
     MessageManager messageManager;
 
+    @Inject
     ConversationManager conversationManager;
 
     //TODO: Split this method

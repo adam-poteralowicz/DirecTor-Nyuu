@@ -58,6 +58,7 @@ public class SingleContactActivity extends Activity {
     @Inject
     AccountManager accountManager;
 
+    @Inject
     ConversationManager conversationManager;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -96,6 +97,8 @@ public class SingleContactActivity extends Activity {
                 switch (position) {
                     case 0:
                     {
+                        Log.d("DTOR/=/", contactIdFromIntent.toString());
+                        if (conversationManager == null) Log.d("CONVMAN", "NULL");
                         Conversation conv = conversationManager.getConversationByContactId(contactIdFromIntent);
                         if (conv == null) {
                             realm.beginTransaction();

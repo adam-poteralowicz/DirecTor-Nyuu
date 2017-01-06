@@ -5,6 +5,7 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 
 import com.apap.director.client.R;
@@ -22,12 +23,14 @@ import io.realm.Realm;
 
 public class AuthUserActivity extends FragmentActivity {
     DirecTorPagerAdapter direcTorPagerAdapter;
-    AccountManager accountManager;
     Realm realm;
     @BindView(R.id.pager) ViewPager viewPager;
 
     @Inject
     StompService service;
+
+    @Inject
+    AccountManager accountManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,6 +48,8 @@ public class AuthUserActivity extends FragmentActivity {
     @Override
     public void onBackPressed() {
         realm.beginTransaction();
+            if (accountManager == null) Log.d("accountManager", "null");
+            if (accountManager.getActiveAccount() == null) Log.d("active account", "null");
             Account active = accountManager.getActiveAccount();
             active.setActive(false);
             realm.copyToRealmOrUpdate(active);

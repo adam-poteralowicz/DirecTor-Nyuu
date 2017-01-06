@@ -55,7 +55,6 @@ public class ContactManager {
             RealmList<ContactKey> keys = new RealmList<>();
             ContactKey contactKey = realm.createObject(ContactKey.class, generateContactKeyId());
             contactKey.setContact(contact);
-            contactKey.setId(generateContactKeyId());
             contactKey.setAccount(accountManager.getActiveAccount());
 
             byte[] decodedKey = Base64.decode(keyBase64, Base64.NO_WRAP | Base64.URL_SAFE);

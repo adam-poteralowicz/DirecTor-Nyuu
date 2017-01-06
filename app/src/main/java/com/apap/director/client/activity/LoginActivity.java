@@ -167,7 +167,10 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
     @OnClick(R.id.postLoginButton)
     public void onClick(View view) {
         try {
-
+            if (accountManager.getActiveAccount() == null) {
+                Toast.makeText(this, "Choose an account", Toast.LENGTH_LONG).show();
+                return;
+            } else Log.d("active account", accountManager.getActiveAccountName());
 
             AsyncTask<Void, Void, String> asyncTask = new AsyncTask<Void, Void, String>() {
                 @Override
