@@ -1,5 +1,6 @@
 package com.apap.director.client.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
@@ -101,9 +102,6 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
 
         listener = new ArrayAdapterChangeListener<>(arrayAdapter);
         realmAccounts.addChangeListener(listener);
-
-        if (getIntent().getStringExtra("accountName") != null)
-           newAccName = getIntent().getStringExtra("accountName");
     }
 
     private void shimmer() {
@@ -160,8 +158,6 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
                 return true;
             case R.id.swapId:
                 Log.v("HAI/LoginActivity", "Swap Id pressed");
-                Account testAccount = accountManager.createAccount(newAccName);
-                accountManager.signUp(testAccount);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -207,7 +203,18 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
     @OnClick(R.id.newAccButton)
     public void newAccount(View view) {
         Intent newAccIntent = new Intent(LoginActivity.this, NewAccountActivity.class);
-        startActivity(newAccIntent);
+        startActivityForResult(newAccIntent, 1);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1) {
+            if (resultCode == Activity.RESULT_OK) {
+                newAccName = data.getStringExtra("accountName");
+                Account testAccount = accountManager.createAccount(newAccName);
+                accountManager.signUp(testAccount);
+            }
+        }
     }
 
     @Override

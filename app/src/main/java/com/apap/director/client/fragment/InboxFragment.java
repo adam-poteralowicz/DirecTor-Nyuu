@@ -37,7 +37,6 @@ public class InboxFragment extends Fragment {
     private Realm realm;
     @BindView(R.id.msgList) ListView msgListView;
 
-    @Inject
     ConversationManager conversationManager;
 
     @Override

@@ -58,7 +58,6 @@ public class SingleContactActivity extends Activity {
     @Inject
     AccountManager accountManager;
 
-    @Inject
     ConversationManager conversationManager;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -145,7 +144,7 @@ public class SingleContactActivity extends Activity {
     public void onBackPressed() {
 
             Intent selectedIntent = new Intent(SingleContactActivity.this, AuthUserActivity.class);
-            startActivityForResult(selectedIntent, 0011);
+            startActivity(selectedIntent);
 
     }
 
