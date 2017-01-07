@@ -23,8 +23,10 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.util.NFCUtils;
 import com.apap.director.db.realm.model.Account;
+import com.apap.director.db.realm.model.Contact;
 import com.apap.director.manager.AccountManager;
 import com.apap.director.manager.ContactManager;
+import com.apap.director.manager.ConversationManager;
 
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.InvalidKeyException;
@@ -47,11 +49,13 @@ public class AddContactActivity extends AppCompatActivity {
     public PendingIntent _pendingIntent;
     public IntentFilter[] _readIntentFilters, _writeIntentFilters;
     private final String _MIME_TYPE = "text/plain";
-    private byte[] publicKey;
+    private String contactPublicKey;
+    private byte[] myPublicKey;
 
     @Inject Realm realm;
     @Inject ContactManager contactManager;
     @Inject AccountManager accountManager;
+    @Inject ConversationManager conversationManager;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,9 +76,14 @@ public class AddContactActivity extends AppCompatActivity {
         if (name.matches(".*\\w.*")
                 && (name.matches("\\w.*")))
         {
-            String keyBase64 = Base64.encodeToString(publicKey, Base64.URL_SAFE | Base64.NO_WRAP);
-            contactManager.addContact(name, keyBase64);
-            Toast.makeText(this, keyBase64, Toast.LENGTH_LONG).show();
+            contactManager.addContact(name, contactPublicKey);
+
+            Realm realm = Realm.getDefaultInstance();
+                Contact contact = realm.where(Contact.class).equalTo("name", name).findFirst();
+                conversationManager.addConversation(contact, null);
+            realm.close();
+
+            Toast.makeText(this, contactPublicKey, Toast.LENGTH_LONG).show();
 
             Intent selectedIntent = new Intent(AddContactActivity.this, AuthUserActivity.class);
             startActivityForResult(selectedIntent, 13);
@@ -120,10 +129,11 @@ public class AddContactActivity extends AppCompatActivity {
         Account account = accountManager.getActiveAccount();
         IdentityKeyPair keyPair = new IdentityKeyPair(account.getKeyPair());
         byte[] key = keyPair.getPublicKey().serialize();
-        publicKey = Base64.encode(key, Base64.NO_WRAP | Base64.URL_SAFE);
-        Log.d("PUBLIC KEY", new String(publicKey));
+        myPublicKey = Base64.encode(key, Base64.NO_WRAP | Base64.URL_SAFE);
+        Log.d("MY PUBLIC KEY", new String(myPublicKey));
+        Log.d("MY PUBLIC KEY2", Base64.encodeToString(key, Base64.NO_WRAP | Base64.URL_SAFE));
 
-        NdefMessage message = NFCUtils.getNewMessage(_MIME_TYPE, publicKey);
+        NdefMessage message = NFCUtils.getNewMessage(_MIME_TYPE, myPublicKey);
 
         if (_nfcAdapter != null) {
             // Automatically beams the message when two devices are in close enough proximity.
@@ -152,14 +162,15 @@ public class AddContactActivity extends AppCompatActivity {
         }
     }
 
-    public NdefMessage _getNdefMessage() {
-        return NFCUtils.getNewMessage(_MIME_TYPE, publicKey);
-    }
+//    public NdefMessage _getNdefMessage() {
+//        return NFCUtils.getNewMessage(_MIME_TYPE, publicKey);
+//    }
 
     public void _readMessage() {
         List<String> msgs = NFCUtils.getStringsFromNfcIntent(_intent);
         if (msgs != null) {
-            Toast.makeText(this, "Public key : " + msgs.get(0), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Contact public key : " + msgs.get(0), Toast.LENGTH_LONG).show();
+            contactPublicKey = msgs.get(0);
             getSupportActionBar().show();
         }
     }

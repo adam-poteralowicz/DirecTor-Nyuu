@@ -2,6 +2,7 @@ package com.apap.director.manager;
 
 import android.util.Base64;
 
+import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.ContactKey;
 import com.apap.director.db.realm.model.Conversation;
@@ -39,35 +40,48 @@ public class ContactManager {
         return realm.where(Contact.class).equalTo("name", name).findFirst();
     }
 
-    public boolean addContact(String name, String keyBase64) {
+    public Contact getContactByContactKey(String keyBase64){
+
+            ContactKey contactKey = realm.where(ContactKey.class).equalTo("keyBase64", keyBase64).findFirst();
+
+            if(contactKey == null) {
+                return null;
+            }
+            return contactKey.getContact();
+    }
+
+    public void addContact(String name, String keyBase64) {
 
         Realm localRealm = Realm.getDefaultInstance();
 
         Contact sameName = localRealm.where(Contact.class).equalTo("name", name).findFirst();
-        if (sameName != null) return false;
+        if (sameName != null) return;
 
         localRealm.beginTransaction();
-            Contact contact = realm.createObject(Contact.class, generateContactId());
+            Contact contact = localRealm.createObject(Contact.class, generateContactKeyId(localRealm));
             contact.setName(name);
 
             RealmList<ContactKey> keys = new RealmList<>();
-            ContactKey contactKey = realm.createObject(ContactKey.class, generateContactKeyId());
-            contactKey.setContact(contact);
-            contactKey.setAccount(accountManager.getActiveAccount());
+            ContactKey contactKey = localRealm.createObject(ContactKey.class, generateContactKeyId(localRealm));
+            contactKey.setAccount(localRealm.where(Account.class).equalTo("active", true).findFirst());
 
             byte[] decodedKey = Base64.decode(keyBase64, Base64.NO_WRAP | Base64.URL_SAFE);
             contactKey.setSerialized(decodedKey);
-            String splitted = Base64.encodeToString(ByteUtil.split(decodedKey, 1, 32)[1], Base64.NO_WRAP | Base64.URL_SAFE);
+            byte[][] typeAndKey = ByteUtil.split(decodedKey, 1, 32);
+
+            String splitted = Base64.encodeToString(typeAndKey[1], Base64.NO_WRAP | Base64.URL_SAFE);
             contactKey.setKeyBase64(splitted);
 
             contactKey.setDeviceId(0);
             keys.add(contactKey);
             contact.setContactKeys(keys);
-            contact.setAccount(accountManager.getActiveAccount());
+            contact.setAccount(localRealm.where(Account.class).equalTo("active", true).findFirst());
 
-            localRealm.copyToRealmOrUpdate(contact);
+            contactKey.setContact(contact);
+
         localRealm.commitTransaction();
-        return true;
+        localRealm.close();
+        return;
     }
 
 //    private boolean addContactKey(String owner, String keyBase64) {
@@ -87,6 +101,13 @@ public class ContactManager {
         if (contactToDelete == null) return false;
 
         realm.beginTransaction();
+            contactToDelete.getContactKeys().deleteAllFromRealm();
+
+            Conversation conversationToDelete = contactToDelete.getConversation();
+            conversationToDelete.getSessions().deleteAllFromRealm();
+            conversationToDelete.getMessages().deleteAllFromRealm();
+            conversationToDelete.deleteFromRealm();
+
             contactToDelete.deleteFromRealm();
         realm.commitTransaction();
         return true;
@@ -113,7 +134,7 @@ public class ContactManager {
         return true;
     }
 
-    private long generateContactId() {
+    private long generateContactId(Realm realm) {
         long id;
         try {
             if (realm.where(Contact.class).max("id") == null) {
@@ -127,7 +148,7 @@ public class ContactManager {
         return id;
     }
 
-    private long generateContactKeyId() {
+    private long generateContactKeyId(Realm realm) {
         long id;
         try {
             if (realm.where(ContactKey.class).max("id") == null) {

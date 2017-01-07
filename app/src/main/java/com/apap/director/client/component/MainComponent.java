@@ -12,6 +12,7 @@ import com.apap.director.client.fragment.InboxFragment;
 import com.apap.director.db.dao.module.DaoModule;
 import com.apap.director.im.signal.module.SignalModule;
 import com.apap.director.im.websocket.module.WebSocketModule;
+import com.apap.director.im.websocket.service.MessageAction;
 import com.apap.director.manager.ManagerModule;
 import com.apap.director.network.rest.module.RestModule;
 
@@ -32,5 +33,6 @@ public interface MainComponent {
     void inject(NewAccountActivity newAccountActivity);
     void inject(AuthUserActivity authUserActivity);
     void inject(App app);
+    MessageAction getMessageAction();
 
 }

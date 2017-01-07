@@ -15,7 +15,9 @@ public class Session extends RealmObject {
     private long id;
     private Conversation conversation;
     private int deviceId;
-    private String name;
     private byte[] serializedKey;
     private Account account;
+    private String name;
+
+
 }

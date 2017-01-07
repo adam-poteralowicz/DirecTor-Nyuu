@@ -11,7 +11,7 @@ public class ErrorAction implements Action1<Throwable> {
 
         //TODO: notify user that something went wrong
 
-        Log.d("HAI/ErrorAction", "Error: "+ throwable.getMessage());
+        Log.e("HAI/ErrorAction", "Error: "+ throwable.getMessage(), throwable);
 
     }
 }

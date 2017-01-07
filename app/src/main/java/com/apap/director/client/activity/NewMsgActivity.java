@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.adapter.MessageAdapter;
+import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.Conversation;
 import com.apap.director.db.realm.model.Message;
 import com.apap.director.db.realm.util.ArrayAdapterChangeListener;
@@ -38,6 +39,7 @@ public class NewMsgActivity extends Activity {
     private Long contactIdFromIntent;
     private List<Message> myMessages;
     private ArrayAdapterChangeListener<Message, RealmResults<Message>> changeListener;
+    RealmResults<Message> allMessages;
     @Inject
     Realm realm;
 
@@ -75,7 +77,7 @@ public class NewMsgActivity extends Activity {
         }
         messagesView.setAdapter(arrayAdapter);
 
-        RealmResults<Message> allMessages = realm.where(Message.class).equalTo("conversation.id", conversation.getId() ).findAll();
+        allMessages = realm.where(Message.class).equalTo("conversation.id", conversation.getId() ).findAll();
         changeListener = new ArrayAdapterChangeListener<>(arrayAdapter);
 
         allMessages.addChangeListener(changeListener);
@@ -108,9 +110,7 @@ public class NewMsgActivity extends Activity {
 
         Message message = messageManager.addMessage(conversation, newMessage, to, true);
 
-        realm.beginTransaction();
-            myMessages.add(message);
-        realm.commitTransaction();
+        ClientService.sendTestMessage(conversation.getContact().getContactKeys().get(0).getKeyBase64(),realm.where(Account.class).equalTo("active", true).findFirst().getKeyBase64(),newMessage);
 
         messagesView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
         messagesView.setStackFromBottom(true);
@@ -121,6 +121,7 @@ public class NewMsgActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        allMessages.removeChangeListener(changeListener);
         super.onDestroy();
         realm.close();
     }

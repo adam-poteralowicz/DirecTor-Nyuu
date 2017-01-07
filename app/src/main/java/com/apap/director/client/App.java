@@ -8,6 +8,7 @@ import com.apap.director.client.component.MainComponent;
 import com.apap.director.db.dao.module.DaoModule;
 import com.apap.director.im.signal.module.SignalModule;
 import com.apap.director.im.websocket.module.WebSocketModule;
+import com.apap.director.im.websocket.service.ClientService;
 import com.apap.director.manager.ManagerModule;
 import com.apap.director.network.rest.module.RestModule;
 
@@ -36,7 +37,7 @@ public class App extends Application {
                     .build();
 
 
-
+            ClientService.init(mainComponent.getMessageAction());
 
             OrbotHelper.get(this).init();
             //OrbotHelper.requestStartTor(this);
