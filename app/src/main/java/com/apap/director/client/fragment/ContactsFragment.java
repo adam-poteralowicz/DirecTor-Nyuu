@@ -73,6 +73,15 @@ public class ContactsFragment extends Fragment {
 
         changeListener = new ArrayAdapterChangeListener<Contact, RealmResults<Contact>>(arrayAdapter);
         allContacts.addChangeListener(changeListener);
+
+        AsyncTask<Void, Void, String> asyncTask = new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                return accountManager.updateKeys();
+            }
+        };
+
+        asyncTask.execute();
     }
 
     @Override

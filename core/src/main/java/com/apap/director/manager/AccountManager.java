@@ -3,6 +3,7 @@ package com.apap.director.manager;
 
 import android.util.Base64;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.ContactKey;
@@ -25,12 +26,14 @@ import org.whispersystems.libsignal.util.KeyHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -263,7 +266,23 @@ public class AccountManager {
     public String updateKeys() {
         try {
             Realm realm = Realm.getDefaultInstance();
-            Account active = realm.where(Account.class).equalTo("active", true).equalTo("registered", true).findFirst();
+            Account activeAcc = realm.where(Account.class).equalTo("active", true).equalTo("registered", true).findFirst();
+            Log.d("HAI/ACTIVE ACCOUNT", activeAcc.getName());
+            Long id;
+
+            // Mock an otk
+            realm.beginTransaction();
+                id = generateOtkId();
+                Account active = realm.copyFromRealm(activeAcc);
+                OneTimeKey oneTimeKey = realm.createObject(OneTimeKey.class, id);
+                oneTimeKey.setAccount(activeAcc);
+                oneTimeKey.setSerializedKey("newKey".getBytes());
+                realm.copyToRealmOrUpdate(oneTimeKey);
+                RealmList<OneTimeKey> otks = active.getOneTimeKeys();
+                otks.add(oneTimeKey);
+                active.setOneTimeKeys(otks);
+                realm.copyToRealmOrUpdate(active);
+            realm.commitTransaction();
 
             // postOneTimeKeys(keys)
             if (active.getOneTimeKeys() == null || active.getOneTimeKeys().isEmpty()) {
@@ -273,13 +292,15 @@ public class AccountManager {
             List<OneTimeKey> otkeys = new ArrayList<>(active.getOneTimeKeys());
             List<OneTimeKeyTO> otkeysTO = new ArrayList<>();
             for (OneTimeKey otk : otkeys) {
+                Log.d("OTK", new String(otk.getSerializedKey()));
                 otkeysTO.add(new OneTimeKeyTO(otk));
             }
             Call<ResponseBody> postOneTimeKeysCall = keyService.postOneTimeKeys(otkeysTO);
             Response<ResponseBody> postOneTimeKeysResponse = postOneTimeKeysCall.execute();
 
             Log.v("HAI/AccountManager", "post one time keys call code:" + postOneTimeKeysResponse.code());
-            Log.v("HAI/AccountManager", "post one time keys call keys:" + otkeysTO);
+            Log.v("HAI/AccountManager", "post one time keys call keys:" + Arrays.toString(otkeysTO.toArray()));
+            Log.v("HAI/AccountManager", "post one time keys call url:" + postOneTimeKeysCall.request().url());
 
             for(String name: postOneTimeKeysResponse.headers().names()){
                 Log.v("HAI/AccountManager", name+" : "+ postOneTimeKeysResponse.headers().get(name));
@@ -308,6 +329,7 @@ public class AccountManager {
 
             Log.v("HAI/AccountManager", "post signed keys call code:" + postSignedKeysResponse.code());
             Log.v("HAI/AccountManager", "post signed keys call keys:" + signedKeyTO);
+            Log.v("HAI/AccountManager", "post signed keys call url:" + postSignedKeysCall.request().url());
 
             for(String name: postSignedKeysResponse.headers().names()){
                 Log.v("HAI/AccountManager", name+" : "+ postSignedKeysResponse.headers().get(name));
@@ -318,9 +340,9 @@ public class AccountManager {
                 return null;
             }
 
+            realm.close();
             Log.v("HAI/AccountManager", "PostSignedKeys successful");
             return "Success";
-
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -343,6 +365,22 @@ public class AccountManager {
         } catch(ArrayIndexOutOfBoundsException ex) {
             id = 0;
         }
+        return id;
+    }
+
+    private long generateOtkId() {
+        Realm realm = Realm.getDefaultInstance();
+        long id;
+        try {
+            if (realm.where(OneTimeKey.class).max("id") == null) {
+                id = 0;
+            } else {
+                id = realm.where(OneTimeKey.class).max("id").longValue() + 1;
+            }
+        } catch(ArrayIndexOutOfBoundsException ex) {
+            id = 0;
+        }
+        realm.close();
         return id;
     }
 
