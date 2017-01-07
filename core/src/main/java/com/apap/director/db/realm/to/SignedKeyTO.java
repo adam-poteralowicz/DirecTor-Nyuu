@@ -4,6 +4,11 @@ import android.util.Base64;
 
 import com.apap.director.db.realm.model.SignedKey;
 
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@NoArgsConstructor
+@Setter
 public class SignedKeyTO {
 
     private String keyBase64;
