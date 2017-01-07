@@ -2,7 +2,9 @@ package com.apap.director.im.websocket.service;
 
 import android.util.Log;
 
+import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.to.MessageTO;
+import com.apap.director.manager.AccountManager;
 import com.apap.director.network.rest.Paths;
 
 import org.java_websocket.WebSocket;
@@ -12,6 +14,7 @@ import java.util.HashMap;
 
 import javax.inject.Inject;
 
+import io.realm.Realm;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompHeader;
 import ua.naiksoftware.stomp.client.StompClient;
@@ -23,10 +26,13 @@ public class StompService {
     private String cookie;
 
     MessageAction messageAction;
+    Realm realm;
+    @Inject AccountManager accountManager;
 
     @Inject
     public StompService(MessageAction messageAction) {
         this.messageAction = messageAction;
+        realm = Realm.getDefaultInstance();
     }
 
     public void connect(String cookie){
@@ -47,6 +53,7 @@ public class StompService {
     public void disconnect(){
         client.disconnect();
     }
+
 
     public void sendMessage(String recipientKeyBase64, String text, String from){
         // TODO: Encode the message and send via stomp client

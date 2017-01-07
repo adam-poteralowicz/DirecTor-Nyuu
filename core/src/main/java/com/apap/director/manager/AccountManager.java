@@ -46,10 +46,11 @@ public class AccountManager {
     private KeyService keyService;
 
     @Inject
-    public AccountManager(Realm realm, UserService userService, Curve25519 curve25519) {
+    public AccountManager(Realm realm, UserService userService, Curve25519 curve25519, KeyService keyService) {
         this.realm = realm;
         this.userService = userService;
         this.curve25519 = curve25519;
+        this.keyService = keyService;
     }
 
     public ArrayList<Account> listAllAccounts(){
@@ -259,12 +260,16 @@ public class AccountManager {
 
     }
 
-    public boolean updateKeys() {
+    public String updateKeys() {
         try {
             Realm realm = Realm.getDefaultInstance();
             Account active = realm.where(Account.class).equalTo("active", true).equalTo("registered", true).findFirst();
 
             // postOneTimeKeys(keys)
+            if (active.getOneTimeKeys() == null || active.getOneTimeKeys().isEmpty()) {
+                Log.d("HAI/AccountManager", "There are no one time keys to be fetched");
+                return null;
+            }
             List<OneTimeKey> otkeys = new ArrayList<>(active.getOneTimeKeys());
             List<OneTimeKeyTO> otkeysTO = new ArrayList<>();
             for (OneTimeKey otk : otkeys) {
@@ -282,12 +287,16 @@ public class AccountManager {
 
             if(!postOneTimeKeysResponse.isSuccessful()){
                 Log.v("HAI/AccountManager", "Failed to post one time keys");
-                return false;
+                return null;
             }
 
             Log.v("HAI/AccountManager", "PostOneTimeKeys successful");
 
             // postSignedKey(key)
+            if (active.getSignedKey() == null) {
+                Log.d("HAI/AccountManager", "There are no signed keys to be fetched");
+                return null;
+            }
             List<SignedKey> sk = new ArrayList<SignedKey>();
             sk.add(active.getSignedKey());
             List<SignedKeyTO> signedKeyTO = new ArrayList<>();
@@ -306,16 +315,16 @@ public class AccountManager {
 
             if(!postSignedKeysResponse.isSuccessful()){
                 Log.v("HAI/AccountManager", "Failed to post signed keys");
-                return false;
+                return null;
             }
 
             Log.v("HAI/AccountManager", "PostSignedKeys successful");
-            return true;
+            return "Success";
 
 
         } catch (IOException e) {
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
 
