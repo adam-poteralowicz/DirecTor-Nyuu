@@ -7,6 +7,9 @@ import com.apap.director.im.signal.DirectorPreKeyStore;
 import com.apap.director.im.signal.DirectorSessionStore;
 import com.apap.director.im.signal.DirectorSignedPreKeyStore;
 import com.apap.director.im.websocket.service.MessageAction;
+import com.apap.director.manager.ContactManager;
+import com.apap.director.manager.ConversationManager;
+import com.apap.director.manager.MessageManager;
 
 import javax.inject.Singleton;
 
@@ -41,8 +44,8 @@ public class WebSocketModule {
 
     @Provides
     @Singleton
-    public MessageAction provideMessageAction(DirectorIdentityKeyStore identityKeyStore, DirectorSessionStore sessionStore, DirectorSignedPreKeyStore signedPreKeyStore, DirectorPreKeyStore preKeyStore){
-        return new MessageAction(preKeyStore, identityKeyStore, sessionStore, signedPreKeyStore);
+    public MessageAction provideMessageAction(DirectorIdentityKeyStore identityKeyStore, DirectorSessionStore sessionStore, DirectorSignedPreKeyStore signedPreKeyStore, DirectorPreKeyStore preKeyStore, MessageManager messageManager, ContactManager contactManager, ConversationManager conversationManager){
+        return new MessageAction(preKeyStore, identityKeyStore, sessionStore, signedPreKeyStore, messageManager, contactManager, conversationManager);
     }
 
 //    @Provides

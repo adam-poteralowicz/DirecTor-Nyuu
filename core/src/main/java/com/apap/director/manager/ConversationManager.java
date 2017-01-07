@@ -44,8 +44,10 @@ public class ConversationManager {
     }
 
     public Conversation getConversationByContactId(Long contactId) {
-        return realm.where(Conversation.class).equalTo("contact.id", contactId).findFirst();
-
+        Realm realm = Realm.getDefaultInstance();
+        Conversation conversation = realm.where(Conversation.class).equalTo("contact.id", contactId).findFirst();
+        realm.close();
+        return conversation;
     }
 
     public Conversation getConversationByAccountId(Long accountId) {
@@ -55,12 +57,13 @@ public class ConversationManager {
     public Conversation addConversation(Contact contact, Session session) {
         if (contact == null) return null;
 
+        Realm realm = Realm.getDefaultInstance();
+
         realm.beginTransaction();
             Contact managedContact = realm.copyToRealmOrUpdate(contact);
-            Conversation conversation = realm.createObject(Conversation.class, generateConversationId());
+            Conversation conversation = realm.createObject(Conversation.class, generateConversationId(realm));
             conversation.setContact(contact);
             RealmList<Session> sessions =  new RealmList<Session>();
-            sessions.add(session);
             conversation.setSessions(sessions);
             conversation.setMessages(new RealmList<Message>());
             conversation.setAccount(accountManager.getActiveAccount());
@@ -68,6 +71,8 @@ public class ConversationManager {
             managedContact.setConversation(conversation);
             realm.copyToRealmOrUpdate(conversation);
         realm.commitTransaction();
+
+        realm.close();
         return conversation;
     }
 
@@ -144,7 +149,7 @@ public class ConversationManager {
         return true;
     }
 
-    public long generateConversationId() {
+    public long generateConversationId(Realm realm) {
         long id;
         try {
             if (realm.where(Conversation.class).max("id") == null) {

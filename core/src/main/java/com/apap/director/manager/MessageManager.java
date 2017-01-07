@@ -1,5 +1,6 @@
 package com.apap.director.manager;
 
+import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.Conversation;
 import com.apap.director.db.realm.model.Message;
 
@@ -39,15 +40,17 @@ public class MessageManager {
     }
 
     public Message addMessage(Conversation conv, String msg, String recipient, Boolean owned) {
+
+        Realm realm = Realm.getDefaultInstance();
         if (conv == null) return null;
         realm.beginTransaction();
-        Conversation conversation = realm.copyFromRealm(conv);
-            Message message = realm.createObject(Message.class, generateMessageId());
+        Conversation conversation = realm.where(Conversation.class).equalTo("id", conv.getId()).findFirst();
+            Message message = realm.createObject(Message.class, generateMessageId(realm));
             message.setConversation(conv);
             message.setContent(msg);
             message.setDate(new Date());
             message.setRecipient(recipient);
-            message.setAccount(accountManager.getActiveAccount());
+            message.setAccount(realm.where(Account.class).equalTo("active", true).findFirst());
             message.setMine(owned);
             RealmList<Message> conversationMsg = conversation.getMessages();
             conversationMsg.add(message);
@@ -55,6 +58,7 @@ public class MessageManager {
             realm.copyToRealmOrUpdate(message);
             realm.copyToRealmOrUpdate(conversation);
         realm.commitTransaction();
+        realm.close();
         return message;
     }
 
@@ -78,7 +82,7 @@ public class MessageManager {
         return true;
     }
 
-    private long generateMessageId() {
+    private long generateMessageId(Realm realm) {
         long id;
         try {
             if (realm.where(Message.class).max("id") == null) {

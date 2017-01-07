@@ -102,7 +102,7 @@ public class SingleContactActivity extends Activity {
                         Conversation conv = conversationManager.getConversationByContactId(contactIdFromIntent);
                         if (conv == null) {
                             realm.beginTransaction();
-                                Conversation conversation = realm.createObject(Conversation.class, conversationManager.generateConversationId());
+                                Conversation conversation = realm.createObject(Conversation.class, conversationManager.generateConversationId(realm));
                                 conversation.setContact(realm.where(Contact.class).equalTo("id", contactIdFromIntent).findFirst());
                                 conversation.setAccount(accountManager.getActiveAccount());
                                 //TODO - conversation.setSessions();
