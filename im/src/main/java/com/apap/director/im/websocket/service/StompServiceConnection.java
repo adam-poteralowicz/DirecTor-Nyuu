@@ -23,4 +23,7 @@
 //        Log.v("HAIServiceConnection", "Disonnected");
 //    }
 //
+//    public StompService getService(){
+//        return stompService;
+//    }
 //}

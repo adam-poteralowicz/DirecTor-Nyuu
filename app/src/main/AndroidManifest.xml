@@ -21,6 +21,7 @@
 
         <!-- Used for transferring files  after a successful connection -->
         <service android:enabled="true" android:name=".wifi.FileTransferService" />
+        <service android:name="com.apap.director.im.websocket.service.StompService" />
 
         <activity android:name=".activity.AuthUserActivity"></activity>
         <activity android:name=".activity.InboxActivity"></activity>

@@ -6,8 +6,6 @@ import com.apap.director.im.signal.DirectorIdentityKeyStore;
 import com.apap.director.im.signal.DirectorPreKeyStore;
 import com.apap.director.im.signal.DirectorSessionStore;
 import com.apap.director.im.signal.DirectorSignedPreKeyStore;
-import com.apap.director.im.websocket.service.MessageAction;
-import com.apap.director.im.websocket.service.StompService;
 import com.apap.director.manager.AccountManager;
 
 import org.whispersystems.curve25519.Curve25519;
@@ -58,16 +56,4 @@ public class SignalModule {
         return new DirectorSignedPreKeyStore(realm);
     }
 
-    @Provides
-    @Singleton
-    public StompService stompService(MessageAction messageAction){
-        return new StompService(messageAction);
-    }
-
-
-    @Provides
-    @Singleton
-    public MessageAction messageAction(DirectorPreKeyStore preKeyStore, DirectorSessionStore sessionStore, DirectorIdentityKeyStore identityKeyStore, DirectorSignedPreKeyStore signedPreKeyStore) {
-        return new MessageAction(preKeyStore, identityKeyStore, sessionStore, signedPreKeyStore);
-    }
 }

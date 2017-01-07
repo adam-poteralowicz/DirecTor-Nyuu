@@ -7,9 +7,9 @@ import com.apap.director.client.component.DaggerMainComponent;
 import com.apap.director.client.component.MainComponent;
 import com.apap.director.db.dao.module.DaoModule;
 import com.apap.director.im.signal.module.SignalModule;
+import com.apap.director.im.websocket.module.WebSocketModule;
 import com.apap.director.manager.ManagerModule;
 import com.apap.director.network.rest.module.RestModule;
-
 
 import info.guardianproject.netcipher.proxy.OrbotHelper;
 import io.realm.Realm;
@@ -18,6 +18,7 @@ public class App extends Application {
 
         private static Context mContext;
         private MainComponent mainComponent;
+
 
         @Override
         public void onCreate() {
@@ -31,7 +32,11 @@ public class App extends Application {
                     .daoModule(new DaoModule(this))
                     .restModule(new RestModule())
                     .signalModule(new SignalModule(this))
+                    .webSocketModule(new WebSocketModule(this))
                     .build();
+
+
+
 
             OrbotHelper.get(this).init();
             //OrbotHelper.requestStartTor(this);
@@ -43,5 +48,6 @@ public class App extends Application {
         public static Context getContext(){
             return mContext;
         }
+
 
     }

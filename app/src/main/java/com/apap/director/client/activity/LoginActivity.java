@@ -19,12 +19,11 @@ import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-//import com.apap.director.manager.AccountManager;
-import com.apap.director.manager.AccountManager;
 import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.util.ArrayAdapterChangeListener;
+import com.apap.director.im.websocket.service.ClientService;
+import com.apap.director.manager.AccountManager;
 import com.apap.director.network.rest.service.UserService;
-import com.apap.director.im.websocket.service.StompService;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
 
@@ -47,14 +46,14 @@ import info.guardianproject.netcipher.client.StrongBuilder;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
+//import com.apap.director.manager.AccountManager;
+
 public class LoginActivity extends AppCompatActivity implements StrongBuilder.Callback<HttpClient> {
 
     Shimmer shimmer;
     //    String HS_URL = "http://3zk5ak4bcbfvwgha.onion";
     String HS_URL = "http://www.wp.pl/static.html";
 
-    @Inject
-    StompService service;
 
     @BindView(R.id.accountsView)
     ListView accountsListView;
@@ -79,11 +78,11 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_view);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
         ((App) getApplication()).getComponent().inject(this);
         ButterKnife.bind(this);
 
         shimmer();
+
 
         /**
          * Account List View
@@ -92,7 +91,7 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
 
         accountList = new ArrayList<Account>();
         arrayAdapter = new ArrayAdapter<Account>(
-                App.getContext(),
+                getApplicationContext(),
                 android.R.layout.simple_list_item_single_choice,
                 accountList);
         accountsListView.setAdapter(arrayAdapter);
@@ -190,7 +189,8 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
                 Log.v("HAI/LoginActivity", "cookie2 "+cookie2);
             realm.commitTransaction();
 
-            service.connect(cookie);
+            ClientService.connect(cookie);
+            ClientService.sendMessage("LoginActivity");
             shimmer.cancel();
             Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);
             startActivity(selectedIntent);

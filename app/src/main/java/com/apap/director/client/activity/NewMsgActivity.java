@@ -1,7 +1,6 @@
 package com.apap.director.client.activity;
 
 import android.app.Activity;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -13,13 +12,12 @@ import android.widget.TextView;
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.adapter.MessageAdapter;
-import com.apap.director.db.realm.model.Account;
-import com.apap.director.db.realm.util.ArrayAdapterChangeListener;
-import com.apap.director.manager.ConversationManager;
-import com.apap.director.manager.MessageManager;
-import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.Conversation;
 import com.apap.director.db.realm.model.Message;
+import com.apap.director.db.realm.util.ArrayAdapterChangeListener;
+import com.apap.director.im.websocket.service.ClientService;
+import com.apap.director.manager.ConversationManager;
+import com.apap.director.manager.MessageManager;
 
 import java.util.List;
 
@@ -29,8 +27,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnItemLongClick;
 import io.realm.Realm;
-import io.realm.RealmChangeListener;
-import io.realm.RealmList;
 import io.realm.RealmResults;
 
 public class NewMsgActivity extends Activity {
@@ -45,6 +41,7 @@ public class NewMsgActivity extends Activity {
     @Inject
     Realm realm;
 
+
     @Inject
     MessageManager messageManager;
 
@@ -56,10 +53,11 @@ public class NewMsgActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         ((App) getApplication()).getComponent().inject(this);
+
+        ClientService.sendMessage("NewMsgActivity");
         setContentView(R.layout.new_msg_view);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+       // setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ButterKnife.bind(this);
 
         if (getIntent().getStringExtra("recipient") != null) {
@@ -80,8 +78,7 @@ public class NewMsgActivity extends Activity {
         RealmResults<Message> allMessages = realm.where(Message.class).equalTo("conversation.id", conversation.getId() ).findAll();
         changeListener = new ArrayAdapterChangeListener<>(arrayAdapter);
 
-        final RealmResults<Message> messages = realm.where(Message.class).findAll();
-        messages.addChangeListener(changeListener);
+        allMessages.addChangeListener(changeListener);
 
     }
 
@@ -96,7 +93,10 @@ public class NewMsgActivity extends Activity {
 
     public boolean onClick(View view) {
 
+
+
         String newMessage = String.valueOf(newMessageField.getText());
+        ClientService.sendMessage("NewMsgActivity: msg");
         String to = String.valueOf(recipient.getText());
         if ("".equals(newMessage))
             return false;
@@ -112,7 +112,6 @@ public class NewMsgActivity extends Activity {
             myMessages.add(message);
         realm.commitTransaction();
 
-        arrayAdapter.notifyDataSetChanged();
         messagesView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
         messagesView.setStackFromBottom(true);
         newMessageField.setText("");

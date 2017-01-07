@@ -6,19 +6,18 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.View;
 
+import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.adapter.DirecTorPagerAdapter;
 import com.apap.director.db.realm.model.Account;
-import com.apap.director.im.websocket.service.StompService;
+import com.apap.director.im.websocket.service.ClientService;
 import com.apap.director.manager.AccountManager;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import io.realm.Realm;
 
 public class AuthUserActivity extends FragmentActivity {
@@ -26,16 +25,19 @@ public class AuthUserActivity extends FragmentActivity {
     Realm realm;
     @BindView(R.id.pager) ViewPager viewPager;
 
-    @Inject
-    StompService service;
 
     @Inject
     AccountManager accountManager;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        ((App) getApplication()).getComponent().inject(this);
+
+
+        ClientService.sendMessage("AuthUserActivity");
         setContentView(R.layout.user_view);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ButterKnife.bind(this);
@@ -54,7 +56,6 @@ public class AuthUserActivity extends FragmentActivity {
             active.setActive(false);
             realm.copyToRealmOrUpdate(active);
         realm.commitTransaction();
-        service.disconnect();
         Intent selectedIntent = new Intent(AuthUserActivity.this, LoginActivity.class);
         startActivity(selectedIntent);
     }
