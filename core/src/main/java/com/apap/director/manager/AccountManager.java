@@ -21,6 +21,7 @@ import com.apap.director.network.rest.service.UserService;
 import org.whispersystems.curve25519.Curve25519;
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.InvalidKeyException;
+import org.whispersystems.libsignal.InvalidKeyIdException;
 import org.whispersystems.libsignal.util.ByteUtil;
 import org.whispersystems.libsignal.util.KeyHelper;
 
@@ -263,92 +264,115 @@ public class AccountManager {
 
     }
 
-    public String updateKeys() {
-        try {
-            Realm realm = Realm.getDefaultInstance();
-            Account activeAcc = realm.where(Account.class).equalTo("active", true).equalTo("registered", true).findFirst();
-            Log.d("HAI/ACTIVE ACCOUNT", activeAcc.getName());
-            Long id;
+    public String getOneTimeKey(String keyBase64) throws InvalidKeyException, IOException {
 
-            // Mock an otk
-            realm.beginTransaction();
-                id = generateOtkId();
-                Account active = realm.copyFromRealm(activeAcc);
-                OneTimeKey oneTimeKey = realm.createObject(OneTimeKey.class, id);
-                oneTimeKey.setAccount(activeAcc);
-                oneTimeKey.setSerializedKey("newKey".getBytes());
-                realm.copyToRealmOrUpdate(oneTimeKey);
-                RealmList<OneTimeKey> otks = active.getOneTimeKeys();
-                otks.add(oneTimeKey);
-                active.setOneTimeKeys(otks);
-                realm.copyToRealmOrUpdate(active);
-            realm.commitTransaction();
+        Call<OneTimeKeyTO> getOneTimeKeyCall = keyService.getOneTimeKey(keyBase64);
+        Log.v("HAI/AccountManager", "request code url " + getOneTimeKeyCall.request().url());
+        Response<OneTimeKeyTO> getOneTimeKeyCallResponse = getOneTimeKeyCall.execute();
 
-            // postOneTimeKeys(keys)
-            if (active.getOneTimeKeys() == null || active.getOneTimeKeys().isEmpty()) {
-                Log.d("HAI/AccountManager", "There are no one time keys to be fetched");
-                return null;
-            }
-            List<OneTimeKey> otkeys = new ArrayList<>(active.getOneTimeKeys());
-            List<OneTimeKeyTO> otkeysTO = new ArrayList<>();
-            for (OneTimeKey otk : otkeys) {
-                Log.d("OTK", new String(otk.getSerializedKey()));
-                otkeysTO.add(new OneTimeKeyTO(otk));
-            }
-            Call<ResponseBody> postOneTimeKeysCall = keyService.postOneTimeKeys(otkeysTO);
-            Response<ResponseBody> postOneTimeKeysResponse = postOneTimeKeysCall.execute();
-
-            Log.v("HAI/AccountManager", "post one time keys call code:" + postOneTimeKeysResponse.code());
-            Log.v("HAI/AccountManager", "post one time keys call keys:" + Arrays.toString(otkeysTO.toArray()));
-            Log.v("HAI/AccountManager", "post one time keys call url:" + postOneTimeKeysCall.request().url());
-
-            for(String name: postOneTimeKeysResponse.headers().names()){
-                Log.v("HAI/AccountManager", name+" : "+ postOneTimeKeysResponse.headers().get(name));
-            }
-
-            if(!postOneTimeKeysResponse.isSuccessful()){
-                Log.v("HAI/AccountManager", "Failed to post one time keys");
-                return null;
-            }
-
-            Log.v("HAI/AccountManager", "PostOneTimeKeys successful");
-
-            // postSignedKey(key)
-            if (active.getSignedKey() == null) {
-                Log.d("HAI/AccountManager", "There are no signed keys to be fetched");
-                return null;
-            }
-            List<SignedKey> sk = new ArrayList<SignedKey>();
-            sk.add(active.getSignedKey());
-            List<SignedKeyTO> signedKeyTO = new ArrayList<>();
-            for (SignedKey signedKey : sk) {
-                signedKeyTO.add(new SignedKeyTO(signedKey));
-            }
-            Call<ResponseBody> postSignedKeysCall = keyService.postSignedKeys(signedKeyTO);
-            Response<ResponseBody> postSignedKeysResponse = postSignedKeysCall.execute();
-
-            Log.v("HAI/AccountManager", "post signed keys call code:" + postSignedKeysResponse.code());
-            Log.v("HAI/AccountManager", "post signed keys call keys:" + signedKeyTO);
-            Log.v("HAI/AccountManager", "post signed keys call url:" + postSignedKeysCall.request().url());
-
-            for(String name: postSignedKeysResponse.headers().names()){
-                Log.v("HAI/AccountManager", name+" : "+ postSignedKeysResponse.headers().get(name));
-            }
-
-            if(!postSignedKeysResponse.isSuccessful()){
-                Log.v("HAI/AccountManager", "Failed to post signed keys");
-                return null;
-            }
-
-            realm.close();
-            Log.v("HAI/AccountManager", "PostSignedKeys successful");
-            return "Success";
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(!getOneTimeKeyCallResponse.isSuccessful()){
+            Log.v("HAI/AccountManager", "Failed to fetch code");
             return null;
         }
+
+        Log.v("HAI/AccountManager", "Fetched code " + getOneTimeKeyCallResponse.body());
+        Log.v("HAI/AccountManager", "Fetching status " + getOneTimeKeyCallResponse.code());
+
+        return "Success";
     }
+
+    public String getSignedKey(String keyBase64) throws InvalidKeyException, IOException {
+
+        Call<SignedKeyTO> getSignedKeyCall = keyService.getSignedKey(keyBase64);
+        Log.v("HAI/AccountManager", "request code url " + getSignedKeyCall.request().url());
+        Response<SignedKeyTO> getSignedKeyCallResponse = getSignedKeyCall.execute();
+
+        if(!getSignedKeyCallResponse.isSuccessful()){
+            Log.v("HAI/AccountManager", "Failed to fetch code");
+            return null;
+        }
+
+        Log.v("HAI/AccountManager", "Fetched code " + getSignedKeyCallResponse.body());
+        Log.v("HAI/AccountManager", "Fetching status " + getSignedKeyCallResponse.code());
+
+        return "Success";
+    }
+
+    public String postOneTimeKeys() throws IOException {
+        Realm realm = Realm.getDefaultInstance();
+        Account activeAcc = realm.where(Account.class).equalTo("active", true).equalTo("registered", true).findFirst();
+        Account active = realm.copyFromRealm(activeAcc);
+        Log.d("HAI/ACTIVE ACCOUNT", activeAcc.getName());
+
+        if (active.getOneTimeKeys() == null || active.getOneTimeKeys().isEmpty()) {
+            Log.d("HAI/AccountManager", "There are no one time keys to be fetched");
+            return null;
+        }
+        List<OneTimeKey> otkeys = new ArrayList<>(active.getOneTimeKeys());
+        List<OneTimeKeyTO> otkeysTO = new ArrayList<>();
+        for (OneTimeKey otk : otkeys) {
+            Log.d("OTK", new String(otk.getSerializedKey()));
+            otkeysTO.add(new OneTimeKeyTO(otk));
+        }
+        Call<ResponseBody> postOneTimeKeysCall = keyService.postOneTimeKeys(otkeysTO, active.getCookie());
+        Response<ResponseBody> postOneTimeKeysResponse = postOneTimeKeysCall.execute();
+
+        Log.v("HAI/AccountManager", "post one time keys call code:" + postOneTimeKeysResponse.code());
+        Log.v("HAI/AccountManager", "post one time keys call keys:" + Arrays.toString(otkeysTO.toArray()));
+        Log.v("HAI/AccountManager", "post one time keys call url:" + postOneTimeKeysCall.request().url());
+
+        for(String name: postOneTimeKeysResponse.headers().names()){
+            Log.v("HAI/AccountManager", name+" : "+ postOneTimeKeysResponse.headers().get(name));
+        }
+
+        if(!postOneTimeKeysResponse.isSuccessful()){
+            Log.v("HAI/AccountManager", "Failed to post one time keys");
+            return null;
+        }
+
+        Log.v("HAI/AccountManager", "PostOneTimeKeys successful");
+        realm.close();
+        return "Success";
+    }
+
+    public String postSignedKey() throws IOException {
+        Realm realm = Realm.getDefaultInstance();
+        Account activeAcc = realm.where(Account.class).equalTo("active", true).equalTo("registered", true).findFirst();
+        Account active = realm.copyFromRealm(activeAcc);
+        Log.d("HAI/ACTIVE ACCOUNT", activeAcc.getName());
+
+        if (active.getSignedKey() == null) {
+            Log.d("HAI/AccountManager", "There are no signed keys to be fetched");
+            return null;
+        }
+        List<SignedKey> sk = new ArrayList<SignedKey>();
+        sk.add(active.getSignedKey());
+        List<SignedKeyTO> signedKeyTO = new ArrayList<>();
+        for (SignedKey signedKey : sk) {
+            signedKeyTO.add(new SignedKeyTO(signedKey));
+        }
+        Call<ResponseBody> postSignedKeysCall = keyService.postSignedKeys(signedKeyTO, active.getCookie());
+        Response<ResponseBody> postSignedKeysResponse = postSignedKeysCall.execute();
+
+        Log.v("HAI/AccountManager", "post signed keys call code:" + postSignedKeysResponse.code());
+        Log.v("HAI/AccountManager", "post signed keys call keys:" + signedKeyTO);
+        Log.v("HAI/AccountManager", "post signed keys call url:" + postSignedKeysCall.request().url());
+
+        for(String name: postSignedKeysResponse.headers().names()){
+            Log.v("HAI/AccountManager", name+" : "+ postSignedKeysResponse.headers().get(name));
+        }
+
+        if(!postSignedKeysResponse.isSuccessful()){
+            Log.v("HAI/AccountManager", "Failed to post signed keys");
+            return null;
+        }
+
+        realm.close();
+        Log.v("HAI/AccountManager", "PostSignedKeys successful");
+        return "Success";
+    }
+
+
 
     /**
      *

@@ -12,6 +12,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -20,16 +21,16 @@ public interface KeyService {
 
     @POST(value = "/key/one_time")
     @Headers("Content-Type: application/json")
-    Call<ResponseBody> postOneTimeKeys(@Body List<OneTimeKeyTO> keys);
+    Call<ResponseBody> postOneTimeKeys(@Body List<OneTimeKeyTO> keys, @Header("Cookie") String cookiez);
 
     @POST(value = "/key/signed")
     @Headers("Content-Type: application/json")
-    Call<ResponseBody> postSignedKeys(@Body List<SignedKeyTO> keys);
+    Call<ResponseBody> postSignedKeys(@Body List<SignedKeyTO> keys, @Header("Cookie") String cookiez);
 
     @GET(value = "/key/one_time/{ownerId}")
-    Call<OneTimeKey> getOneTimeKey(@Path("ownerId") String ownerId);
+    Call<OneTimeKeyTO> getOneTimeKey(@Path("ownerId") String ownerId);
 
     @GET(value = "/key/signed/{ownerId}")
-    Call<SignedKey> getSignedKey(@Path("ownerId") String ownerId);
+    Call<SignedKeyTO> getSignedKey(@Path("ownerId") String ownerId);
 
 }
