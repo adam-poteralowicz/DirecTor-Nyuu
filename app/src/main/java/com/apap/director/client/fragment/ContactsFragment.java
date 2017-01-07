@@ -1,6 +1,7 @@
 package com.apap.director.client.fragment;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -17,8 +18,11 @@ import com.apap.director.client.activity.SingleContactActivity;
 import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.util.ArrayAdapterChangeListener;
+import com.apap.director.manager.AccountManager;
 
 import java.util.ArrayList;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,6 +40,9 @@ public class ContactsFragment extends Fragment {
     private ArrayAdapterChangeListener<Contact, RealmResults<Contact>> changeListener;
     private RealmResults<Contact> allContacts;
     @BindView(R.id.contactsView) ListView contactsListView;
+
+    @Inject
+    AccountManager accountManager;
 
 
     @Override

@@ -115,6 +115,7 @@ public class NewMsgActivity extends Activity {
         messagesView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
         messagesView.setStackFromBottom(true);
         newMessageField.setText("");
+
         return true;
     }
 
