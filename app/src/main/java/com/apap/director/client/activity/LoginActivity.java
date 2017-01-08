@@ -27,7 +27,6 @@ import com.apap.director.network.rest.service.UserService;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
@@ -38,22 +37,16 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnItemClick;
 import butterknife.OnItemLongClick;
-import cz.msebera.android.httpclient.client.HttpClient;
-import cz.msebera.android.httpclient.client.methods.HttpGet;
-import cz.msebera.android.httpclient.impl.client.BasicResponseHandler;
 import info.guardianproject.netcipher.NetCipher;
-import info.guardianproject.netcipher.client.StrongBuilder;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
 //import com.apap.director.manager.AccountManager;
 
-public class LoginActivity extends AppCompatActivity implements StrongBuilder.Callback<HttpClient> {
+public class LoginActivity extends AppCompatActivity {
 
     Shimmer shimmer;
-    //    String HS_URL = "http://3zk5ak4bcbfvwgha.onion";
-    String HS_URL = "http://www.wp.pl/static.html";
-
+    //String HS_URL = "http://3zk5ak4bcbfvwgha.onion";
 
     @BindView(R.id.accountsView)
     ListView accountsListView;
@@ -83,7 +76,6 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
 
         shimmer();
 
-
         /**
          * Account List View
          */
@@ -101,6 +93,8 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
 
         listener = new ArrayAdapterChangeListener<>(arrayAdapter, "login activity");
         realmAccounts.addChangeListener(listener);
+
+
     }
 
     private void shimmer() {
@@ -192,13 +186,13 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
             Log.v("HAI/LoginActivity", "Choosen account: "+accountManager.getActiveAccount()+ " cookie" +accountManager.getActiveAccount().getCookie());
 
             realm.beginTransaction();
-                Account account = realm.where(Account.class).equalTo("active", true).findFirst();
-                String cookie2 = account.getCookie();
-                Log.v("HAI/LoginActivity", "cookie2 "+cookie2);
+            Account account = realm.where(Account.class).equalTo("active", true).findFirst();
+            String cookie2 = account.getCookie();
+            Log.v("HAI/LoginActivity", "cookie2 "+cookie2);
             realm.commitTransaction();
 
             ClientService.connect(cookie);
-            ClientService.sendMessage("LoginActivity");
+//            ClientService.sendMessage("LoginActivity");
             shimmer.cancel();
             Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);
             startActivity(selectedIntent);
@@ -226,83 +220,6 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
                 accountManager.signUp(testAccount);
             }
         }
-    }
-
-    @Override
-    public void onConnected(final HttpClient httpClient) {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    Log.d("HS_URL", HS_URL);
-                    HttpGet get = new HttpGet(HS_URL);
-
-                    String result = httpClient.execute(get, new BasicResponseHandler());
-
-                    System.out.println(result);
-                } catch (IOException e) {
-                    onConnectionException(e);
-                }
-            }
-        }.start();
-    }
-
-    @Override
-    public void onConnectionException(Exception e) {
-        Log.e(getClass().getSimpleName(),
-                "Exception connecting to hidden service", e);
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(LoginActivity.this, R.string.msg_crash,
-                        Toast.LENGTH_LONG)
-                        .show();
-                finish();
-            }
-        });
-    }
-
-    @Override
-    public void onTimeout() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast
-                        .makeText(LoginActivity.this, R.string.msg_timeout,
-                                Toast.LENGTH_LONG)
-                        .show();
-                Log.d("onTimeout", String.valueOf(R.string.msg_timeout));
-                finish();
-            }
-        });
-    }
-
-    @Override
-    public void onInvalid() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast
-                        .makeText(LoginActivity.this, R.string.msg_invalid,
-                                Toast.LENGTH_LONG)
-                        .show();
-                Log.d("onInvalid", String.valueOf(R.string.msg_invalid));
-                finish();
-            }
-        });
-    }
-
-    @Override
-    protected void onStart() {
-        realmAccounts.addChangeListener(listener);
-        super.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        realmAccounts.removeChangeListener(listener);
-        super.onStop();
     }
 
     @Override

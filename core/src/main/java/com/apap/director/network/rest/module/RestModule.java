@@ -17,11 +17,12 @@ public class RestModule {
     private Retrofit retrofit;
     private final String baseUrl = "http://"+Paths.SERVER_IP+":"+Paths.SERVER_PORT;
 
-    public RestModule(){
+    public RestModule() {
         this.retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(JacksonConverterFactory.create())
                 .build();
+
     }
 
     @Provides
