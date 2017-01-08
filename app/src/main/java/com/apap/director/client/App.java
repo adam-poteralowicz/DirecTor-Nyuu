@@ -37,7 +37,7 @@ public class App extends Application {
                     .build();
 
 
-            ClientService.init(mainComponent.getMessageAction());
+            ClientService.init(mainComponent.getMessageAction(), mainComponent.getDirectorSessionStore(), mainComponent.getDirectorIdentityKeyStore(), mainComponent.getDirectorPreKeyStore(), mainComponent.getDirectorSignedPreKeyStore(), mainComponent.getKeyService());
 
             OrbotHelper.get(this).init();
             //OrbotHelper.requestStartTor(this);

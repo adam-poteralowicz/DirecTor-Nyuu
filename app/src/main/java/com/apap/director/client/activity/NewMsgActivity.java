@@ -20,12 +20,14 @@ import com.apap.director.im.websocket.service.ClientService;
 import com.apap.director.manager.ConversationManager;
 import com.apap.director.manager.MessageManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.OnItemLongClick;
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -71,16 +73,19 @@ public class NewMsgActivity extends Activity {
         contactIdFromIntent = getIntent().getLongExtra("contactId", 1L);
         final Conversation conversation = conversationManager.getConversationByContactId(contactIdFromIntent);
 
-        myMessages = messageManager.getMessages(conversation);
-        if (myMessages != null) {
-            arrayAdapter = new MessageAdapter(this, R.layout.item_chat_left, myMessages);
-        }
+        myMessages = new ArrayList<>();
+        arrayAdapter = new MessageAdapter(this, R.layout.item_chat_left, myMessages);
         messagesView.setAdapter(arrayAdapter);
 
-        allMessages = realm.where(Message.class).equalTo("conversation.id", conversation.getId() ).findAll();
-        changeListener = new ArrayAdapterChangeListener<>(arrayAdapter);
+        allMessages = realm.where(Message.class).equalTo("conversation.id", contactIdFromIntent).findAll();
+        myMessages.addAll(allMessages);
+        arrayAdapter.notifyDataSetChanged();
 
+        changeListener = new ArrayAdapterChangeListener<>(arrayAdapter, "message activity listener");
         allMessages.addChangeListener(changeListener);
+
+        messagesView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
+        messagesView.setStackFromBottom(true);
 
     }
 
@@ -93,30 +98,20 @@ public class NewMsgActivity extends Activity {
     }
 
 
-    public boolean onClick(View view) {
-
-
-
+    @OnClick(R.id.sendButton)
+    public void onClick() {
         String newMessage = String.valueOf(newMessageField.getText());
-        ClientService.sendMessage("NewMsgActivity: msg");
         String to = String.valueOf(recipient.getText());
         if ("".equals(newMessage))
-            return false;
+            return;
 
-        realm.beginTransaction();
-            Conversation conversation = conversationManager.getConversationByContactId(contactIdFromIntent);
-            realm.copyToRealmOrUpdate(conversation);
-        realm.commitTransaction();
 
+        Conversation conversation = conversationManager.getConversationByContactId(contactIdFromIntent);
         Message message = messageManager.addMessage(conversation, newMessage, to, true);
 
         ClientService.sendTestMessage(conversation.getContact().getContactKeys().get(0).getKeyBase64(),realm.where(Account.class).equalTo("active", true).findFirst().getKeyBase64(),newMessage);
-
-        messagesView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
-        messagesView.setStackFromBottom(true);
         newMessageField.setText("");
 
-        return true;
     }
 
     @Override

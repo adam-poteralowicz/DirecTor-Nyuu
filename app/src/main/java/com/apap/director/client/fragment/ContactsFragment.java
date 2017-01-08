@@ -69,7 +69,7 @@ public class ContactsFragment extends Fragment {
                 contactList);
         contactsListView.setAdapter(arrayAdapter);
 
-        changeListener = new ArrayAdapterChangeListener<Contact, RealmResults<Contact>>(arrayAdapter);
+        changeListener = new ArrayAdapterChangeListener<Contact, RealmResults<Contact>>(arrayAdapter, "contacts fragment listner");
         allContacts.addChangeListener(changeListener);
     }
 
@@ -98,11 +98,12 @@ public class ContactsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        realm = Realm.getDefaultInstance();
+        allContacts.addChangeListener(changeListener);
     }
 
     @Override
     public void onStop() {
+        allContacts.removeChangeListener(changeListener);
         super.onStop();
         realm.close();
     }

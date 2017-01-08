@@ -99,7 +99,7 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
         arrayAdapter.addAll(realmAccounts);
         arrayAdapter.notifyDataSetChanged();
 
-        listener = new ArrayAdapterChangeListener<>(arrayAdapter);
+        listener = new ArrayAdapterChangeListener<>(arrayAdapter, "login activity");
         realmAccounts.addChangeListener(listener);
     }
 
@@ -120,6 +120,7 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
 
     @Override
     public void onBackPressed() {
+        ClientService.disconnect();
     }
 
     @OnItemLongClick(R.id.accountsView)
@@ -171,14 +172,21 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
                 return;
             } else Log.d("active account", accountManager.getActiveAccountName());
 
-            AsyncTask<Void, Void, String> asyncTask = new AsyncTask<Void, Void, String>() {
-                @Override
-                protected String doInBackground(Void... params) {
-                    return accountManager.logIn();
-                }
-            };
 
-            String cookie=asyncTask.execute().get();
+            String cookie = null;
+
+            for(int i = 0; i<3; i++) {
+                AsyncTask<Void, Void, String> asyncTask = new AsyncTask<Void, Void, String>() {
+                    @Override
+                    protected String doInBackground(Void... params) {
+                        return accountManager.logIn();
+                    }
+                };
+
+                cookie = asyncTask.execute().get();
+                if(cookie!=null) break;
+            }
+
             Log.v("HAI/LoginActivity", "Logged in");
 
             Log.v("HAI/LoginActivity", "Choosen account: "+accountManager.getActiveAccount()+ " cookie" +accountManager.getActiveAccount().getCookie());
@@ -283,6 +291,18 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
                 finish();
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        realmAccounts.addChangeListener(listener);
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        realmAccounts.removeChangeListener(listener);
+        super.onStop();
     }
 
     @Override

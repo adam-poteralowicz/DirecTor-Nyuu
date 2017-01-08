@@ -1,5 +1,8 @@
 package com.apap.director.im.signal;
 
+import com.apap.director.db.realm.model.Account;
+import com.apap.director.db.realm.model.ContactKey;
+import com.apap.director.db.realm.model.Conversation;
 import com.apap.director.db.realm.model.Session;
 
 import org.whispersystems.libsignal.SignalProtocolAddress;
@@ -56,7 +59,10 @@ public class DirectorSessionStore implements SessionStore {
 
         realm.beginTransaction();
             Session session = realm.createObject(Session.class);
+            session.setAccount(realm.where(Account.class).equalTo("active", true).findFirst());
             session.setName(address.getName());
+            ContactKey contactKey = realm.where(ContactKey.class).equalTo("keyBase64", address.getName()).findFirst();
+            session.setConversation(contactKey.getContact().getConversation());
             session.setDeviceId(address.getDeviceId());
             session.setSerializedKey(record.serialize());
         realm.commitTransaction();

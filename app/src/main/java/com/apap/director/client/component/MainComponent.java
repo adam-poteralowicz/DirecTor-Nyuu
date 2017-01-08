@@ -10,11 +10,16 @@ import com.apap.director.client.activity.SingleContactActivity;
 import com.apap.director.client.fragment.ContactsFragment;
 import com.apap.director.client.fragment.InboxFragment;
 import com.apap.director.db.dao.module.DaoModule;
+import com.apap.director.im.signal.DirectorIdentityKeyStore;
+import com.apap.director.im.signal.DirectorPreKeyStore;
+import com.apap.director.im.signal.DirectorSessionStore;
+import com.apap.director.im.signal.DirectorSignedPreKeyStore;
 import com.apap.director.im.signal.module.SignalModule;
 import com.apap.director.im.websocket.module.WebSocketModule;
 import com.apap.director.im.websocket.service.MessageAction;
 import com.apap.director.manager.ManagerModule;
 import com.apap.director.network.rest.module.RestModule;
+import com.apap.director.network.rest.service.KeyService;
 
 import javax.inject.Singleton;
 
@@ -34,5 +39,10 @@ public interface MainComponent {
     void inject(AuthUserActivity authUserActivity);
     void inject(App app);
     MessageAction getMessageAction();
+    KeyService getKeyService();
+    DirectorIdentityKeyStore getDirectorIdentityKeyStore();
+    DirectorPreKeyStore getDirectorPreKeyStore();
+    DirectorSignedPreKeyStore getDirectorSignedPreKeyStore();
+    DirectorSessionStore getDirectorSessionStore();
 
 }

@@ -1,5 +1,7 @@
 package com.apap.director.manager;
 
+import android.util.Log;
+
 import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.Conversation;
 import com.apap.director.db.realm.model.Message;
@@ -42,6 +44,7 @@ public class MessageManager {
     public Message addMessage(Conversation conv, String msg, String recipient, Boolean owned) {
 
         Realm realm = Realm.getDefaultInstance();
+        Log.v("HAI/MessageManager", "adding mesage "+msg+" owned: "+owned);
         if (conv == null) return null;
         realm.beginTransaction();
         Conversation conversation = realm.where(Conversation.class).equalTo("id", conv.getId()).findFirst();

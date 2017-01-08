@@ -73,7 +73,10 @@ public class MessageAction implements Action1<StompMessage> {
             Account active = localRealm.where(Account.class).equalTo("active", true).findFirst();
             String keyBase64 = Base64.encodeToString(new IdentityKeyPair(active.getKeyPair()).getPublicKey().serialize(), Base64.NO_WRAP | Base64.URL_SAFE);
 
-            ContactKey key = localRealm.where(ContactKey.class).equalTo("keyBase64", frame.getFrom()).findFirst();
+            ContactKey key = localRealm.where(ContactKey.class)
+                    .equalTo("keyBase64", frame.getFrom())
+                    .equalTo("account.active", true)
+                    .findFirst();
             Contact contact = key.getContact();
 
             Log.v("HAI/MessageAction", "POINTCUT: GET ACTIVE");
@@ -121,92 +124,6 @@ public class MessageAction implements Action1<StompMessage> {
             e.printStackTrace();
         }
 
-////        String payload = stompMessage.getPayload();
-////
-////        ObjectMapper mapper = new ObjectMapper();
-////
-////        SessionCipher sessionCipher = new SessionCipher(sessionStore, preKeyStore, signedPreKeyStore, identityKeyStore, address);
-////        CiphertextMessage message      = sessionCipher.decrypt()
-//
-//        Realm realm = Realm.getDefaultInstance();
-//        //TODO: decode message and add it to database;
-//        Log.v("HAI/MessageAction", stompMessage.getPayload());
-//
-//        try {
-//            ObjectMapper mapper = new ObjectMapper();
-//            MessageTO messageTO = mapper.readValue(stompMessage.getPayload(), MessageTO.class);
-//
-//            Account owner = realm.where(Account.class).equalTo("active", true).findFirst();
-//
-//            realm.beginTransaction();
-//            ContactKey key = realm.where(ContactKey.class).equalTo("keyBase64", messageTO.getFrom()).findFirst();
-//            Contact contact = key.getContact();
-//
-//            if(contact == null){
-//                Log.v("HAI/MessageAction", "No such contact key: "+messageTO.getFrom());
-//                if(messageTO.getFrom().equals(owner.getKeyBase64())){
-//
-//                    //if it is a message from the current account, create new contact ("Me");
-//                        Contact me = realm.createObject(Contact.class);
-//                        me.setAccount(owner);
-//                        me.setName("Me");
-//                        me.setId(realm.where(Contact.class).max("id").longValue());
-//
-//                        ContactKey myKey = realm.createObject(ContactKey.class);
-//                        myKey.setKeyBase64(owner.getKeyBase64());
-//                        IdentityKeyPair myKeyPair = new IdentityKeyPair(owner.getKeyPair());
-//                        myKey.setSerialized(myKeyPair.getPublicKey().serialize());
-//                        myKey.setDeviceId(0);
-//                        myKey.setId(realm.where(ContactKey.class).max("id").longValue());
-//                        myKey.setAccount(owner);
-//                        myKey.setContact(me);
-//
-//                        RealmList<ContactKey> myKeys = new RealmList<>(myKey);
-//
-//                        me.setContactKeys(myKeys);
-//
-//                        contact = me;
-//                }
-//                else{
-//                    realm.commitTransaction();
-//                    return;
-//                }
-//
-//            }
-//
-//            Conversation existingConversation = realm.where(Conversation.class).equalTo("contact.name", contact.getName()).findFirst();
-//            if(existingConversation == null){
-//                Log.v("HAI/MessageAction", "No such conversation");
-//                existingConversation = realm.createObject(Conversation.class);
-//                existingConversation.setAccount(owner);
-//                existingConversation.setContact(contact);
-//                existingConversation.setId(realm.where(Conversation.class).max("id").longValue()+1);
-//                contact.setConversation(existingConversation);
-//            }
-//
-////            long lastId = realm.where(Message.class).max("id").longValue();
-////
-////            Message newMessage = realm.createObject(Message.class);
-////            newMessage.setId(lastId+1);
-////            newMessage.setContent(messageTO.getMessage());
-////            newMessage.setConversation(existingConversation);
-////            newMessage.setAccount(owner);
-////            newMessage.setMine(false);
-////            realm.commitTransaction();
-//
-//            realm.commitTransaction();
-//            Log.v("HAI/MessageAction", "Adding msg");
-//            messageManager.addMessage(existingConversation, stompMessage.getPayload(), "me", false);
-//
-//
-//        } catch (IOException e) {
-//            realm.commitTransaction();
-//            Log.e("HAI/MessageAction", "Incorrect message frame", e);
-//
-//        } catch (InvalidKeyException e) {
-//            realm.commitTransaction();
-//            e.printStackTrace();
-//        }
 
 
     }

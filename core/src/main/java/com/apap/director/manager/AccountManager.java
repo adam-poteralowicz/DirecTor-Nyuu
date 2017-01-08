@@ -191,17 +191,18 @@ public class AccountManager {
 
     }
 
-    public String logIn(){
+    private String requestCode(){
 
         try {
-
             Realm realm = Realm.getDefaultInstance();
 
             Account active = realm.where(Account.class).equalTo("active", true).equalTo("registered", true).findFirst();
             if(active == null) return null;
 
             Call<String> requestCodeCall = userService.requestCode(active.getKeyBase64());
-            Response<String> codeCallResponse = requestCodeCall.execute();
+            Response<String> codeCallResponse = null;
+
+            codeCallResponse = requestCodeCall.execute();
 
             Log.v("HAI/AccountManager", "request code url " + requestCodeCall.request().url());
 
@@ -213,27 +214,37 @@ public class AccountManager {
             Log.v("HAI/AccountManager", "Fetched code " + codeCallResponse.body());
             Log.v("HAI/AccountManager", "Fetching status " + codeCallResponse.code());
 
+            realm.close();
+            return codeCallResponse.body();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            realm.close();
+            return null;
+        }
+    }
+
+    public String logIn(){
+
+        try {
+            Realm realm = Realm.getDefaultInstance();
+
+            Account active = realm.where(Account.class).equalTo("active", true).equalTo("registered", true).findFirst();
+            if(active == null) return null;
+
             IdentityKeyPair keyPair = new IdentityKeyPair(active.getKeyPair());
-
-            byte[] signature = curve25519.calculateSignature(keyPair.getPrivateKey().serialize(), codeCallResponse.body().getBytes());
-
-            Log.v("HAI/AccountManager", new String(signature));
-
-
+            byte[] signature = curve25519.calculateSignature(keyPair.getPrivateKey().serialize(), requestCode().getBytes());
 
             LoginDetails loginDetails = new LoginDetails(active.getKeyBase64(), Base64.encodeToString(signature, Base64.URL_SAFE | Base64.NO_WRAP));
-
-
 
             Call<ResponseBody> loginCall = userService.login(loginDetails);
             Response<ResponseBody> loginCallResponse = loginCall.execute();
 
             Log.v("HAI/AccountManager", "login call code:" + loginCallResponse.code());
-            Log.v("HAI/AccountManager", "login call account:" + new String(Base64.decode(active.getKeyBase64(), Base64.NO_WRAP | Base64.URL_SAFE), 32));
 
-            for(String name: loginCallResponse.headers().names()){
-                Log.v("HAI/AccountManager", name+" : "+ loginCallResponse.headers().get(name));
-            }
+//            for(String name: loginCallResponse.headers().names()){
+//                Log.v("HAI/AccountManager", name+" : "+ loginCallResponse.headers().get(name));
+//            }
 
             String cookie = loginCallResponse.headers().get("Set-Cookie").split(";")[0];
 
@@ -255,12 +266,15 @@ public class AccountManager {
             return cookie;
 
         } catch (IOException e) {
+            realm.close();
             e.printStackTrace();
             return null;
         } catch (InvalidKeyException e) {
+            realm.close();
             e.printStackTrace();
             return null;
         }
+
 
     }
 

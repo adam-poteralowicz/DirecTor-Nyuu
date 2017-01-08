@@ -14,14 +14,17 @@ public class ArrayAdapterChangeListener<E extends RealmModel, T extends RealmRes
 
 
     private ArrayAdapter<E> arrayAdapter;
+    private String name;
 
-    public ArrayAdapterChangeListener(ArrayAdapter<E> arrayAdapter) {
+    public ArrayAdapterChangeListener(ArrayAdapter<E> arrayAdapter, String name) {
         this.arrayAdapter = arrayAdapter;
+        this.name = name;
     }
     @Override
     public void onChange(RealmResults elements) {
 
-        Log.v("HAI/ChangeListener", "Change detected");
+
+       Log.v("HAI/ChangeListener", name+ ": Change detected");
 
         arrayAdapter.clear();
         arrayAdapter.addAll(elements);
