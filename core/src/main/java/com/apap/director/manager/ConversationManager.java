@@ -54,7 +54,7 @@ public class ConversationManager {
         return realm.where(Conversation.class).equalTo("account.id", accountId).findFirst();
     }
 
-    public Conversation addConversation(Contact contact, Session session) {
+    public Conversation addConversation(Contact contact) {
         if (contact == null) return null;
 
         Realm realm = Realm.getDefaultInstance();

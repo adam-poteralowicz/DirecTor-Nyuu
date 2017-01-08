@@ -1,9 +1,15 @@
 package com.apap.director.im.websocket.service;
 
+import android.util.Base64;
 import android.util.Log;
+import android.util.Pair;
 
 import com.apap.director.db.realm.model.ContactKey;
+import com.apap.director.db.realm.model.OneTimeKey;
+import com.apap.director.db.realm.model.Session;
 import com.apap.director.db.realm.to.MessageTO;
+import com.apap.director.db.realm.to.OneTimeKeyTO;
+import com.apap.director.db.realm.to.SignedKeyTO;
 import com.apap.director.im.signal.DirectorIdentityKeyStore;
 import com.apap.director.im.signal.DirectorPreKeyStore;
 import com.apap.director.im.signal.DirectorSessionStore;
@@ -12,17 +18,33 @@ import com.apap.director.network.rest.Paths;
 import com.apap.director.network.rest.service.KeyService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.deser.Deserializers;
 
 import org.java_websocket.WebSocket;
+import org.whispersystems.libsignal.IdentityKey;
+import org.whispersystems.libsignal.InvalidKeyException;
 import org.whispersystems.libsignal.SessionBuilder;
 import org.whispersystems.libsignal.SessionCipher;
 import org.whispersystems.libsignal.SignalProtocolAddress;
+import org.whispersystems.libsignal.UntrustedIdentityException;
+import org.whispersystems.libsignal.ecc.Curve;
+import org.whispersystems.libsignal.ecc.ECKeyPair;
+import org.whispersystems.libsignal.ecc.ECPublicKey;
 import org.whispersystems.libsignal.protocol.CiphertextMessage;
+import org.whispersystems.libsignal.state.PreKeyBundle;
+import org.whispersystems.libsignal.state.PreKeyRecord;
+import org.whispersystems.libsignal.state.PreKeyStore;
+import org.whispersystems.libsignal.state.SignedPreKeyRecord;
+import org.whispersystems.libsignal.util.KeyHelper;
 
+import java.io.IOException;
+import java.security.Key;
 import java.util.Arrays;
 import java.util.HashMap;
 
 import io.realm.Realm;
+import retrofit2.Call;
+import retrofit2.Response;
 import rx.functions.Action1;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompHeader;
@@ -105,33 +127,41 @@ public class ClientService {
             String address = "/app/message/"+to;
             Log.v("HAI/StompService", "Sending framed message! " +address);
 
-            MessageTO frame = new MessageTO(from, text);
-            ObjectMapper mapper = new ObjectMapper();
-            String json = mapper.writeValueAsString(frame);
-
             Realm realm = Realm.getDefaultInstance();
             ContactKey contactKey = realm.where(ContactKey.class).equalTo("keyBase64",to).findFirst();
 
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(to, contactKey.getDeviceId());
 
-            if(contactKey.getContact().getConversation().getSessions().size()==0){
+            Session session = realm.where(Session.class).equalTo("name", to).equalTo("deviceId", contactKey.getDeviceId()).findFirst();
+
+            if(session == null){
 
                 // Instantiate a SessionBuilder for a remote recipientId + deviceId tuple.
                 SessionBuilder sessionBuilder = new SessionBuilder(sessionStore, preKeyStore, signedPreKeyStore,
                         identityKeyStore, signalProtocolAddress);
 
                 // Build a session with a PreKey retrieved from the server.
-              //  sessionBuilder.process(retrievedPreKey);
+
+                ECPublicKey oneTimeKey = getOneTimeKey(to);
+                Pair<ECPublicKey, byte[]> signedKey = getSignedKey(to);
+
+                IdentityKey contactIdentity = new IdentityKey(contactKey.getSerialized(),0);
+
+                PreKeyBundle preKeyBundle = new PreKeyBundle(0, contactKey.getDeviceId(), 0, oneTimeKey, 0, signedKey.first, signedKey.second, contactIdentity);
+                sessionBuilder.process(preKeyBundle);
 
             }
 
+            SessionCipher sessionCipher = new SessionCipher(sessionStore, preKeyStore, signedPreKeyStore, identityKeyStore, new SignalProtocolAddress(to, contactKey.getDeviceId()));
+            CiphertextMessage message = sessionCipher.encrypt(text.getBytes("UTF-8"));
+            String encodedText = Base64.encodeToString(message.serialize(), Base64.URL_SAFE | Base64.NO_WRAP);
 
-//            SessionCipher     sessionCipher = new SessionCipher(sessionStore, recipientId, deviceId);
-//            CiphertextMessage message      = sessionCipher.encrypt("Hello world!".getBytes("UTF-8"));
-//            sessionCipher.
-//            message.
 
-            client.send("/app/message/test/"+to,json)
+            MessageTO frame = new MessageTO(from, encodedText);
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(frame);
+
+            client.send("/app/message/test"+to,json)
                     .subscribe(new Action1<Void>() {
                         @Override
                         public void call(Void aVoid) {
@@ -146,11 +176,40 @@ public class ClientService {
                         }
                     });
 
+            realm.close();
 
         } catch (JsonProcessingException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (UntrustedIdentityException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
         }
+    }
 
+    private static ECPublicKey getOneTimeKey(String to) throws IOException, InvalidKeyException {
+        Call<OneTimeKeyTO> getKeyCall = keyService.getOneTimeKey(to);
+        Response<OneTimeKeyTO> response = getKeyCall.execute();
+        OneTimeKeyTO oneTimeKeyTO = response.body();
+
+        byte[] decoded = Base64.decode(oneTimeKeyTO.getKeyBase64(), Base64.NO_WRAP | Base64.URL_SAFE);
+
+        return Curve.decodePoint(decoded, 0);
+
+    }
+
+    private static Pair<ECPublicKey, byte[]> getSignedKey(String to) throws IOException, InvalidKeyException {
+
+        Call<SignedKeyTO> getKeyCall = keyService.getSignedKey(to);
+        Response<SignedKeyTO> response = getKeyCall.execute();
+        SignedKeyTO signedKeyTO = response.body();
+
+        byte[] decodedKey = Base64.decode(signedKeyTO.getKeyBase64(), Base64.NO_WRAP | Base64.URL_SAFE);
+        byte[] decodedSignature = Base64.decode(signedKeyTO.getSignatureBase64(), Base64.NO_WRAP | Base64.URL_SAFE);
+
+        return new Pair<ECPublicKey, byte[]>(Curve.decodePoint(decodedKey,0), decodedSignature);
     }
 
     public static void sendMessage(final String text){

@@ -38,14 +38,10 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         ViewHolder holder;
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
 
-        Realm realm = Realm.getDefaultInstance();
         Message message = getItem(position);
-
-        System.out.println("getView " + position + " " + message.getContent()+ " " + convertView + " type = " + message.isMine());
 
         if (convertView == null) {
             if(getItemViewType(position) == VIEW_TYPE_MINE) {
-                System.out.println("MINE: getView " + position + " " + convertView + " type = " + message.isMine());
 
                 convertView = View.inflate(activity, R.layout.item_chat_right, null);
                 holder = new ViewHolder(convertView);
