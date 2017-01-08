@@ -1,6 +1,7 @@
 package com.apap.director.client.adapter;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import com.apap.director.db.realm.model.Message;
 
 import java.util.List;
 
+import butterknife.OnClick;
 import io.realm.Realm;
 
 
@@ -20,10 +22,14 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     private List<Message> messages;
     private Realm realm;
 
+    private final int VIEW_TYPE_MINE = 0;
+    private final int VIEW_TYPE_OTHER = 1;
+
     public MessageAdapter(Activity context, int resource, List<Message> objects) {
         super(context, resource, objects);
         this.activity = context;
         realm = Realm.getDefaultInstance();
+        this.messages = objects;
 
     }
 
@@ -32,45 +38,44 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         ViewHolder holder;
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
 
-        int layoutResource = 0; // determined by view type
-        Message chatMessage = getItem(position);
-        int viewType = getItemViewType(position);
+        Realm realm = Realm.getDefaultInstance();
+        Message message = getItem(position);
 
-        if (chatMessage.isMine()) {
-            layoutResource = R.layout.item_chat_right;
-        } else {
-            realm.beginTransaction();
-                chatMessage.setMine(false);
-                realm.copyToRealmOrUpdate(chatMessage);
-            realm.commitTransaction();
-            layoutResource = R.layout.item_chat_left;
-        }
+        System.out.println("getView " + position + " " + message.getContent()+ " " + convertView + " type = " + message.isMine());
 
-        if (convertView != null) {
-            holder = (ViewHolder) convertView.getTag();
-        } else {
-            convertView = inflater.inflate(layoutResource, parent, false);
-            holder = new ViewHolder(convertView);
+        if (convertView == null) {
+            if(getItemViewType(position) == VIEW_TYPE_MINE) {
+                System.out.println("MINE: getView " + position + " " + convertView + " type = " + message.isMine());
+
+                convertView = View.inflate(activity, R.layout.item_chat_right, null);
+                holder = new ViewHolder(convertView);
+            }
+            else{
+                convertView = View.inflate(activity,R.layout.item_chat_left, null);
+                holder = new ViewHolder(convertView);
+            }
             convertView.setTag(holder);
+        } else {
+            holder = (ViewHolder)convertView.getTag();
         }
-
-        holder.msg.setText(chatMessage.getContent());
-
+        holder.msg.setText(message.getContent());
         return convertView;
     }
 
     @Override
-    public int getViewTypeCount() {
+    public int getViewTypeCount()
+    {
         return 2;
     }
 
     @Override
-    public int getItemViewType(int position) {
-        return position % 2;
+    public int getItemViewType(int position)
+    {
+        return messages.get(position).isMine() == true ?  VIEW_TYPE_MINE : VIEW_TYPE_OTHER;
     }
 
     private class ViewHolder {
-        private TextView msg;
+        public TextView msg;
 
         public ViewHolder(View v) {
             msg = (TextView) v.findViewById(R.id.txt_msg);
