@@ -38,21 +38,23 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnItemClick;
 import butterknife.OnItemLongClick;
-import cz.msebera.android.httpclient.client.HttpClient;
-import cz.msebera.android.httpclient.client.methods.HttpGet;
-import cz.msebera.android.httpclient.impl.client.BasicResponseHandler;
+
 import info.guardianproject.netcipher.NetCipher;
 import info.guardianproject.netcipher.client.StrongBuilder;
+import info.guardianproject.netcipher.client.StrongOkHttpClientBuilder;
 import io.realm.Realm;
 import io.realm.RealmResults;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 //import com.apap.director.manager.AccountManager;
 
-public class LoginActivity extends AppCompatActivity implements StrongBuilder.Callback<HttpClient> {
+public class LoginActivity extends AppCompatActivity implements StrongBuilder.Callback<OkHttpClient> {
 
     Shimmer shimmer;
-    //    String HS_URL = "http://3zk5ak4bcbfvwgha.onion";
-    String HS_URL = "http://www.wp.pl/static.html";
+    //String HS_URL = "http://3zk5ak4bcbfvwgha.onion";
+    //String HS_URL = "http://www.wp.pl/static.html";
 
 
     @BindView(R.id.accountsView)
@@ -101,6 +103,22 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
 
         listener = new ArrayAdapterChangeListener<>(arrayAdapter);
         realmAccounts.addChangeListener(listener);
+
+//        try {
+//            StrongOkHttpClientBuilder builder = new StrongOkHttpClientBuilder(this);
+//            StrongOkHttpClientBuilder
+//                    .forMaxSecurity(this)
+//                    .withTorValidation()
+//                    .applyTo(builder, this);
+//            Log.d("Builder status", String.valueOf(builder.supportsHttpProxy())+"\n"+String.valueOf(builder.supportsSocksProxy())+"\n"+builder);
+//        }
+//        catch (Exception e) {
+//            Toast.makeText(this, R.string.msg_crash, Toast.LENGTH_LONG)
+//                    .show();
+//            Log.e(getClass().getSimpleName(),
+//                    "Exception loading hidden service", e);
+//            finish();
+//        }
     }
 
     private void shimmer() {
@@ -184,9 +202,9 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
             Log.v("HAI/LoginActivity", "Choosen account: "+accountManager.getActiveAccount()+ " cookie" +accountManager.getActiveAccount().getCookie());
 
             realm.beginTransaction();
-                Account account = realm.where(Account.class).equalTo("active", true).findFirst();
-                String cookie2 = account.getCookie();
-                Log.v("HAI/LoginActivity", "cookie2 "+cookie2);
+            Account account = realm.where(Account.class).equalTo("active", true).findFirst();
+            String cookie2 = account.getCookie();
+            Log.v("HAI/LoginActivity", "cookie2 "+cookie2);
             realm.commitTransaction();
 
             ClientService.connect(cookie);
@@ -221,22 +239,23 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
     }
 
     @Override
-    public void onConnected(final HttpClient httpClient) {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    Log.d("HS_URL", HS_URL);
-                    HttpGet get = new HttpGet(HS_URL);
-
-                    String result = httpClient.execute(get, new BasicResponseHandler());
-
-                    System.out.println(result);
-                } catch (IOException e) {
-                    onConnectionException(e);
-                }
-            }
-        }.start();
+    public void onConnected(final OkHttpClient okHttpClient) {
+//        new Thread() {
+//            @Override
+//            public void run() {
+//                try {
+//                    Log.d("HS_URL", HS_URL);
+//                    Request request=new Request.Builder().url(HS_URL).build();
+//                    Response response = okHttpClient.newCall(request).execute();
+//
+//                    //String result = okHttpClient.(request, new BasicResponseHandler());
+//
+//                    System.out.println(response.body());
+//                } catch (IOException e) {
+//                    onConnectionException(e);
+//                }
+//            }
+//        }.start();
     }
 
     @Override

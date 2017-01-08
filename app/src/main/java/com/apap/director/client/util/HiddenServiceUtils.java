@@ -5,7 +5,7 @@ package com.apap.director.client.util;
  */
 
 public class HiddenServiceUtils {
-    //        try {
+//            try {
 //            StrongHttpClientBuilder builder = new StrongHttpClientBuilder(this);
 //            StrongHttpClientBuilder
 //                    .forMaxSecurity(this)
