@@ -27,7 +27,6 @@ import com.apap.director.network.rest.service.UserService;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
@@ -38,24 +37,16 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnItemClick;
 import butterknife.OnItemLongClick;
-
 import info.guardianproject.netcipher.NetCipher;
-import info.guardianproject.netcipher.client.StrongBuilder;
-import info.guardianproject.netcipher.client.StrongOkHttpClientBuilder;
 import io.realm.Realm;
 import io.realm.RealmResults;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 //import com.apap.director.manager.AccountManager;
 
-public class LoginActivity extends AppCompatActivity implements StrongBuilder.Callback<OkHttpClient> {
+public class LoginActivity extends AppCompatActivity {
 
     Shimmer shimmer;
     //String HS_URL = "http://3zk5ak4bcbfvwgha.onion";
-    //String HS_URL = "http://www.wp.pl/static.html";
-
 
     @BindView(R.id.accountsView)
     ListView accountsListView;
@@ -85,7 +76,6 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
 
         shimmer();
 
-
         /**
          * Account List View
          */
@@ -104,21 +94,7 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
         listener = new ArrayAdapterChangeListener<>(arrayAdapter);
         realmAccounts.addChangeListener(listener);
 
-//        try {
-//            StrongOkHttpClientBuilder builder = new StrongOkHttpClientBuilder(this);
-//            StrongOkHttpClientBuilder
-//                    .forMaxSecurity(this)
-//                    .withTorValidation()
-//                    .applyTo(builder, this);
-//            Log.d("Builder status", String.valueOf(builder.supportsHttpProxy())+"\n"+String.valueOf(builder.supportsSocksProxy())+"\n"+builder);
-//        }
-//        catch (Exception e) {
-//            Toast.makeText(this, R.string.msg_crash, Toast.LENGTH_LONG)
-//                    .show();
-//            Log.e(getClass().getSimpleName(),
-//                    "Exception loading hidden service", e);
-//            finish();
-//        }
+
     }
 
     private void shimmer() {
@@ -208,7 +184,7 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
             realm.commitTransaction();
 
             ClientService.connect(cookie);
-            ClientService.sendMessage("LoginActivity");
+//            ClientService.sendMessage("LoginActivity");
             shimmer.cancel();
             Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);
             startActivity(selectedIntent);
@@ -236,72 +212,6 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
                 accountManager.signUp(testAccount);
             }
         }
-    }
-
-    @Override
-    public void onConnected(final OkHttpClient okHttpClient) {
-//        new Thread() {
-//            @Override
-//            public void run() {
-//                try {
-//                    Log.d("HS_URL", HS_URL);
-//                    Request request=new Request.Builder().url(HS_URL).build();
-//                    Response response = okHttpClient.newCall(request).execute();
-//
-//                    //String result = okHttpClient.(request, new BasicResponseHandler());
-//
-//                    System.out.println(response.body());
-//                } catch (IOException e) {
-//                    onConnectionException(e);
-//                }
-//            }
-//        }.start();
-    }
-
-    @Override
-    public void onConnectionException(Exception e) {
-        Log.e(getClass().getSimpleName(),
-                "Exception connecting to hidden service", e);
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(LoginActivity.this, R.string.msg_crash,
-                        Toast.LENGTH_LONG)
-                        .show();
-                finish();
-            }
-        });
-    }
-
-    @Override
-    public void onTimeout() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast
-                        .makeText(LoginActivity.this, R.string.msg_timeout,
-                                Toast.LENGTH_LONG)
-                        .show();
-                Log.d("onTimeout", String.valueOf(R.string.msg_timeout));
-                finish();
-            }
-        });
-    }
-
-    @Override
-    public void onInvalid() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast
-                        .makeText(LoginActivity.this, R.string.msg_invalid,
-                                Toast.LENGTH_LONG)
-                        .show();
-                Log.d("onInvalid", String.valueOf(R.string.msg_invalid));
-                finish();
-            }
-        });
     }
 
     @Override

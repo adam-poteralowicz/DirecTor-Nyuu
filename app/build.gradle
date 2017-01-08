@@ -55,7 +55,7 @@ dependencies {
     //compile 'javax.annotation:jsr250-api:1.0'
     compile 'info.guardianproject.netcipher:netcipher:2.0.0-alpha1'
     compile 'info.guardianproject.netcipher:netcipher-okhttp3:2.0.0-alpha1'
-    compile 'com.squareup.okhttp3:okhttp:3.5.0'
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
     compile 'com.romainpiel.shimmer:library:1.4.0@aar'
     compile project(':im')
     compile project(':core')
