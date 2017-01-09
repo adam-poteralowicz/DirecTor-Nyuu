@@ -37,7 +37,6 @@ public class AuthUserActivity extends FragmentActivity {
         ((App) getApplication()).getComponent().inject(this);
 
 
-        ClientService.sendMessage("AuthUserActivity");
         setContentView(R.layout.user_view);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ButterKnife.bind(this);

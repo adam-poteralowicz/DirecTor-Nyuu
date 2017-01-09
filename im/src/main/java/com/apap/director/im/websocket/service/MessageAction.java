@@ -3,18 +3,16 @@ package com.apap.director.im.websocket.service;
 import android.util.Base64;
 import android.util.Log;
 
-import com.apap.director.db.manager.DatabaseManager;
 import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.ContactKey;
 import com.apap.director.db.realm.model.Conversation;
-import com.apap.director.db.realm.model.Message;
 import com.apap.director.db.realm.model.Session;
 import com.apap.director.db.realm.to.MessageTO;
-import com.apap.director.im.signal.DirectorIdentityKeyStore;
-import com.apap.director.im.signal.DirectorPreKeyStore;
-import com.apap.director.im.signal.DirectorSessionStore;
-import com.apap.director.im.signal.DirectorSignedPreKeyStore;
+import com.apap.director.signal.DirectorIdentityKeyStore;
+import com.apap.director.signal.DirectorPreKeyStore;
+import com.apap.director.signal.DirectorSessionStore;
+import com.apap.director.signal.DirectorSignedPreKeyStore;
 import com.apap.director.manager.ContactManager;
 import com.apap.director.manager.ConversationManager;
 import com.apap.director.manager.MessageManager;
@@ -22,18 +20,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.InvalidKeyException;
-import org.whispersystems.libsignal.SessionBuilder;
-import org.whispersystems.libsignal.SessionCipher;
-import org.whispersystems.libsignal.SignalProtocolAddress;
-import org.whispersystems.libsignal.protocol.CiphertextMessage;
-import org.whispersystems.libsignal.state.PreKeyBundle;
 
 import java.io.IOException;
 
 import javax.inject.Inject;
 
 import io.realm.Realm;
-import io.realm.RealmList;
 import rx.functions.Action1;
 import ua.naiksoftware.stomp.client.StompMessage;
 
@@ -111,7 +103,7 @@ public class MessageAction implements Action1<StompMessage> {
                 session.setName(key.getKeyBase64());
                 session.setSerializedKey(key.getSerialized());
 
-                conversation = conversationManager.addConversation(contact, session);
+                conversation = conversationManager.addConversation(contact);
             }
 
             Log.v("HAI/MessageAction", "adding message "+frame.getMessage());

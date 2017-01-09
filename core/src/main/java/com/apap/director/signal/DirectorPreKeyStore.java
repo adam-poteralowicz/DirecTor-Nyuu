@@ -1,6 +1,8 @@
-package com.apap.director.im.signal;
+package com.apap.director.signal;
 
+import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.OneTimeKey;
+import com.apap.director.db.realm.model.SignedKey;
 
 import org.whispersystems.libsignal.InvalidKeyIdException;
 import org.whispersystems.libsignal.state.PreKeyRecord;
@@ -40,9 +42,20 @@ public class DirectorPreKeyStore implements PreKeyStore {
     @Override
     public void storePreKey(int preKeyId, PreKeyRecord record) {
         realm.beginTransaction();
-            OneTimeKey oneTimeKey = realm.createObject(OneTimeKey.class);
-            oneTimeKey.setSerializedKey(record.serialize());
+            Account active = realm.where(Account.class).equalTo("active", true).findFirst();
+            OneTimeKey oneTimeKey = new OneTimeKey();
+
+        long id;
+        if(realm.where(OneTimeKey.class).findFirst() == null){
+            id = 0;
+        }
+        else{
+            id = realm.where(OneTimeKey.class).max("id").longValue()+1;
+        }
+            oneTimeKey.setId(id);
             oneTimeKey.setOneTimeKeyId(preKeyId);
+            oneTimeKey.setSerializedKey(record.serialize());
+            realm.copyToRealmOrUpdate(oneTimeKey);
         realm.commitTransaction();
 
     }

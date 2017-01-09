@@ -80,7 +80,7 @@ public class AddContactActivity extends AppCompatActivity {
 
             Realm realm = Realm.getDefaultInstance();
                 Contact contact = realm.where(Contact.class).equalTo("name", name).findFirst();
-                conversationManager.addConversation(contact, null);
+                conversationManager.addConversation(contact);
             realm.close();
 
             Toast.makeText(this, contactPublicKey, Toast.LENGTH_LONG).show();

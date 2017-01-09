@@ -4,7 +4,7 @@
 //import com.apap.director.db.realm.ApplicationScope;
 //import com.apap.director.im.websocket.module.WebSocketModule;
 //import com.apap.director.im.websocket.service.StompService;
-//import com.apap.director.im.signal.module.SignalModule;
+//import com.apap.director.signal.module.SignalModule;
 //
 //import dagger.Component;
 //

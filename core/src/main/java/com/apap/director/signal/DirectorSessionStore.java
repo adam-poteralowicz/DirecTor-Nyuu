@@ -1,8 +1,7 @@
-package com.apap.director.im.signal;
+package com.apap.director.signal;
 
 import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.ContactKey;
-import com.apap.director.db.realm.model.Conversation;
 import com.apap.director.db.realm.model.Session;
 
 import org.whispersystems.libsignal.SignalProtocolAddress;

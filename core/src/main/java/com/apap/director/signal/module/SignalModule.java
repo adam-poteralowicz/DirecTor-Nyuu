@@ -1,11 +1,11 @@
-package com.apap.director.im.signal.module;
+package com.apap.director.signal.module;
 
 import android.content.Context;
 
-import com.apap.director.im.signal.DirectorIdentityKeyStore;
-import com.apap.director.im.signal.DirectorPreKeyStore;
-import com.apap.director.im.signal.DirectorSessionStore;
-import com.apap.director.im.signal.DirectorSignedPreKeyStore;
+import com.apap.director.signal.DirectorIdentityKeyStore;
+import com.apap.director.signal.DirectorPreKeyStore;
+import com.apap.director.signal.DirectorSessionStore;
+import com.apap.director.signal.DirectorSignedPreKeyStore;
 import com.apap.director.manager.AccountManager;
 
 import org.whispersystems.curve25519.Curve25519;

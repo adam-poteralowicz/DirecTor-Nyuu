@@ -6,7 +6,7 @@ import android.content.Context;
 import com.apap.director.client.component.DaggerMainComponent;
 import com.apap.director.client.component.MainComponent;
 import com.apap.director.db.dao.module.DaoModule;
-import com.apap.director.im.signal.module.SignalModule;
+import com.apap.director.signal.module.SignalModule;
 import com.apap.director.im.websocket.module.WebSocketModule;
 import com.apap.director.im.websocket.service.ClientService;
 import com.apap.director.manager.ManagerModule;

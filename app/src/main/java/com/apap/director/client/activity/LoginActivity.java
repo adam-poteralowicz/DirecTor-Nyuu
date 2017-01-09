@@ -187,7 +187,23 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
                 if(cookie!=null) break;
             }
 
-            Log.v("HAI/LoginActivity", "Logged in");
+
+            AsyncTask<Void, Void, Void> keysTask = new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    try {
+                        Log.v("HAI/LoginActivity", "Trying to post keys");
+                        accountManager.postSignedKey();
+                        accountManager.postOneTimeKeys();
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            };
+
+            keysTask.execute().get();
 
             Log.v("HAI/LoginActivity", "Choosen account: "+accountManager.getActiveAccount()+ " cookie" +accountManager.getActiveAccount().getCookie());
 
@@ -198,7 +214,6 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
             realm.commitTransaction();
 
             ClientService.connect(cookie);
-            ClientService.sendMessage("LoginActivity");
             shimmer.cancel();
             Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);
             startActivity(selectedIntent);

@@ -1,24 +1,23 @@
 package com.apap.director.im.websocket.service;
 
+import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
 import android.util.Pair;
 
 import com.apap.director.db.realm.model.ContactKey;
-import com.apap.director.db.realm.model.OneTimeKey;
 import com.apap.director.db.realm.model.Session;
 import com.apap.director.db.realm.to.MessageTO;
 import com.apap.director.db.realm.to.OneTimeKeyTO;
 import com.apap.director.db.realm.to.SignedKeyTO;
-import com.apap.director.im.signal.DirectorIdentityKeyStore;
-import com.apap.director.im.signal.DirectorPreKeyStore;
-import com.apap.director.im.signal.DirectorSessionStore;
-import com.apap.director.im.signal.DirectorSignedPreKeyStore;
+import com.apap.director.signal.DirectorIdentityKeyStore;
+import com.apap.director.signal.DirectorPreKeyStore;
+import com.apap.director.signal.DirectorSessionStore;
+import com.apap.director.signal.DirectorSignedPreKeyStore;
 import com.apap.director.network.rest.Paths;
 import com.apap.director.network.rest.service.KeyService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.deser.Deserializers;
 
 import org.java_websocket.WebSocket;
 import org.whispersystems.libsignal.IdentityKey;
@@ -28,19 +27,14 @@ import org.whispersystems.libsignal.SessionCipher;
 import org.whispersystems.libsignal.SignalProtocolAddress;
 import org.whispersystems.libsignal.UntrustedIdentityException;
 import org.whispersystems.libsignal.ecc.Curve;
-import org.whispersystems.libsignal.ecc.ECKeyPair;
 import org.whispersystems.libsignal.ecc.ECPublicKey;
 import org.whispersystems.libsignal.protocol.CiphertextMessage;
 import org.whispersystems.libsignal.state.PreKeyBundle;
-import org.whispersystems.libsignal.state.PreKeyRecord;
-import org.whispersystems.libsignal.state.PreKeyStore;
-import org.whispersystems.libsignal.state.SignedPreKeyRecord;
-import org.whispersystems.libsignal.util.KeyHelper;
 
 import java.io.IOException;
-import java.security.Key;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
 
 import io.realm.Realm;
 import retrofit2.Call;
@@ -141,9 +135,39 @@ public class ClientService {
                         identityKeyStore, signalProtocolAddress);
 
                 // Build a session with a PreKey retrieved from the server.
+                AsyncTask<Void, Void, ECPublicKey> getKeyTask = new AsyncTask<Void, Void, ECPublicKey>() {
+                    @Override
+                    protected ECPublicKey doInBackground(Void... params) {
+                        try {
+                            return getOneTimeKey(to);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            return null;
+                        } catch (InvalidKeyException e) {
+                            e.printStackTrace();
+                            return null;
+                        }
+                    }
+                };
 
-                ECPublicKey oneTimeKey = getOneTimeKey(to);
-                Pair<ECPublicKey, byte[]> signedKey = getSignedKey(to);
+                ECPublicKey oneTimeKey = getKeyTask.execute().get();
+
+                AsyncTask<Void, Void, Pair<ECPublicKey, byte[]>> getSignedKeyTask = new AsyncTask<Void, Void, Pair<ECPublicKey, byte[]>>() {
+                    @Override
+                    protected Pair<ECPublicKey, byte[]> doInBackground(Void... params) {
+                        try {
+                            return getSignedKey(to);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            return null;
+                        } catch (InvalidKeyException e) {
+                            e.printStackTrace();
+                            return null;
+                        }
+                    }
+                };
+
+                Pair<ECPublicKey, byte[]> signedKey = getSignedKeyTask.execute().get();
 
                 IdentityKey contactIdentity = new IdentityKey(contactKey.getSerialized(),0);
 
@@ -185,6 +209,10 @@ public class ClientService {
         } catch (UntrustedIdentityException e) {
             e.printStackTrace();
         } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
             e.printStackTrace();
         }
     }

@@ -17,11 +17,15 @@ import com.apap.director.db.realm.to.SignedKeyTO;
 import com.apap.director.network.rest.service.KeyService;
 import com.apap.director.network.rest.service.LoginDetails;
 import com.apap.director.network.rest.service.UserService;
+import com.apap.director.signal.DirectorPreKeyStore;
+import com.apap.director.signal.DirectorSignedPreKeyStore;
 
 import org.whispersystems.curve25519.Curve25519;
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.InvalidKeyException;
 import org.whispersystems.libsignal.InvalidKeyIdException;
+import org.whispersystems.libsignal.state.PreKeyRecord;
+import org.whispersystems.libsignal.state.SignedPreKeyRecord;
 import org.whispersystems.libsignal.util.ByteUtil;
 import org.whispersystems.libsignal.util.KeyHelper;
 
@@ -41,6 +45,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static org.whispersystems.libsignal.util.KeyHelper.generatePreKeys;
+
 
 public class AccountManager {
 
@@ -48,13 +54,16 @@ public class AccountManager {
     private UserService userService;
     private Curve25519 curve25519;
     private KeyService keyService;
+    private DirectorPreKeyStore preKeyStore;
+    private DirectorSignedPreKeyStore signedPreKeyStore;
 
-    @Inject
-    public AccountManager(Realm realm, UserService userService, Curve25519 curve25519, KeyService keyService) {
+    public AccountManager(Realm realm, UserService userService, Curve25519 curve25519, KeyService keyService, DirectorPreKeyStore preKeyStore, DirectorSignedPreKeyStore signedPreKeyStore) {
         this.realm = realm;
         this.userService = userService;
         this.curve25519 = curve25519;
         this.keyService = keyService;
+        this.preKeyStore = preKeyStore;
+        this.signedPreKeyStore = signedPreKeyStore;
     }
 
     public ArrayList<Account> listAllAccounts(){
@@ -64,28 +73,59 @@ public class AccountManager {
 
     public Account createAccount(String name){
 
-        Account sameName = realm.where(Account.class).equalTo("name", name).findFirst();
-        if(sameName != null) return null;
+        try {
+            Account sameName = realm.where(Account.class).equalTo("name", name).findFirst();
+            if(sameName != null) return null;
 
-        IdentityKeyPair identityKeyPair = KeyHelper.generateIdentityKeyPair();
-        int registrationId  = KeyHelper.generateRegistrationId(false);
+            IdentityKeyPair identityKeyPair = KeyHelper.generateIdentityKeyPair();
+            int registrationId  = KeyHelper.generateRegistrationId(false);
 
 
-        Account account = new Account();
-        account.setId(generateAccountId());
-        account.setKeyPair(identityKeyPair.serialize());
-        account.setName(name);
-        byte[][] typeAndKey = ByteUtil.split(identityKeyPair.getPublicKey().serialize(), 1, 32);
-        account.setKeyBase64(Base64.encodeToString(typeAndKey[1], Base64.URL_SAFE | Base64.NO_WRAP));
-        account.setRegistrationId(registrationId);
+            Account account = new Account();
+            account.setId(generateAccountId());
+            account.setKeyPair(identityKeyPair.serialize());
+            account.setName(name);
+            byte[][] typeAndKey = ByteUtil.split(identityKeyPair.getPublicKey().serialize(), 1, 32);
+            account.setKeyBase64(Base64.encodeToString(typeAndKey[1], Base64.URL_SAFE | Base64.NO_WRAP));
+            account.setRegistrationId(registrationId);
 
-        
 
-        realm.beginTransaction();
-            realm.copyToRealmOrUpdate(account);
-        realm.commitTransaction();
+            List<PreKeyRecord> preKeyRecords =  KeyHelper.generatePreKeys(0,50);
+            RealmList<OneTimeKey> oneTimeKeys = new RealmList<>();
 
-        return account;
+            for(PreKeyRecord record : preKeyRecords){
+                preKeyStore.storePreKey(record.getId(), record);
+                realm.beginTransaction();
+                    OneTimeKey temporaryKey = realm.where(OneTimeKey.class).equalTo("oneTimeKeyId", record.getId()).findFirst();
+                    oneTimeKeys.add(temporaryKey);
+                realm.commitTransaction();
+
+            }
+
+            SignedPreKeyRecord signedPreKeyRecord = KeyHelper.generateSignedPreKey(identityKeyPair, 0);
+            signedPreKeyStore.storeSignedPreKey(signedPreKeyRecord.getId(),signedPreKeyRecord);
+
+            SignedKey signedKey = realm.where(SignedKey.class).equalTo("signedKeyId", signedPreKeyRecord.getId()).findFirst();
+
+
+
+
+            account.setOneTimeKeys(oneTimeKeys);
+
+
+            realm.beginTransaction();
+                account =  realm.copyToRealmOrUpdate(account);
+                signedKey = realm.copyToRealmOrUpdate(signedKey);
+                signedKey.setAccount(account);
+                account.setSignedKey(signedKey);
+
+            realm.commitTransaction();
+
+            return account;
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+            return null;
+        }
 
     }
 
@@ -315,20 +355,19 @@ public class AccountManager {
     public String postOneTimeKeys() throws IOException {
         Realm realm = Realm.getDefaultInstance();
         Account activeAcc = realm.where(Account.class).equalTo("active", true).equalTo("registered", true).findFirst();
-        Account active = realm.copyFromRealm(activeAcc);
         Log.d("HAI/ACTIVE ACCOUNT", activeAcc.getName());
 
-        if (active.getOneTimeKeys() == null || active.getOneTimeKeys().isEmpty()) {
+        if (activeAcc.getOneTimeKeys() == null || activeAcc.getOneTimeKeys().isEmpty()) {
             Log.d("HAI/AccountManager", "There are no one time keys to be fetched");
             return null;
         }
-        List<OneTimeKey> otkeys = new ArrayList<>(active.getOneTimeKeys());
+        List<OneTimeKey> otkeys = new ArrayList<>(activeAcc.getOneTimeKeys());
         List<OneTimeKeyTO> otkeysTO = new ArrayList<>();
         for (OneTimeKey otk : otkeys) {
             Log.d("OTK", new String(otk.getSerializedKey()));
             otkeysTO.add(new OneTimeKeyTO(otk));
         }
-        Call<ResponseBody> postOneTimeKeysCall = keyService.postOneTimeKeys(otkeysTO, active.getCookie());
+        Call<ResponseBody> postOneTimeKeysCall = keyService.postOneTimeKeys(otkeysTO, activeAcc.getCookie());
         Response<ResponseBody> postOneTimeKeysResponse = postOneTimeKeysCall.execute();
 
         Log.v("HAI/AccountManager", "post one time keys call code:" + postOneTimeKeysResponse.code());
@@ -359,17 +398,12 @@ public class AccountManager {
             Log.d("HAI/AccountManager", "There are no signed keys to be fetched");
             return null;
         }
-        List<SignedKey> sk = new ArrayList<SignedKey>();
-        sk.add(active.getSignedKey());
-        List<SignedKeyTO> signedKeyTO = new ArrayList<>();
-        for (SignedKey signedKey : sk) {
-            signedKeyTO.add(new SignedKeyTO(signedKey));
-        }
-        Call<ResponseBody> postSignedKeysCall = keyService.postSignedKeys(signedKeyTO, active.getCookie());
+
+
+        Call<ResponseBody> postSignedKeysCall = keyService.postSignedKeys(new SignedKeyTO(active.getSignedKey()), active.getCookie());
         Response<ResponseBody> postSignedKeysResponse = postSignedKeysCall.execute();
 
         Log.v("HAI/AccountManager", "post signed keys call code:" + postSignedKeysResponse.code());
-        Log.v("HAI/AccountManager", "post signed keys call keys:" + signedKeyTO);
         Log.v("HAI/AccountManager", "post signed keys call url:" + postSignedKeysCall.request().url());
 
         for(String name: postSignedKeysResponse.headers().names()){

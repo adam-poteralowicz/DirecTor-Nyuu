@@ -2,10 +2,10 @@ package com.apap.director.im.websocket.module;
 
 import android.content.Context;
 
-import com.apap.director.im.signal.DirectorIdentityKeyStore;
-import com.apap.director.im.signal.DirectorPreKeyStore;
-import com.apap.director.im.signal.DirectorSessionStore;
-import com.apap.director.im.signal.DirectorSignedPreKeyStore;
+import com.apap.director.signal.DirectorIdentityKeyStore;
+import com.apap.director.signal.DirectorPreKeyStore;
+import com.apap.director.signal.DirectorSessionStore;
+import com.apap.director.signal.DirectorSignedPreKeyStore;
 import com.apap.director.im.websocket.service.MessageAction;
 import com.apap.director.manager.ContactManager;
 import com.apap.director.manager.ConversationManager;

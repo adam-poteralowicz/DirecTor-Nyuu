@@ -109,7 +109,7 @@ public class NewMsgActivity extends Activity {
         Conversation conversation = conversationManager.getConversationByContactId(contactIdFromIntent);
         Message message = messageManager.addMessage(conversation, newMessage, to, true);
 
-        ClientService.sendTestMessage(conversation.getContact().getContactKeys().get(0).getKeyBase64(),realm.where(Account.class).equalTo("active", true).findFirst().getKeyBase64(),newMessage);
+        ClientService.sendEncryptedMessage(conversation.getContact().getContactKeys().get(0).getKeyBase64(),realm.where(Account.class).equalTo("active", true).findFirst().getKeyBase64(),newMessage);
         newMessageField.setText("");
 
     }
