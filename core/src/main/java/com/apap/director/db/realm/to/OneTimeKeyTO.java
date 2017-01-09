@@ -31,7 +31,7 @@ public class OneTimeKeyTO {
         try {
             this.keyId = oneTimeKey.getId();
             PreKeyRecord record = new PreKeyRecord(oneTimeKey.getSerializedKey());
-            this.keyBase64 = Base64.encodeToString(oneTimeKey.getSerializedKey(), Base64.NO_WRAP | Base64.URL_SAFE);
+            this.keyBase64 = Base64.encodeToString(record.getKeyPair().getPublicKey().serialize(), Base64.NO_WRAP | Base64.URL_SAFE);
         } catch (IOException e) {
             e.printStackTrace();
         }

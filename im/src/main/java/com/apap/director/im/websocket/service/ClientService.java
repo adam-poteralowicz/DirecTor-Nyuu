@@ -5,6 +5,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.util.Pair;
 
+import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.ContactKey;
 import com.apap.director.db.realm.model.Session;
 import com.apap.director.db.realm.to.MessageTO;
@@ -21,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.java_websocket.WebSocket;
 import org.whispersystems.libsignal.IdentityKey;
+import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.InvalidKeyException;
 import org.whispersystems.libsignal.SessionBuilder;
 import org.whispersystems.libsignal.SessionCipher;
@@ -30,6 +32,7 @@ import org.whispersystems.libsignal.ecc.Curve;
 import org.whispersystems.libsignal.ecc.ECPublicKey;
 import org.whispersystems.libsignal.protocol.CiphertextMessage;
 import org.whispersystems.libsignal.state.PreKeyBundle;
+import org.whispersystems.libsignal.state.SignedPreKeyRecord;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -170,6 +173,17 @@ public class ClientService {
                 Pair<ECPublicKey, byte[]> signedKey = getSignedKeyTask.execute().get();
 
                 IdentityKey contactIdentity = new IdentityKey(contactKey.getSerialized(),0);
+
+                Account account = realm.where(Account.class).equalTo("active", true).findFirst();
+                SignedPreKeyRecord record = new SignedPreKeyRecord(account.getSignedKey().getSerializedKey());
+
+                Log.v("HAI/ClientService", "My signed key: " + Base64.encodeToString(record.getKeyPair().getPublicKey().serialize(), Base64.URL_SAFE | Base64.NO_WRAP));
+                Log.v("HAI/ClientService", "My signature: " + Base64.encodeToString(record.getSignature(), Base64.URL_SAFE | Base64.NO_WRAP));
+                Log.v("HAI/ClientService", "My key: " + Base64.encodeToString(new IdentityKeyPair(account.getKeyPair()).getPublicKey().serialize() , Base64.URL_SAFE | Base64.NO_WRAP));
+                Log.v("HAI/ClientService", "Received key : " + Base64.encodeToString(contactIdentity.getPublicKey().serialize() , Base64.URL_SAFE | Base64.NO_WRAP));
+
+                Log.v("HAI/ClientService", "Received signed key: " + Base64.encodeToString(signedKey.first.serialize(), Base64.URL_SAFE | Base64.NO_WRAP));
+                Log.v("HAI/ClientService", "Received signature signature: " + Base64.encodeToString(signedKey.second, Base64.URL_SAFE | Base64.NO_WRAP));
 
                 PreKeyBundle preKeyBundle = new PreKeyBundle(0, contactKey.getDeviceId(), 0, oneTimeKey, 0, signedKey.first, signedKey.second, contactIdentity);
                 sessionBuilder.process(preKeyBundle);
