@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.java_websocket.WebSocket;
+import org.whispersystems.curve25519.Curve25519;
 import org.whispersystems.libsignal.IdentityKey;
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.InvalidKeyException;
@@ -32,7 +33,9 @@ import org.whispersystems.libsignal.ecc.Curve;
 import org.whispersystems.libsignal.ecc.ECPublicKey;
 import org.whispersystems.libsignal.protocol.CiphertextMessage;
 import org.whispersystems.libsignal.state.PreKeyBundle;
+import org.whispersystems.libsignal.state.SessionRecord;
 import org.whispersystems.libsignal.state.SignedPreKeyRecord;
+import org.whispersystems.libsignal.util.KeyHelper;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -129,66 +132,72 @@ public class ClientService {
 
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(to, contactKey.getDeviceId());
 
-            Session session = realm.where(Session.class).equalTo("name", to).equalTo("deviceId", contactKey.getDeviceId()).findFirst();
+            // Instantiate a SessionBuilder for a remote recipientId + deviceId tuple.
+            SessionBuilder sessionBuilder = new SessionBuilder(sessionStore, preKeyStore, signedPreKeyStore,
+                identityKeyStore, signalProtocolAddress);
 
-            if(session == null){
 
-                // Instantiate a SessionBuilder for a remote recipientId + deviceId tuple.
-                SessionBuilder sessionBuilder = new SessionBuilder(sessionStore, preKeyStore, signedPreKeyStore,
-                        identityKeyStore, signalProtocolAddress);
-
-                // Build a session with a PreKey retrieved from the server.
-                AsyncTask<Void, Void, ECPublicKey> getKeyTask = new AsyncTask<Void, Void, ECPublicKey>() {
-                    @Override
-                    protected ECPublicKey doInBackground(Void... params) {
-                        try {
-                            return getOneTimeKey(to);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            return null;
-                        } catch (InvalidKeyException e) {
-                            e.printStackTrace();
-                            return null;
-                        }
+            // Build a session with a PreKey retrieved from the server.
+            AsyncTask<Void, Void, ECPublicKey> getKeyTask = new AsyncTask<Void, Void, ECPublicKey>() {
+                @Override
+                protected ECPublicKey doInBackground(Void... params) {
+                    try {
+                        return getOneTimeKey(to);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return null;
+                    } catch (InvalidKeyException e) {
+                        e.printStackTrace();
+                        return null;
                     }
-                };
+                }
+            };
 
-                ECPublicKey oneTimeKey = getKeyTask.execute().get();
+            ECPublicKey oneTimeKey = getKeyTask.execute().get();
 
-                AsyncTask<Void, Void, Pair<ECPublicKey, byte[]>> getSignedKeyTask = new AsyncTask<Void, Void, Pair<ECPublicKey, byte[]>>() {
-                    @Override
-                    protected Pair<ECPublicKey, byte[]> doInBackground(Void... params) {
-                        try {
-                            return getSignedKey(to);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            return null;
-                        } catch (InvalidKeyException e) {
-                            e.printStackTrace();
-                            return null;
-                        }
+            AsyncTask<Void, Void, Pair<ECPublicKey, byte[]>> getSignedKeyTask = new AsyncTask<Void, Void, Pair<ECPublicKey, byte[]>>() {
+                @Override
+                protected Pair<ECPublicKey, byte[]> doInBackground(Void... params) {
+                    try {
+                        return getSignedKey(to);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return null;
+                    } catch (InvalidKeyException e) {
+                        e.printStackTrace();
+                        return null;
                     }
-                };
+                }
+            };
 
-                Pair<ECPublicKey, byte[]> signedKey = getSignedKeyTask.execute().get();
+            Pair<ECPublicKey, byte[]> signedKey = getSignedKeyTask.execute().get();
 
-                IdentityKey contactIdentity = new IdentityKey(contactKey.getSerialized(),0);
+            IdentityKey contactIdentity = new IdentityKey(contactKey.getSerialized(),0);
 
-                Account account = realm.where(Account.class).equalTo("active", true).findFirst();
-                SignedPreKeyRecord record = new SignedPreKeyRecord(account.getSignedKey().getSerializedKey());
+            Account account = realm.where(Account.class).equalTo("active", true).findFirst();
+            SignedPreKeyRecord record = new SignedPreKeyRecord(account.getSignedKey().getSerializedKey());
 
-                Log.v("HAI/ClientService", "My signed key: " + Base64.encodeToString(record.getKeyPair().getPublicKey().serialize(), Base64.URL_SAFE | Base64.NO_WRAP));
-                Log.v("HAI/ClientService", "My signature: " + Base64.encodeToString(record.getSignature(), Base64.URL_SAFE | Base64.NO_WRAP));
-                Log.v("HAI/ClientService", "My key: " + Base64.encodeToString(new IdentityKeyPair(account.getKeyPair()).getPublicKey().serialize() , Base64.URL_SAFE | Base64.NO_WRAP));
-                Log.v("HAI/ClientService", "Received key : " + Base64.encodeToString(contactIdentity.getPublicKey().serialize() , Base64.URL_SAFE | Base64.NO_WRAP));
+//            Log.v("HAI/ClientService", "My signed key: " + Base64.encodeToString(record.getKeyPair().getPublicKey().serialize(), Base64.URL_SAFE | Base64.NO_WRAP));
+//            Log.v("HAI/ClientService", "My signature: " + Base64.encodeToString(record.getSignature(), Base64.URL_SAFE | Base64.NO_WRAP));
+//            Log.v("HAI/ClientService", "My key: " + Base64.encodeToString(new IdentityKeyPair(account.getKeyPair()).getPublicKey().serialize() , Base64.URL_SAFE | Base64.NO_WRAP));
+//            Log.v("HAI/ClientService", "Received key : " + Base64.encodeToString(contactIdentity.getPublicKey().serialize() , Base64.URL_SAFE | Base64.NO_WRAP));
+//
+//            Log.v("HAI/ClientService", "Received signed key: " + Base64.encodeToString(signedKey.first.serialize(), Base64.URL_SAFE | Base64.NO_WRAP));
+//            Log.v("HAI/ClientService", "Received signature signature: " + Base64.encodeToString(signedKey.second, Base64.URL_SAFE | Base64.NO_WRAP));
 
-                Log.v("HAI/ClientService", "Received signed key: " + Base64.encodeToString(signedKey.first.serialize(), Base64.URL_SAFE | Base64.NO_WRAP));
-                Log.v("HAI/ClientService", "Received signature signature: " + Base64.encodeToString(signedKey.second, Base64.URL_SAFE | Base64.NO_WRAP));
+//                Curve25519 curve25519 = Curve25519.getInstance(Curve25519.BEST);
+//
+//
+//                boolean isOk = Curve.verifySignature(contactIdentity.getPublicKey(),
+//                        signedKey.first.serialize(),
+//                        signedKey.second);
+//
+//                Log.v("HAI/ClientService", "Is ok "+isOk);
 
-                PreKeyBundle preKeyBundle = new PreKeyBundle(0, contactKey.getDeviceId(), 0, oneTimeKey, 0, signedKey.first, signedKey.second, contactIdentity);
-                sessionBuilder.process(preKeyBundle);
+            sessionStore.storeSession(signalProtocolAddress, new SessionRecord());
 
-            }
+            PreKeyBundle preKeyBundle = new PreKeyBundle(0, contactKey.getDeviceId(), 0, oneTimeKey, 0, signedKey.first, signedKey.second, contactIdentity);
+            sessionBuilder.process(preKeyBundle);
 
             SessionCipher sessionCipher = new SessionCipher(sessionStore, preKeyStore, signedPreKeyStore, identityKeyStore, new SignalProtocolAddress(to, contactKey.getDeviceId()));
             CiphertextMessage message = sessionCipher.encrypt(text.getBytes("UTF-8"));
@@ -199,7 +208,7 @@ public class ClientService {
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(frame);
 
-            client.send("/app/message/test"+to,json)
+            client.send("/app/message/test/"+to,json)
                     .subscribe(new Action1<Void>() {
                         @Override
                         public void call(Void aVoid) {

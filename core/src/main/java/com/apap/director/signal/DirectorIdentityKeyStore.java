@@ -46,6 +46,12 @@ public class DirectorIdentityKeyStore implements IdentityKeyStore {
     public void saveIdentity(SignalProtocolAddress address, IdentityKey identityKey) {
 
         realm.beginTransaction();
+            ContactKey sameName = realm.where(ContactKey.class).equalTo("keyBase64", address.getName()).equalTo("deviceId", address.getDeviceId()).findFirst();
+
+            if(sameName != null) {
+                realm.commitTransaction();
+                return;
+            }
 
             ContactKey contactKey = realm.createObject(ContactKey.class);
             contactKey.setDeviceId(address.getDeviceId());

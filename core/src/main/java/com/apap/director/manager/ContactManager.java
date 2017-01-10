@@ -58,7 +58,7 @@ public class ContactManager {
         if (sameName != null) return;
 
         localRealm.beginTransaction();
-            Contact contact = localRealm.createObject(Contact.class, generateContactKeyId(localRealm));
+            Contact contact = localRealm.createObject(Contact.class, generateContactId(localRealm));
             contact.setName(name);
 
             RealmList<ContactKey> keys = new RealmList<>();
