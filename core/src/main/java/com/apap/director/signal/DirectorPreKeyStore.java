@@ -27,6 +27,7 @@ public class DirectorPreKeyStore implements PreKeyStore {
 
     @Override
     public PreKeyRecord loadPreKey(int preKeyId) throws InvalidKeyIdException {
+        Realm realm = Realm.getDefaultInstance();
         try {
             OneTimeKey preKey = realm.where(OneTimeKey.class).equalTo("oneTimeKeyId", preKeyId).findFirst();
 
@@ -70,6 +71,7 @@ public class DirectorPreKeyStore implements PreKeyStore {
     @Override
     public void removePreKey(int preKeyId) {
 
+        Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
             realm.where(OneTimeKey.class).equalTo("oneTimeKeyId", preKeyId).findFirst().deleteFromRealm();
         realm.commitTransaction();

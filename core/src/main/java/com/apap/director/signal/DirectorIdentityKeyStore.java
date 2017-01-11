@@ -45,6 +45,7 @@ public class DirectorIdentityKeyStore implements IdentityKeyStore {
     @Override
     public void saveIdentity(SignalProtocolAddress address, IdentityKey identityKey) {
 
+        Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
             ContactKey sameName = realm.where(ContactKey.class).equalTo("keyBase64", address.getName()).equalTo("deviceId", address.getDeviceId()).findFirst();
 
@@ -70,6 +71,7 @@ public class DirectorIdentityKeyStore implements IdentityKeyStore {
     @Override
     public boolean isTrustedIdentity(SignalProtocolAddress address, IdentityKey identityKey) {
 
+        Realm realm = Realm.getDefaultInstance();
         ContactKey contactKey = realm.where(ContactKey.class)
                 .equalTo("keyBase64", address.getName())
                 .equalTo("deviceId", address.getDeviceId())

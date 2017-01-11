@@ -135,6 +135,7 @@ public class AccountManager {
     }
 
     public Account getActiveAccount(){
+        Realm realm = Realm.getDefaultInstance();
         return realm.where(Account.class).equalTo("active", true).findFirst();
     }
 

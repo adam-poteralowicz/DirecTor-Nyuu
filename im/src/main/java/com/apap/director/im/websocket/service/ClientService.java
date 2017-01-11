@@ -96,7 +96,7 @@ public class ClientService {
             String address = "/app/message/test/"+to;
             Log.v("HAI/StompService", "Sending framed message! " +address);
 
-            MessageTO frame = new MessageTO(from, text);
+            MessageTO frame = new MessageTO(from, text, 0);
             ObjectMapper mapper = new ObjectMapper();
 
             String json = mapper.writeValueAsString(frame);
@@ -187,17 +187,22 @@ public class ClientService {
             Account account = realm.where(Account.class).equalTo("active", true).findFirst();
             SignedPreKeyRecord record = new SignedPreKeyRecord(account.getSignedKey().getSerializedKey());
 
-            sessionStore.storeSession(signalProtocolAddress, new SessionRecord());
+            SessionRecord mySession = sessionStore.loadSession(signalProtocolAddress);
 
-            PreKeyBundle preKeyBundle = new PreKeyBundle(0, 0, oneTimeKeyTO.getOneTimeKeyId(), oneTimeKeyEC, signedKeyTO.getSignedKeyId(), signedKeyEC, decodedSignature, contactIdentity);
-            sessionBuilder.process(preKeyBundle);
+            if(mySession==null){
+                sessionStore.storeSession(signalProtocolAddress, new SessionRecord());
 
-            SessionCipher sessionCipher = new SessionCipher(sessionStore, preKeyStore, signedPreKeyStore, identityKeyStore, new SignalProtocolAddress(to, contactKey.getDeviceId()));
+                PreKeyBundle preKeyBundle = new PreKeyBundle(0, 0, oneTimeKeyTO.getOneTimeKeyId(), oneTimeKeyEC, signedKeyTO.getSignedKeyId(), signedKeyEC, decodedSignature, contactIdentity);
+                sessionBuilder.process(preKeyBundle);
+            }
+
+
+            SessionCipher sessionCipher = new SessionCipher(sessionStore, preKeyStore, signedPreKeyStore, identityKeyStore, signalProtocolAddress);
             CiphertextMessage message = sessionCipher.encrypt(text.getBytes("UTF-8"));
             String encodedText = Base64.encodeToString(message.serialize(), Base64.URL_SAFE | Base64.NO_WRAP);
 
 
-            MessageTO frame = new MessageTO(from, encodedText);
+            MessageTO frame = new MessageTO(from, encodedText, message.getType());
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(frame);
 

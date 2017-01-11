@@ -7,6 +7,7 @@ import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.ContactKey;
 import com.apap.director.db.realm.model.Conversation;
+import com.apap.director.db.realm.model.Message;
 import com.apap.director.db.realm.model.Session;
 import com.apap.director.db.realm.to.MessageTO;
 import com.apap.director.signal.DirectorIdentityKeyStore;
@@ -18,8 +19,23 @@ import com.apap.director.manager.ConversationManager;
 import com.apap.director.manager.MessageManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.whispersystems.libsignal.DuplicateMessageException;
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.InvalidKeyException;
+import org.whispersystems.libsignal.InvalidKeyIdException;
+import org.whispersystems.libsignal.InvalidMessageException;
+import org.whispersystems.libsignal.InvalidVersionException;
+import org.whispersystems.libsignal.LegacyMessageException;
+import org.whispersystems.libsignal.NoSessionException;
+import org.whispersystems.libsignal.SessionCipher;
+import org.whispersystems.libsignal.SignalProtocolAddress;
+import org.whispersystems.libsignal.UntrustedIdentityException;
+import org.whispersystems.libsignal.logging.SignalProtocolLogger;
+import org.whispersystems.libsignal.protocol.CiphertextMessage;
+import org.whispersystems.libsignal.protocol.PreKeySignalMessage;
+import org.whispersystems.libsignal.protocol.SignalMessage;
+import org.whispersystems.libsignal.state.SessionRecord;
+import org.whispersystems.libsignal.state.SessionState;
 
 import java.io.IOException;
 
@@ -71,51 +87,60 @@ public class MessageAction implements Action1<StompMessage> {
                     .findFirst();
             Contact contact = key.getContact();
 
-            Log.v("HAI/MessageAction", "POINTCUT: GET ACTIVE");
-
-            if(contact == null){
-
-                if(frame.getFrom().equals(active.getKeyBase64())){
-                    Log.v("HAI/MessageAction", "POINTCUT BEFORE ADD");
-
-                    contactManager.addContact("me", keyBase64);
-
-                    localRealm.beginTransaction();
-                        key = localRealm.where(ContactKey.class).equalTo("keyBase64", frame.getFrom()).findFirst();
-                        contact = key.getContact();
-                    localRealm.commitTransaction();
-
-                    Log.v("HAI/MessageAction", "POINTCUT AFTER ADD");
-
-                }
-
-            }
 
             Log.v("HAI/MessageAction", "Contact name "+contact.getName());
 
             Conversation conversation = localRealm.where(Conversation.class).equalTo("contact.id", contact.getId()).findFirst();
 
-            if(conversation == null){
-                Session session = new Session();
-                session.setId(localRealm.where(Session.class).max("id").longValue()+1);
-                session.setDeviceId(0);
-                session.setAccount(active);
-                session.setName(key.getKeyBase64());
-                session.setSerializedKey(key.getSerialized());
+            SignalProtocolAddress address = new SignalProtocolAddress(frame.getFrom(), 0);
+            SessionCipher cipher = new SessionCipher(sessionStore, preKeyStore, signedPreKeyStore, identityKeyStore, address);
+            byte[] decodedMessage = Base64.decode(frame.getMessage(), Base64.NO_WRAP | Base64.URL_SAFE);
+            String finalMessage;
+            SessionRecord mySession = sessionStore.loadSession(address);
+            SessionState sessionState = mySession.getSessionState();
 
-                conversation = conversationManager.addConversation(contact);
+            if(mySession == null){
+                Log.v("HAI/MessageAction", "Session is null");
+                sessionStore.storeSession(address, new SessionRecord());
+            }
+
+
+            if(frame.getType()== CiphertextMessage.PREKEY_TYPE){
+
+                    Log.v("HAI/MessageAction", "Unack");
+                    finalMessage = new String(cipher.decrypt(new PreKeySignalMessage(decodedMessage)));
+            }
+            else{
+                Log.v("HAI/MessageAction", "Acked");
+                finalMessage = new String(cipher.decrypt(new SignalMessage(decodedMessage)));
             }
 
             Log.v("HAI/MessageAction", "adding message "+frame.getMessage());
-            messageManager.addMessage(conversation, frame.getMessage(), frame.getFrom(), false);
+            messageManager.addMessage(conversation, finalMessage, frame.getFrom(), false);
 
 
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InvalidKeyException e) {
             e.printStackTrace();
-        }
+        } catch (DuplicateMessageException e) {
+            e.printStackTrace();
+        } catch (InvalidMessageException e) {
+            Log.v("HAI/MessageAction","Invalid message");
 
+
+            e.printStackTrace();
+        } catch (UntrustedIdentityException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyIdException e) {
+            e.printStackTrace();
+        } catch (InvalidVersionException e) {
+            e.printStackTrace();
+        } catch (LegacyMessageException e) {
+            e.printStackTrace();
+        } catch (NoSessionException e) {
+            e.printStackTrace();
+        }
 
 
     }

@@ -29,6 +29,7 @@ public class DirectorSessionStore implements SessionStore {
     @Override
     public SessionRecord loadSession(SignalProtocolAddress address) {
         try {
+            Realm realm = Realm.getDefaultInstance();
             Session session = realm.where(Session.class)
                     .equalTo("name", address.getName())
                     .equalTo("deviceId", address.getDeviceId())
@@ -55,13 +56,14 @@ public class DirectorSessionStore implements SessionStore {
 
     @Override
     public void storeSession(SignalProtocolAddress address, SessionRecord record) {
-
+        Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
 
             Session sameName = realm.where(Session.class).equalTo("name", address.getName()).equalTo("deviceId", address.getDeviceId()).findFirst();
             if(sameName != null){
                 sameName.setSerializedKey(record.serialize());
                 realm.copyToRealmOrUpdate(sameName);
+                realm.insertOrUpdate(sameName);
                 realm.commitTransaction();
                 return;
             }
@@ -85,7 +87,7 @@ public class DirectorSessionStore implements SessionStore {
 
     @Override
     public boolean containsSession(SignalProtocolAddress address) {
-
+        Realm realm = Realm.getDefaultInstance();
         Session session =  realm.where(Session.class)
                 .equalTo("name", address.getName())
                 .equalTo("deviceId", address.getDeviceId())
@@ -97,6 +99,7 @@ public class DirectorSessionStore implements SessionStore {
 
     @Override
     public void deleteSession(SignalProtocolAddress address) {
+        Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
             realm.where(Session.class).equalTo("deviceId", address.getDeviceId()).equalTo("name", address.getName()).findFirst().deleteFromRealm();
         realm.commitTransaction();
@@ -104,6 +107,7 @@ public class DirectorSessionStore implements SessionStore {
 
     @Override
     public void deleteAllSessions(String name) {
+        Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
             realm.where(Session.class).equalTo("name", name).findAll().deleteAllFromRealm();
         realm.commitTransaction();

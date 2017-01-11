@@ -66,9 +66,12 @@ public class MessageManager {
     }
 
     public boolean deleteMessage(Long id) {
+        Realm realm = Realm.getDefaultInstance();
         Message messageToDelete = realm.where(Message.class).equalTo("id", id).findFirst();
         if (messageToDelete != null) {
+            realm.beginTransaction();
             messageToDelete.deleteFromRealm();
+            realm.commitTransaction();
             return true;
         } else return false;
     }

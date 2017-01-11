@@ -28,7 +28,22 @@ public class DirectorSignedPreKeyStore implements SignedPreKeyStore {
 
     @Override
     public SignedPreKeyRecord loadSignedPreKey(int signedPreKeyId) throws InvalidKeyIdException {
-        return null;
+        try {
+            Realm realm = Realm.getDefaultInstance();
+
+            SignedKey signedKey = realm.where(SignedKey.class)
+                    .equalTo("signedKeyId", signedPreKeyId)
+                    .findFirst();
+
+            if(signedKey == null) throw new InvalidKeyIdException("No such key " + signedPreKeyId);
+
+            return new SignedPreKeyRecord(signedKey.getSerializedKey());
+        } catch (IOException e) {
+            e.printStackTrace();
+
+            throw new InvalidKeyIdException("IO exception: "+e.getMessage());
+        }
+
     }
 
     @Override
@@ -51,6 +66,7 @@ public class DirectorSignedPreKeyStore implements SignedPreKeyStore {
 
     @Override
     public void storeSignedPreKey(int signedPreKeyId, SignedPreKeyRecord record) {
+        Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
             SignedKey signedKey = new SignedKey();
             signedKey.setSerializedKey(record.serialize());
