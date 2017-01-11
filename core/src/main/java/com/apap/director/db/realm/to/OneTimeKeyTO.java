@@ -17,6 +17,7 @@ public class OneTimeKeyTO {
 
     private long keyId;
     private String keyBase64;
+    private int oneTimeKeyId;
 
 
     public long getKeyId() {
@@ -27,11 +28,16 @@ public class OneTimeKeyTO {
         return keyBase64;
     }
 
+    public int getOneTimeKeyId() {
+        return oneTimeKeyId;
+    }
+
     public OneTimeKeyTO(OneTimeKey oneTimeKey) {
         try {
             this.keyId = oneTimeKey.getId();
             PreKeyRecord record = new PreKeyRecord(oneTimeKey.getSerializedKey());
             this.keyBase64 = Base64.encodeToString(record.getKeyPair().getPublicKey().serialize(), Base64.NO_WRAP | Base64.URL_SAFE);
+            this.oneTimeKeyId = oneTimeKey.getOneTimeKeyId();
         } catch (IOException e) {
             e.printStackTrace();
         }

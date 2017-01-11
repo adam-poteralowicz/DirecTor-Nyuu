@@ -21,6 +21,8 @@ public class SignedKeyTO {
 
     private String signatureBase64;
 
+    private int signedKeyId;
+
     public String getKeyBase64() {
         return keyBase64;
     }
@@ -31,6 +33,7 @@ public class SignedKeyTO {
             SignedPreKeyRecord record = new SignedPreKeyRecord(signedKey.getSerializedKey());
             this.keyBase64 = Base64.encodeToString(record.getKeyPair().getPublicKey().serialize(), Base64.NO_WRAP | Base64.URL_SAFE);
             this.signatureBase64 = Base64.encodeToString(record.getSignature(), Base64.NO_WRAP | Base64.URL_SAFE);
+            this.signedKeyId = signedKey.getSignedKeyId();
         } catch (IOException e) {
             e.printStackTrace();
         }

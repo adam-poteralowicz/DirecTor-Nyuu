@@ -7,6 +7,7 @@ import android.util.Pair;
 
 import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.ContactKey;
+import com.apap.director.db.realm.model.OneTimeKey;
 import com.apap.director.db.realm.model.Session;
 import com.apap.director.db.realm.to.MessageTO;
 import com.apap.director.db.realm.to.OneTimeKeyTO;
@@ -138,9 +139,9 @@ public class ClientService {
 
 
             // Build a session with a PreKey retrieved from the server.
-            AsyncTask<Void, Void, ECPublicKey> getKeyTask = new AsyncTask<Void, Void, ECPublicKey>() {
+            AsyncTask<Void, Void, OneTimeKeyTO> getKeyTask = new AsyncTask<Void, Void, OneTimeKeyTO>() {
                 @Override
-                protected ECPublicKey doInBackground(Void... params) {
+                protected OneTimeKeyTO doInBackground(Void... params) {
                     try {
                         return getOneTimeKey(to);
                     } catch (IOException e) {
@@ -153,11 +154,15 @@ public class ClientService {
                 }
             };
 
-            ECPublicKey oneTimeKey = getKeyTask.execute().get();
+            OneTimeKeyTO oneTimeKeyTO = getKeyTask.execute().get();
+            byte[] decoded = Base64.decode(oneTimeKeyTO.getKeyBase64(), Base64.NO_WRAP | Base64.URL_SAFE);
 
-            AsyncTask<Void, Void, Pair<ECPublicKey, byte[]>> getSignedKeyTask = new AsyncTask<Void, Void, Pair<ECPublicKey, byte[]>>() {
+            ECPublicKey oneTimeKeyEC =  Curve.decodePoint(decoded, 0);
+
+
+            AsyncTask<Void, Void, SignedKeyTO> getSignedKeyTask = new AsyncTask<Void, Void, SignedKeyTO>() {
                 @Override
-                protected Pair<ECPublicKey, byte[]> doInBackground(Void... params) {
+                protected SignedKeyTO doInBackground(Void... params) {
                     try {
                         return getSignedKey(to);
                     } catch (IOException e) {
@@ -170,33 +175,21 @@ public class ClientService {
                 }
             };
 
-            Pair<ECPublicKey, byte[]> signedKey = getSignedKeyTask.execute().get();
+            SignedKeyTO signedKeyTO = getSignedKeyTask.execute().get();
+            byte[] decodedKey = Base64.decode(signedKeyTO.getKeyBase64(), Base64.NO_WRAP | Base64.URL_SAFE);
+            byte[] decodedSignature = Base64.decode(signedKeyTO.getSignatureBase64(), Base64.NO_WRAP | Base64.URL_SAFE);
+
+
+            ECPublicKey signedKeyEC =  Curve.decodePoint(decodedKey, 0);
 
             IdentityKey contactIdentity = new IdentityKey(contactKey.getSerialized(),0);
 
             Account account = realm.where(Account.class).equalTo("active", true).findFirst();
             SignedPreKeyRecord record = new SignedPreKeyRecord(account.getSignedKey().getSerializedKey());
 
-//            Log.v("HAI/ClientService", "My signed key: " + Base64.encodeToString(record.getKeyPair().getPublicKey().serialize(), Base64.URL_SAFE | Base64.NO_WRAP));
-//            Log.v("HAI/ClientService", "My signature: " + Base64.encodeToString(record.getSignature(), Base64.URL_SAFE | Base64.NO_WRAP));
-//            Log.v("HAI/ClientService", "My key: " + Base64.encodeToString(new IdentityKeyPair(account.getKeyPair()).getPublicKey().serialize() , Base64.URL_SAFE | Base64.NO_WRAP));
-//            Log.v("HAI/ClientService", "Received key : " + Base64.encodeToString(contactIdentity.getPublicKey().serialize() , Base64.URL_SAFE | Base64.NO_WRAP));
-//
-//            Log.v("HAI/ClientService", "Received signed key: " + Base64.encodeToString(signedKey.first.serialize(), Base64.URL_SAFE | Base64.NO_WRAP));
-//            Log.v("HAI/ClientService", "Received signature signature: " + Base64.encodeToString(signedKey.second, Base64.URL_SAFE | Base64.NO_WRAP));
-
-//                Curve25519 curve25519 = Curve25519.getInstance(Curve25519.BEST);
-//
-//
-//                boolean isOk = Curve.verifySignature(contactIdentity.getPublicKey(),
-//                        signedKey.first.serialize(),
-//                        signedKey.second);
-//
-//                Log.v("HAI/ClientService", "Is ok "+isOk);
-
             sessionStore.storeSession(signalProtocolAddress, new SessionRecord());
 
-            PreKeyBundle preKeyBundle = new PreKeyBundle(0, contactKey.getDeviceId(), 0, oneTimeKey, 0, signedKey.first, signedKey.second, contactIdentity);
+            PreKeyBundle preKeyBundle = new PreKeyBundle(0, 0, oneTimeKeyTO.getOneTimeKeyId(), oneTimeKeyEC, signedKeyTO.getSignedKeyId(), signedKeyEC, decodedSignature, contactIdentity);
             sessionBuilder.process(preKeyBundle);
 
             SessionCipher sessionCipher = new SessionCipher(sessionStore, preKeyStore, signedPreKeyStore, identityKeyStore, new SignalProtocolAddress(to, contactKey.getDeviceId()));
@@ -240,27 +233,22 @@ public class ClientService {
         }
     }
 
-    private static ECPublicKey getOneTimeKey(String to) throws IOException, InvalidKeyException {
+    private static OneTimeKeyTO getOneTimeKey(String to) throws IOException, InvalidKeyException {
         Call<OneTimeKeyTO> getKeyCall = keyService.getOneTimeKey(to);
         Response<OneTimeKeyTO> response = getKeyCall.execute();
         OneTimeKeyTO oneTimeKeyTO = response.body();
 
-        byte[] decoded = Base64.decode(oneTimeKeyTO.getKeyBase64(), Base64.NO_WRAP | Base64.URL_SAFE);
-
-        return Curve.decodePoint(decoded, 0);
-
+        return  oneTimeKeyTO;
     }
 
-    private static Pair<ECPublicKey, byte[]> getSignedKey(String to) throws IOException, InvalidKeyException {
+    private static SignedKeyTO getSignedKey(String to) throws IOException, InvalidKeyException {
 
         Call<SignedKeyTO> getKeyCall = keyService.getSignedKey(to);
         Response<SignedKeyTO> response = getKeyCall.execute();
         SignedKeyTO signedKeyTO = response.body();
 
-        byte[] decodedKey = Base64.decode(signedKeyTO.getKeyBase64(), Base64.NO_WRAP | Base64.URL_SAFE);
-        byte[] decodedSignature = Base64.decode(signedKeyTO.getSignatureBase64(), Base64.NO_WRAP | Base64.URL_SAFE);
 
-        return new Pair<ECPublicKey, byte[]>(Curve.decodePoint(decodedKey,0), decodedSignature);
+        return signedKeyTO;
     }
 
     public static void sendMessage(final String text){
