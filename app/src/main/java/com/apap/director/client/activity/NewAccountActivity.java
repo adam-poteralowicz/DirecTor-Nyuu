@@ -26,7 +26,7 @@ public class NewAccountActivity extends Activity {
         ((App) getApplication()).getComponent().inject(this);
         ButterKnife.bind(this);
 
-        accountNameEditText = (EditText) findViewById(R.id.accNameEditText);
+        accountNameEditText = (EditText) findViewById(R.id.contactNameEditText);
         accountNameEditText.setHint("ACCOUNT NAME");
     }
 

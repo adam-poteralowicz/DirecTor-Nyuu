@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.apap.director.client.App;
@@ -42,7 +43,10 @@ import io.realm.Realm;
 
 public class AddContactActivity extends AppCompatActivity {
 
-    @BindView(R.id.newContactName) EditText newContactName;
+
+    @BindView(R.id.myPublicKey)
+    TextView myKeyView;
+
     public static final String TAG = "DirecTor";
     public NfcAdapter _nfcAdapter;
     public Intent _intent;
@@ -63,32 +67,27 @@ public class AddContactActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ButterKnife.bind(this);
 
-        newContactName = (EditText) findViewById(R.id.newContactName);
-        newContactName.setHint("CONTACT NAME");
+
+        try {
+            Account account = accountManager.getActiveAccount();
+            IdentityKeyPair keyPair = null;
+            keyPair = new IdentityKeyPair(account.getKeyPair());
+            byte[] key = keyPair.getPublicKey().serialize();
+            myPublicKey = Base64.encode(key, Base64.NO_WRAP | Base64.URL_SAFE);
+
+            myKeyView.setText("My public key: " + myPublicKey);
+
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
+
+
+
         ((App) getApplication()).getComponent().inject(this);
         getSupportActionBar().show();
         initNFC();
     }
 
-    @OnClick(R.id.addContactButton)
-    public void onClick() {
-        String name = String.valueOf(newContactName.getText());
-        if (name.matches(".*\\w.*")
-                && (name.matches("\\w.*")))
-        {
-            contactManager.addContact(name, contactPublicKey);
-
-            Realm realm = Realm.getDefaultInstance();
-                Contact contact = realm.where(Contact.class).equalTo("name", name).findFirst();
-                conversationManager.addConversation(contact);
-            realm.close();
-
-            Toast.makeText(this, contactPublicKey, Toast.LENGTH_LONG).show();
-
-            Intent selectedIntent = new Intent(AddContactActivity.this, AuthUserActivity.class);
-            startActivityForResult(selectedIntent, 13);
-        }
-    }
 
     @Override
     protected void onDestroy() {
@@ -126,12 +125,7 @@ public class AddContactActivity extends AppCompatActivity {
 
     // Exchange public key with another user
     private void _enableNdefExchangeMode() throws InvalidKeyException {
-        Account account = accountManager.getActiveAccount();
-        IdentityKeyPair keyPair = new IdentityKeyPair(account.getKeyPair());
-        byte[] key = keyPair.getPublicKey().serialize();
-        myPublicKey = Base64.encode(key, Base64.NO_WRAP | Base64.URL_SAFE);
-        Log.d("MY PUBLIC KEY", new String(myPublicKey));
-        Log.d("MY PUBLIC KEY2", Base64.encodeToString(key, Base64.NO_WRAP | Base64.URL_SAFE));
+
 
         NdefMessage message = NFCUtils.getNewMessage(_MIME_TYPE, myPublicKey);
 

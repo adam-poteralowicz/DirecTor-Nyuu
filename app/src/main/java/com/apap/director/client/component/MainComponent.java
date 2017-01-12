@@ -5,6 +5,7 @@ import com.apap.director.client.activity.AddContactActivity;
 import com.apap.director.client.activity.AuthUserActivity;
 import com.apap.director.client.activity.LoginActivity;
 import com.apap.director.client.activity.NewAccountActivity;
+import com.apap.director.client.activity.NewContactActivity;
 import com.apap.director.client.activity.NewMsgActivity;
 import com.apap.director.client.activity.SingleContactActivity;
 import com.apap.director.client.fragment.ContactsFragment;
@@ -38,6 +39,7 @@ public interface MainComponent {
     void inject(NewAccountActivity newAccountActivity);
     void inject(AuthUserActivity authUserActivity);
     void inject(App app);
+    void inject(NewContactActivity newContactActivity);
     MessageAction getMessageAction();
     KeyService getKeyService();
     DirectorIdentityKeyStore getDirectorIdentityKeyStore();
