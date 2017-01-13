@@ -57,7 +57,8 @@ public class NewContactActivity extends Activity {
             return;
         }
 
-        contactManager.addContact(String.valueOf(contactNameEditText.getText()), contactPublicKey);
+        String name = String.valueOf(contactNameEditText.getText());
+        contactManager.addContact(name, contactPublicKey);
 
         Realm realm = Realm.getDefaultInstance();
         Contact contact = realm.where(Contact.class).equalTo("name", name).findFirst();
