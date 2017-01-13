@@ -28,6 +28,7 @@
         <activity android:name=".activity.NewMsgActivity"></activity>
         <activity android:name=".activity.AddContactActivity"></activity>
         <activity android:name=".activity.NewAccountActivity"></activity>
+        <activity android:name=".activity.NewContactActivity"></activity>
         <activity android:name=".activity.SingleContactActivity"
             android:configChanges="orientation|screenSize" />
     </application>
@@ -40,8 +41,6 @@
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.NFC" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <uses-feature android:name="android.hardware.wifi.direct" android:required="true"/>
     <uses-feature android:name="android.hardware.nfc" android:required="true" />

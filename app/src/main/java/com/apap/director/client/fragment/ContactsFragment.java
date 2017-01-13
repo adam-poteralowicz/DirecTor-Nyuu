@@ -12,6 +12,7 @@ import android.widget.ListView;
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.activity.AddContactActivity;
+import com.apap.director.client.activity.NewContactActivity;
 import com.apap.director.client.activity.SingleContactActivity;
 import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.Contact;
@@ -92,7 +93,7 @@ public class ContactsFragment extends Fragment {
     @OnClick(R.id.addNewContactButton)
     public void onClick(View view) {
             Intent selectedIntent = new Intent(getActivity(), AddContactActivity.class);
-            startActivityForResult(selectedIntent, 0010);
+            startActivity(selectedIntent);
     }
 
     @Override
