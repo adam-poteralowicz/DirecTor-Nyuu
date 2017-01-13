@@ -32,6 +32,7 @@ import com.apap.director.manager.ConversationManager;
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.InvalidKeyException;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -65,6 +66,7 @@ public class AddContactActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_contact_view);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        ((App) getApplication()).getComponent().inject(this);
         ButterKnife.bind(this);
 
 
@@ -75,7 +77,7 @@ public class AddContactActivity extends AppCompatActivity {
             byte[] key = keyPair.getPublicKey().serialize();
             myPublicKey = Base64.encode(key, Base64.NO_WRAP | Base64.URL_SAFE);
 
-            myKeyView.setText("My public key: " + myPublicKey);
+            myKeyView.setText("My public key: " + new String(myPublicKey));
 
         } catch (InvalidKeyException e) {
             e.printStackTrace();
@@ -83,7 +85,6 @@ public class AddContactActivity extends AppCompatActivity {
 
 
 
-        ((App) getApplication()).getComponent().inject(this);
         getSupportActionBar().show();
         initNFC();
     }
@@ -166,6 +167,10 @@ public class AddContactActivity extends AppCompatActivity {
             Toast.makeText(this, "Contact public key : " + msgs.get(0), Toast.LENGTH_LONG).show();
             contactPublicKey = msgs.get(0);
             getSupportActionBar().show();
+
+            Intent intent = new Intent(this, NewContactActivity.class);
+            intent.putExtra("key", contactPublicKey);
+            startActivity(intent);
         }
     }
 

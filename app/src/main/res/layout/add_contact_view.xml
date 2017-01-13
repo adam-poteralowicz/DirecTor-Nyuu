@@ -8,11 +8,11 @@
 
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:id="@+id/imageView2"
         app:srcCompat="@drawable/nfc_exchange"
-        android:padding="20dp"
+        android:padding="40dp"
         android:cropToPadding="false"
         android:layout_marginBottom="86dp"
         android:layout_alignParentBottom="true"
@@ -20,7 +20,7 @@
 
     <TextView
         android:text="TextView"
-        android:textSize="32sp"
+        android:textSize="20sp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="27dp"
