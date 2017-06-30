@@ -93,7 +93,7 @@ public class DirectorSessionStore implements SessionStore {
                 .equalTo("deviceId", address.getDeviceId())
                 .findFirst();
 
-        return session == null? false : true;
+        return session != null;
 
     }
 

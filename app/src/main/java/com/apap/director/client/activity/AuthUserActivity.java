@@ -11,7 +11,6 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.adapter.DirecTorPagerAdapter;
 import com.apap.director.db.realm.model.Account;
-import com.apap.director.im.websocket.service.ClientService;
 import com.apap.director.manager.AccountManager;
 
 import javax.inject.Inject;
@@ -21,22 +20,22 @@ import butterknife.ButterKnife;
 import io.realm.Realm;
 
 public class AuthUserActivity extends FragmentActivity {
-    DirecTorPagerAdapter direcTorPagerAdapter;
-    Realm realm;
-    @BindView(R.id.pager) ViewPager viewPager;
-
 
     @Inject
-    AccountManager accountManager;
+    AccountManager
+    accountManager;
 
+    @BindView(R.id.pager)
+    ViewPager viewPager;
+
+    DirecTorPagerAdapter direcTorPagerAdapter;
+    Realm realm;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         ((App) getApplication()).getComponent().inject(this);
-
-
         setContentView(R.layout.user_view);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ButterKnife.bind(this);
@@ -49,8 +48,10 @@ public class AuthUserActivity extends FragmentActivity {
     @Override
     public void onBackPressed() {
         realm.beginTransaction();
-            if (accountManager == null) Log.d("accountManager", "null");
-            if (accountManager.getActiveAccount() == null) Log.d("active account", "null");
+            if (accountManager == null)
+                Log.d("accountManager", "null");
+            if (accountManager.getActiveAccount() == null)
+                Log.d("active account", "null");
             Account active = accountManager.getActiveAccount();
             active.setActive(false);
             realm.copyToRealmOrUpdate(active);

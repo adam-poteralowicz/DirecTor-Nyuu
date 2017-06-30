@@ -25,34 +25,33 @@ public class SignalModule {
         this.context = context;
     }
 
-
     @Provides
     @Singleton
-    public Curve25519 provideCurve25519(){
+    Curve25519 provideCurve25519(){
         return Curve25519.getInstance(Curve25519.BEST);
     }
 
     @Provides
     @Singleton
-    public DirectorIdentityKeyStore provideIdentityKeyStore(Realm realm, AccountManager manager){
+    DirectorIdentityKeyStore provideIdentityKeyStore(Realm realm, AccountManager manager){
         return new DirectorIdentityKeyStore(realm, manager);
     }
 
     @Provides
     @Singleton
-    public DirectorPreKeyStore providePreKeyStore(Realm realm){
+    DirectorPreKeyStore providePreKeyStore(Realm realm){
         return new DirectorPreKeyStore(realm);
     }
 
     @Provides
     @Singleton
-    public DirectorSessionStore provideSessionStore(Realm realm){
+    DirectorSessionStore provideSessionStore(Realm realm){
         return new DirectorSessionStore(realm);
     }
 
     @Provides
     @Singleton
-    public DirectorSignedPreKeyStore provideSignedPreKeyStore(Realm realm){
+    DirectorSignedPreKeyStore provideSignedPreKeyStore(Realm realm){
         return new DirectorSignedPreKeyStore(realm);
     }
 

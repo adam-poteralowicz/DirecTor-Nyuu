@@ -10,11 +10,13 @@ import android.widget.EditText;
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class NewAccountActivity extends Activity {
 
+    @BindView(R.id.contactNameEditText)
     EditText accountNameEditText;
 
     @Override
@@ -26,7 +28,6 @@ public class NewAccountActivity extends Activity {
         ((App) getApplication()).getComponent().inject(this);
         ButterKnife.bind(this);
 
-        accountNameEditText = (EditText) findViewById(R.id.contactNameEditText);
         accountNameEditText.setHint("ACCOUNT NAME");
     }
 

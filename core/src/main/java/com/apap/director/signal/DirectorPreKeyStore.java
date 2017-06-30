@@ -17,7 +17,6 @@ import io.realm.Realm;
 
 public class DirectorPreKeyStore implements PreKeyStore {
 
-
     private Realm realm;
 
     @Inject
@@ -31,7 +30,8 @@ public class DirectorPreKeyStore implements PreKeyStore {
         try {
             OneTimeKey preKey = realm.where(OneTimeKey.class).equalTo("oneTimeKeyId", preKeyId).findFirst();
 
-            if ( preKey == null ) throw new InvalidKeyIdException("No such key id");
+            if ( preKey == null )
+                throw new InvalidKeyIdException("No such key id");
 
             return new PreKeyRecord(preKey.getSerializedKey());
         } catch (IOException e) {
@@ -43,7 +43,7 @@ public class DirectorPreKeyStore implements PreKeyStore {
     @Override
     public void storePreKey(int preKeyId, PreKeyRecord record) {
         realm.beginTransaction();
-            Account active = realm.where(Account.class).equalTo("active", true).findFirst();
+        realm.where(Account.class).equalTo("active", true).findFirst();
             OneTimeKey oneTimeKey = new OneTimeKey();
 
         long id;
@@ -64,7 +64,7 @@ public class DirectorPreKeyStore implements PreKeyStore {
     @Override
     public boolean containsPreKey(int preKeyId) {
 
-        return realm.where(OneTimeKey.class).equalTo("oneTimeKeyId", preKeyId).findFirst() == null ? false : true;
+        return realm.where(OneTimeKey.class).equalTo("oneTimeKeyId", preKeyId).findFirst() != null;
 
     }
 

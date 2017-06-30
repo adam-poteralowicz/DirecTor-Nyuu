@@ -22,37 +22,13 @@ public class WebSocketModule {
     private Context context;
 
     public WebSocketModule(Context context){
-
+        this.context = context;
     }
-
-//    @Provides
-//    @Singleton
-//    public StompService provideStompService(MessageAction messageAction){
-//        return new StompService(messageAction);
-//    }
-
-//    @Provides
-//    @Singleton
-//    public StompService provideStompService(StompServiceConnection connection){
-//
-//        Intent bindingIntent = new Intent(context, StompService.class);
-//        context.bindService(bindingIntent, connection, Context.BIND_AUTO_CREATE);
-//
-//
-//        return connection.getService();
-//    }
 
     @Provides
     @Singleton
-    public MessageAction provideMessageAction(DirectorIdentityKeyStore identityKeyStore, DirectorSessionStore sessionStore, DirectorSignedPreKeyStore signedPreKeyStore, DirectorPreKeyStore preKeyStore, MessageManager messageManager, ContactManager contactManager, ConversationManager conversationManager){
+    MessageAction provideMessageAction(DirectorIdentityKeyStore identityKeyStore, DirectorSessionStore sessionStore, DirectorSignedPreKeyStore signedPreKeyStore, DirectorPreKeyStore preKeyStore, MessageManager messageManager, ContactManager contactManager, ConversationManager conversationManager){
         return new MessageAction(preKeyStore, identityKeyStore, sessionStore, signedPreKeyStore, messageManager, contactManager, conversationManager);
     }
-
-//    @Provides
-//    @Singleton
-//    public StompServiceConnection provideStompServiceConnection(){
-//        return new StompServiceConnection();
-//    }
-
 
 }

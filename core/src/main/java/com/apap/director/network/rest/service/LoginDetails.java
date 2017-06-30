@@ -2,8 +2,8 @@ package com.apap.director.network.rest.service;
 
 public class LoginDetails{
 
-    String keyBase64;
-    String signatureBase64;
+    private String keyBase64;
+    private String signatureBase64;
 
     public LoginDetails(){
 

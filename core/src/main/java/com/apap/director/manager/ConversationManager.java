@@ -60,16 +60,16 @@ public class ConversationManager {
         Realm realm = Realm.getDefaultInstance();
 
         realm.beginTransaction();
-            Contact managedContact = realm.copyToRealmOrUpdate(contact);
-            Conversation conversation = realm.createObject(Conversation.class, generateConversationId(realm));
-            conversation.setContact(contact);
-            RealmList<Session> sessions =  new RealmList<Session>();
-            conversation.setSessions(sessions);
-            conversation.setMessages(new RealmList<Message>());
-            conversation.setAccount(accountManager.getActiveAccount());
+        Contact managedContact = realm.copyToRealmOrUpdate(contact);
+        Conversation conversation = realm.createObject(Conversation.class, generateConversationId(realm));
+        conversation.setContact(contact);
+        RealmList<Session> sessions = new RealmList<Session>();
+        conversation.setSessions(sessions);
+        conversation.setMessages(new RealmList<Message>());
+        conversation.setAccount(accountManager.getActiveAccount());
 
-            managedContact.setConversation(conversation);
-            realm.copyToRealmOrUpdate(conversation);
+        managedContact.setConversation(conversation);
+        realm.copyToRealmOrUpdate(conversation);
         realm.commitTransaction();
 
         realm.close();
@@ -80,7 +80,7 @@ public class ConversationManager {
         Conversation conversationToDelete = realm.where(Conversation.class).equalTo("id", id).findFirst();
         if (conversationToDelete != null) {
             realm.beginTransaction();
-                conversationToDelete.deleteFromRealm();
+            conversationToDelete.deleteFromRealm();
             realm.commitTransaction();
             return true;
         } else return false;
@@ -90,7 +90,7 @@ public class ConversationManager {
         Conversation conversationToDelete = realm.where(Conversation.class).equalTo("contact.name", contactName).findFirst();
         if (conversationToDelete != null) {
             realm.beginTransaction();
-                conversationToDelete.deleteFromRealm();
+            conversationToDelete.deleteFromRealm();
             realm.commitTransaction();
             return true;
         } else return false;
@@ -100,7 +100,7 @@ public class ConversationManager {
         Conversation conversationToDelete = realm.where(Conversation.class).equalTo("contact.id", contactId).findFirst();
         if (conversationToDelete != null) {
             realm.beginTransaction();
-                conversationToDelete.deleteFromRealm();
+            conversationToDelete.deleteFromRealm();
             realm.commitTransaction();
             return true;
         } else return false;
@@ -110,7 +110,7 @@ public class ConversationManager {
         Conversation conversationToDelete = realm.where(Conversation.class).equalTo("account.id", accountId).findFirst();
         if (conversationToDelete != null) {
             realm.beginTransaction();
-                conversationToDelete.deleteFromRealm();
+            conversationToDelete.deleteFromRealm();
             realm.commitTransaction();
             return true;
         } else return false;
@@ -120,9 +120,9 @@ public class ConversationManager {
         Conversation conversation = realm.where(Conversation.class).equalTo("id", id).findFirst();
         if (conversation == null) return false;
         realm.beginTransaction();
-            RealmList<Session> sessions = conversation.getSessions();
-            sessions.add(session);
-            realm.copyToRealmOrUpdate(sessions);
+        RealmList<Session> sessions = conversation.getSessions();
+        sessions.add(session);
+        realm.copyToRealmOrUpdate(sessions);
         realm.commitTransaction();
         return true;
     }
@@ -131,9 +131,9 @@ public class ConversationManager {
         Conversation conversation = realm.where(Conversation.class).equalTo("contact.name", name).findFirst();
         if (conversation == null) return false;
         realm.beginTransaction();
-            RealmList<Session> sessions = conversation.getSessions();
-            sessions.add(session);
-            realm.copyToRealmOrUpdate(sessions);
+        RealmList<Session> sessions = conversation.getSessions();
+        sessions.add(session);
+        realm.copyToRealmOrUpdate(sessions);
         realm.commitTransaction();
         return true;
     }
@@ -142,9 +142,9 @@ public class ConversationManager {
         Conversation conversation = realm.where(Conversation.class).equalTo("contact.id", contactId).findFirst();
         if (conversation == null) return false;
         realm.beginTransaction();
-            RealmList<Session> sessions = conversation.getSessions();
-            sessions.add(session);
-            realm.copyToRealmOrUpdate(sessions);
+        RealmList<Session> sessions = conversation.getSessions();
+        sessions.add(session);
+        realm.copyToRealmOrUpdate(sessions);
         realm.commitTransaction();
         return true;
     }
@@ -157,7 +157,7 @@ public class ConversationManager {
             } else {
                 id = realm.where(Conversation.class).max("id").longValue() + 1;
             }
-        } catch(ArrayIndexOutOfBoundsException ex) {
+        } catch (ArrayIndexOutOfBoundsException ex) {
             id = 0;
         }
         return id;

@@ -3,7 +3,6 @@ package com.apap.director.client.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +13,6 @@ import android.widget.Toast;
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.activity.NewMsgActivity;
-import com.apap.director.db.manager.DatabaseManager;
 import com.apap.director.db.realm.model.Conversation;
 import com.apap.director.manager.ConversationManager;
 
@@ -32,13 +30,15 @@ import io.realm.RealmResults;
 
 public class InboxFragment extends Fragment {
 
+    @Inject
+    ConversationManager conversationManager;
+
+    @BindView(R.id.msgList)
+    ListView msgListView;
+
     private ArrayList<Conversation> conversationList;
     private ArrayAdapter<Conversation> arrayAdapter;
     private Realm realm;
-    @BindView(R.id.msgList) ListView msgListView;
-
-    @Inject
-    ConversationManager conversationManager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -54,16 +54,14 @@ public class InboxFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         realm = Realm.getDefaultInstance();
 
-        conversationList = new ArrayList<Conversation>();
+        conversationList = new ArrayList<>();
         RealmResults<Conversation> conversationResults = realm.where(Conversation.class).findAll();
         if (!conversationResults.isEmpty())
             conversationList.addAll(realm.copyFromRealm(conversationResults));
-        arrayAdapter = new ArrayAdapter<Conversation>(
+        arrayAdapter = new ArrayAdapter<>(
                 getActivity(),
                 android.R.layout.simple_list_item_1,
                 conversationList);
-
-        if(arrayAdapter == null) Log.i("ARRAY ADAPTER", "null");
 
         msgListView.setAdapter(arrayAdapter);
 
@@ -77,23 +75,6 @@ public class InboxFragment extends Fragment {
 
     }
 
-    @OnItemClick(R.id.msgList)
-    public void startSendMessageActivity(int position){
-        Toast.makeText(getActivity(), conversationList.get(position).getContact().getName(), Toast.LENGTH_LONG).show();
-        Intent intent = new Intent(getActivity(), NewMsgActivity.class);
-        intent.putExtra("contactId", conversationList.get(position).getContact().getId());
-        intent.putExtra("msgTitle", conversationList.get(position).getContact().getName());
-        startActivity(intent);
-    }
-
-    @OnItemLongClick(R.id.msgList)
-    public boolean deleteConversation(int position){
-        conversationManager.deleteConversationByContactId(conversationList.get(position).getContact().getId());
-        conversationList.remove(position);
-        arrayAdapter.notifyDataSetChanged();
-        return true;
-    }
-
     @Override
     public void onStart() {
         super.onStart();
@@ -104,5 +85,22 @@ public class InboxFragment extends Fragment {
     public void onStop() {
         super.onStop();
         realm.close();
+    }
+
+    @OnItemClick(R.id.msgList)
+    public void startSendMessageActivity(int position) {
+        Toast.makeText(getActivity(), conversationList.get(position).getContact().getName(), Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(getActivity(), NewMsgActivity.class)
+                .putExtra("contactId", conversationList.get(position).getContact().getId())
+                .putExtra("msgTitle", conversationList.get(position).getContact().getName());
+        startActivity(intent);
+    }
+
+    @OnItemLongClick(R.id.msgList)
+    public boolean deleteConversation(int position) {
+        conversationManager.deleteConversationByContactId(conversationList.get(position).getContact().getId());
+        conversationList.remove(position);
+        arrayAdapter.notifyDataSetChanged();
+        return true;
     }
 }

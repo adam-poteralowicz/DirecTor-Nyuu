@@ -35,7 +35,8 @@ public class DirectorSignedPreKeyStore implements SignedPreKeyStore {
                     .equalTo("signedKeyId", signedPreKeyId)
                     .findFirst();
 
-            if(signedKey == null) throw new InvalidKeyIdException("No such key " + signedPreKeyId);
+            if(signedKey == null)
+                throw new InvalidKeyIdException("No such key " + signedPreKeyId);
 
             return new SignedPreKeyRecord(signedKey.getSerializedKey());
         } catch (IOException e) {
@@ -87,7 +88,7 @@ public class DirectorSignedPreKeyStore implements SignedPreKeyStore {
 
     @Override
     public boolean containsSignedPreKey(int signedPreKeyId) {
-        return realm.where(SignedKey.class).equalTo("signedKeyId", signedPreKeyId).findFirst() == null ? false : true;
+        return realm.where(SignedKey.class).equalTo("signedKeyId", signedPreKeyId).findFirst() != null;
     }
 
     @Override

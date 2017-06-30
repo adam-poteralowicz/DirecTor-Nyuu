@@ -18,12 +18,10 @@ import io.realm.Realm;
 
 public class DirectorIdentityKeyStore implements IdentityKeyStore {
 
-    private Realm realm;
     private AccountManager accountManager;
 
     @Inject
     public DirectorIdentityKeyStore(Realm realm, AccountManager accountManager){
-        this.realm = realm;
         this.accountManager = accountManager;
     }
 
@@ -77,7 +75,7 @@ public class DirectorIdentityKeyStore implements IdentityKeyStore {
                 .equalTo("deviceId", address.getDeviceId())
                 .findFirst();
 
-        return contactKey == null ? false : true;
+        return contactKey != null;
 
     }
 

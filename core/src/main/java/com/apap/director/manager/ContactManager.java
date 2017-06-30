@@ -7,23 +7,22 @@ import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.ContactKey;
 import com.apap.director.db.realm.model.Conversation;
 import com.apap.director.network.rest.service.KeyService;
-import com.apap.director.network.rest.service.UserService;
 
 import org.whispersystems.libsignal.util.ByteUtil;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
+
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 
 public class ContactManager {
     private Realm realm;
-    private Contact contact;
     private AccountManager accountManager;
-    private UserService userService;
-    private KeyService keyService;
 
     @Inject
     public ContactManager(Realm realm, AccountManager manager, KeyService service) {
@@ -31,7 +30,7 @@ public class ContactManager {
         this.accountManager = manager;
     }
 
-    public ArrayList<Contact> listAllContacts() {
+    public List<Contact> listAllContacts() {
         RealmResults<Contact> contacts = realm.where(Contact.class).findAll();
         return new ArrayList<>(contacts);
     }
@@ -55,7 +54,8 @@ public class ContactManager {
         Realm localRealm = Realm.getDefaultInstance();
 
         Contact sameName = localRealm.where(Contact.class).equalTo("name", name).findFirst();
-        if (sameName != null) return;
+        if (sameName != null)
+            return;
 
         localRealm.beginTransaction();
             Contact contact = localRealm.createObject(Contact.class, generateContactId(localRealm));
@@ -81,24 +81,12 @@ public class ContactManager {
 
         localRealm.commitTransaction();
         localRealm.close();
-        return;
     }
-
-//    private boolean addContactKey(String owner, String keyBase64) {
-//        realm.beginTransaction();
-//            ContactKey contactKey = realm.createObject(ContactKey.class, generateContactKeyId());
-//            contactKey.setContact(realm.where(Contact.class).equalTo("name", name).findFirst());
-//            contactKey.setKeyBase64(contact.getOneTimeKey());
-//            contactKey.setAccount(accountManager.getActiveAccount());
-//            //contactKey.setDeviceId();
-//            realm.insertOrUpdate(contactKey);
-//        realm.commitTransaction();
-//        return true;
-//    }
 
     public boolean deleteContact(String name) {
         Contact contactToDelete = realm.where(Contact.class).equalTo("name", name).findFirst();
-        if (contactToDelete == null) return false;
+        if (contactToDelete == null)
+            return false;
 
         realm.beginTransaction();
             contactToDelete.getContactKeys().deleteAllFromRealm();
@@ -115,7 +103,8 @@ public class ContactManager {
 
     public boolean updateContact(String name, String image, Conversation conversation, ContactKey contactKey) {
         Contact contact = realm.where(Contact.class).equalTo("name", name).findFirst();
-        if (contact == null) return false;
+        if (contact == null)
+            return false;
         realm.beginTransaction();
             if (image != null) {
                 contact.setImage(image);
@@ -169,7 +158,7 @@ public class ContactManager {
         int x;
         for (int i = 0; i < 32; i++) {
             x = sr.nextInt(alphabet.length()-1);
-            otk += alphabet.charAt(x);
+            otk += Character.toString(alphabet.charAt(x));
         }
         return otk;
     }

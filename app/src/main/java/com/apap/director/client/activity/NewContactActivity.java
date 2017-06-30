@@ -21,15 +21,16 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
 
-import static android.R.attr.name;
-
 public class NewContactActivity extends Activity {
 
 
     @BindView(R.id.contactNameEditText) EditText contactNameEditText;
+
     @BindView(R.id.theirPublicKey) TextView textView;
+
     @Inject
     ContactManager contactManager;
+
     @Inject
     ConversationManager conversationManager;
 

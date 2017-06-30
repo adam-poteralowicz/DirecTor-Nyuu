@@ -52,8 +52,6 @@ public class MessageAction implements Action1<StompMessage> {
     private DirectorSessionStore sessionStore;
     private DirectorSignedPreKeyStore signedPreKeyStore;
     private MessageManager messageManager;
-    private ContactManager contactManager;
-    private ConversationManager conversationManager;
 
     @Inject
     public MessageAction(DirectorPreKeyStore preKeyStore, DirectorIdentityKeyStore identityKeyStore, DirectorSessionStore sessionStore, DirectorSignedPreKeyStore signedPreKeyStore, MessageManager messageManager, ContactManager contactManager, ConversationManager conversationManager) {
@@ -62,8 +60,6 @@ public class MessageAction implements Action1<StompMessage> {
         this.sessionStore = sessionStore;
         this.signedPreKeyStore = signedPreKeyStore;
         this.messageManager = messageManager;
-        this.contactManager = contactManager;
-        this.conversationManager = conversationManager;
     }
 
     @Override
@@ -78,15 +74,12 @@ public class MessageAction implements Action1<StompMessage> {
 
             Log.v("HAI/MessageAction", "POINTCUT: GET CONTACT");
             Realm localRealm = Realm.getDefaultInstance();
-            Account active = localRealm.where(Account.class).equalTo("active", true).findFirst();
-            String keyBase64 = Base64.encodeToString(new IdentityKeyPair(active.getKeyPair()).getPublicKey().serialize(), Base64.NO_WRAP | Base64.URL_SAFE);
 
             ContactKey key = localRealm.where(ContactKey.class)
                     .equalTo("keyBase64", frame.getFrom())
                     .equalTo("account.active", true)
                     .findFirst();
             Contact contact = key.getContact();
-
 
             Log.v("HAI/MessageAction", "Contact name "+contact.getName());
 
@@ -118,7 +111,6 @@ public class MessageAction implements Action1<StompMessage> {
             Log.v("HAI/MessageAction", "adding message "+frame.getMessage());
             messageManager.addMessage(conversation, finalMessage, frame.getFrom(), false);
 
-
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InvalidKeyException e) {
@@ -141,7 +133,5 @@ public class MessageAction implements Action1<StompMessage> {
         } catch (NoSessionException e) {
             e.printStackTrace();
         }
-
-
     }
 }

@@ -66,7 +66,7 @@ public class AccountManager {
         this.signedPreKeyStore = signedPreKeyStore;
     }
 
-    public ArrayList<Account> listAllAccounts(){
+    public List listAllAccounts(){
         RealmResults<Account> accounts = realm.where(Account.class).findAll();
         return new ArrayList<>(accounts);
     }
@@ -75,7 +75,8 @@ public class AccountManager {
 
         try {
             Account sameName = realm.where(Account.class).equalTo("name", name).findFirst();
-            if(sameName != null) return null;
+            if(sameName != null)
+                return null;
 
             IdentityKeyPair identityKeyPair = KeyHelper.generateIdentityKeyPair();
             int registrationId  = KeyHelper.generateRegistrationId(false);
@@ -107,11 +108,7 @@ public class AccountManager {
 
             SignedKey signedKey = realm.where(SignedKey.class).equalTo("signedKeyId", signedPreKeyRecord.getId()).findFirst();
 
-
-
-
             account.setOneTimeKeys(oneTimeKeys);
-
 
             realm.beginTransaction();
                 account =  realm.copyToRealmOrUpdate(account);
@@ -143,7 +140,8 @@ public class AccountManager {
 
         Account anyAccount = realm.where(Account.class).equalTo("name", name).findFirst();
 
-        if(anyAccount == null) return false;
+        if(anyAccount == null)
+            return false;
 
         realm.beginTransaction();
             RealmResults<Account> activeAccounts = realm.where(Account.class).equalTo("active", true).findAll();
@@ -164,7 +162,8 @@ public class AccountManager {
     public boolean deleteAccount(String name){
 
         Account sameName = realm.where(Account.class).equalTo("name", name).findFirst();
-        if(sameName == null) return false;
+        if(sameName == null)
+            return false;
 
         realm.beginTransaction();
             RealmResults<OneTimeKey> oneTimeKeys = realm.where(OneTimeKey.class).equalTo("account.name", name).findAll();
@@ -205,7 +204,6 @@ public class AccountManager {
         Log.v("HAI/AccountManager", "Sign up call to : " + call.request().url());
         Log.v("HAI/AccountManager", "Sign up method : " + call.request().method());
 
-
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -238,7 +236,8 @@ public class AccountManager {
             Realm realm = Realm.getDefaultInstance();
 
             Account active = realm.where(Account.class).equalTo("active", true).equalTo("registered", true).findFirst();
-            if(active == null) return null;
+            if(active == null)
+                return null;
 
             Call<String> requestCodeCall = userService.requestCode(active.getKeyBase64());
             Response<String> codeCallResponse = null;
@@ -271,7 +270,8 @@ public class AccountManager {
             Realm realm = Realm.getDefaultInstance();
 
             Account active = realm.where(Account.class).equalTo("active", true).equalTo("registered", true).findFirst();
-            if(active == null) return null;
+            if(active == null)
+                return null;
 
             IdentityKeyPair keyPair = new IdentityKeyPair(active.getKeyPair());
             byte[] signature = curve25519.calculateSignature(keyPair.getPrivateKey().serialize(), requestCode().getBytes());
@@ -282,10 +282,6 @@ public class AccountManager {
             Response<ResponseBody> loginCallResponse = loginCall.execute();
 
             Log.v("HAI/AccountManager", "login call code:" + loginCallResponse.code());
-
-//            for(String name: loginCallResponse.headers().names()){
-//                Log.v("HAI/AccountManager", name+" : "+ loginCallResponse.headers().get(name));
-//            }
 
             String cookie = loginCallResponse.headers().get("Set-Cookie").split(";")[0];
 

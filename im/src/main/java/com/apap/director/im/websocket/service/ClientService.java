@@ -58,7 +58,7 @@ import ua.naiksoftware.stomp.client.StompClient;
 public class ClientService {
 
     public static StompClient client;
-    public static MessageAction messageAction;
+    private static MessageAction messageAction;
     private static DirectorSessionStore sessionStore;
     private static DirectorIdentityKeyStore identityKeyStore;
     private static DirectorPreKeyStore preKeyStore;
@@ -185,7 +185,6 @@ public class ClientService {
             IdentityKey contactIdentity = new IdentityKey(contactKey.getSerialized(),0);
 
             Account account = realm.where(Account.class).equalTo("active", true).findFirst();
-            SignedPreKeyRecord record = new SignedPreKeyRecord(account.getSignedKey().getSerializedKey());
 
             SessionRecord mySession = sessionStore.loadSession(signalProtocolAddress);
 
@@ -196,11 +195,9 @@ public class ClientService {
                 sessionBuilder.process(preKeyBundle);
             }
 
-
             SessionCipher sessionCipher = new SessionCipher(sessionStore, preKeyStore, signedPreKeyStore, identityKeyStore, signalProtocolAddress);
             CiphertextMessage message = sessionCipher.encrypt(text.getBytes("UTF-8"));
             String encodedText = Base64.encodeToString(message.serialize(), Base64.URL_SAFE | Base64.NO_WRAP);
-
 
             MessageTO frame = new MessageTO(from, encodedText, message.getType());
             ObjectMapper mapper = new ObjectMapper();
@@ -241,19 +238,16 @@ public class ClientService {
     private static OneTimeKeyTO getOneTimeKey(String to) throws IOException, InvalidKeyException {
         Call<OneTimeKeyTO> getKeyCall = keyService.getOneTimeKey(to);
         Response<OneTimeKeyTO> response = getKeyCall.execute();
-        OneTimeKeyTO oneTimeKeyTO = response.body();
 
-        return  oneTimeKeyTO;
+        return response.body();
     }
 
     private static SignedKeyTO getSignedKey(String to) throws IOException, InvalidKeyException {
 
         Call<SignedKeyTO> getKeyCall = keyService.getSignedKey(to);
         Response<SignedKeyTO> response = getKeyCall.execute();
-        SignedKeyTO signedKeyTO = response.body();
 
-
-        return signedKeyTO;
+        return response.body();
     }
 
     public static void sendMessage(final String text){
@@ -272,7 +266,6 @@ public class ClientService {
 
                     }
                 });
-
     }
 
     public static void disconnect(){

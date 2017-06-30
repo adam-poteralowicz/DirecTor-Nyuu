@@ -1,11 +1,9 @@
 package com.apap.director.manager;
 
-import com.apap.director.db.dao.model.Conversation;
 import com.apap.director.network.rest.service.KeyService;
 import com.apap.director.network.rest.service.UserService;
 import com.apap.director.signal.DirectorPreKeyStore;
 import com.apap.director.signal.DirectorSignedPreKeyStore;
-import com.fasterxml.jackson.databind.annotation.JsonAppend;
 
 import org.whispersystems.curve25519.Curve25519;
 

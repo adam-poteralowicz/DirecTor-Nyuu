@@ -8,35 +8,33 @@ import com.apap.director.db.realm.model.Message;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmList;
 
 public class MessageManager {
     private Realm realm;
-    private AccountManager accountManager;
 
     public MessageManager(Realm realm, AccountManager accountManager) {
         this.realm = realm;
-        this.accountManager = accountManager;
     }
 
-    public ArrayList<Message> listAllMessages(Conversation conversation) {
-        return (ArrayList<Message>) realm.copyFromRealm(conversation.getMessages());
+    public List<Message> listAllMessages(Conversation conversation) {
+        return realm.copyFromRealm(conversation.getMessages());
     }
 
     public Message getMessage(Long id) {
         Message message = realm.where(Message.class).equalTo("id", id).findFirst();
         if (message != null) {
             return message;
-        } else return null;
+        } else
+            return null;
     }
 
-    public ArrayList<Message> getMessages(Conversation conversation) {
-        if (conversation != null) {
-            if (conversation.getMessages() != null) {
+    public List<Message> getMessages(Conversation conversation) {
+        if (conversation.getMessages() != null) {
                 return new ArrayList<>(conversation.getMessages());
-            }
         }
         return null;
     }
@@ -45,9 +43,10 @@ public class MessageManager {
 
         Realm realm = Realm.getDefaultInstance();
         Log.v("HAI/MessageManager", "adding mesage "+msg+" owned: "+owned);
-        if (conv == null) return null;
+        if (conv == null)
+            return null;
         realm.beginTransaction();
-        Conversation conversation = realm.where(Conversation.class).equalTo("id", conv.getId()).findFirst();
+            Conversation conversation = realm.where(Conversation.class).equalTo("id", conv.getId()).findFirst();
             Message message = realm.createObject(Message.class, generateMessageId(realm));
             message.setConversation(conv);
             message.setContent(msg);
@@ -78,7 +77,8 @@ public class MessageManager {
 
     public boolean updateMessage(Long id, Boolean ownership) {
         Message message = realm.where(Message.class).equalTo("id", id).findFirst();
-        if (message == null) return false;
+        if (message == null)
+            return false;
         realm.beginTransaction();
         if (ownership != null) {
             message.setMine(ownership);
