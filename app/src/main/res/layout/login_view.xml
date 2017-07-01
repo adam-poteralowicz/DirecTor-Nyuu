@@ -4,19 +4,6 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <com.romainpiel.shimmer.ShimmerTextView
-        android:id="@+id/shimmer_tv"
-        android:text="DirecTor"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#444"
-        android:textSize="50sp"
-        android:layout_marginTop="128dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
-
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -53,10 +40,9 @@
         android:id="@+id/accountsView"
         android:background="#6666ff"
         android:layout_above="@+id/newAccButton"
-        android:layout_alignStart="@+id/shimmer_tv"
-        android:layout_below="@+id/shimmer_tv"
-        android:layout_alignEnd="@+id/shimmer_tv"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="116dp"
+        android:layout_marginLeft="100dp"
+        android:layout_marginRight="100dp"
         android:layout_marginBottom="30dp"/>
 
 </RelativeLayout>

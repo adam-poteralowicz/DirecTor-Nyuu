@@ -47,6 +47,7 @@ import static java.lang.System.out;
 public class LoginActivity extends AppCompatActivity implements StrongBuilder.Callback<HttpClient> {
 
     private static final String HS_URL = "http://3zk5ak4bcbfvwgha.onion";
+    private String TAG = App.getContext().getClass().getSimpleName();
 
     @Inject
     AccountManager accountManager;
@@ -103,7 +104,7 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
                 NetCipher.clearProxy();
                 return true;
             case R.id.swapId:
-                Log.v("HAI/LoginActivity", "Swap Id pressed");
+                Log.v(TAG, "Swap Id pressed");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -228,12 +229,12 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
                 @Override
                 protected Void doInBackground(Void... params) {
                     try {
-                        Log.v("HAI/LoginActivity", "Trying to post keys");
+                        Log.v(TAG, "Trying to post keys");
                         accountManager.postSignedKey();
                         accountManager.postOneTimeKeys();
 
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        Log.getStackTraceString(e);
                     }
                     return null;
                 }
@@ -241,21 +242,19 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
 
             keysTask.execute().get();
 
-            Log.v("HAI/LoginActivity", "Chosen account: " + accountManager.getActiveAccount() + " cookie" + accountManager.getActiveAccount().getCookie());
+            Log.v(TAG, "Chosen account: " + accountManager.getActiveAccount() + " cookie" + accountManager.getActiveAccount().getCookie());
 
             realm.beginTransaction();
             Account account = realm.where(Account.class).equalTo("active", true).findFirst();
             String cookie2 = account.getCookie();
-            Log.v("HAI/LoginActivity", "cookie2 " + cookie2);
+            Log.v(TAG, "cookie2 " + cookie2);
             realm.commitTransaction();
 
             ClientService.connect(cookie);
             startActivity(new Intent(LoginActivity.this, AuthUserActivity.class));
 
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+        } catch (InterruptedException | ExecutionException e) {
+            Log.getStackTraceString(e);
         }
     }
 
@@ -277,11 +276,10 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
         boolean deleted = accountManager.deleteAccount(name);
 
         if (!deleted)
-            Log.v("HAI/LoginActivity", "Account " + name + " failed to delete");
+            Log.v(TAG, name + " account failed to delete");
         else
-            Log.v("HAI/LoginActivity", "Account " + name + " deleted");
-
-        Toast.makeText(this, "Account " + name + " deleted", Toast.LENGTH_LONG).show();
+            Log.v(TAG, name + " account deleted");
+        
         return false;
     }
 }

@@ -3,7 +3,6 @@ package com.apap.director.manager;
 
 import android.util.Base64;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.ContactKey;
@@ -23,7 +22,6 @@ import com.apap.director.signal.DirectorSignedPreKeyStore;
 import org.whispersystems.curve25519.Curve25519;
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.InvalidKeyException;
-import org.whispersystems.libsignal.InvalidKeyIdException;
 import org.whispersystems.libsignal.state.PreKeyRecord;
 import org.whispersystems.libsignal.state.SignedPreKeyRecord;
 import org.whispersystems.libsignal.util.ByteUtil;
@@ -32,10 +30,7 @@ import org.whispersystems.libsignal.util.KeyHelper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-
-import javax.inject.Inject;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -44,8 +39,6 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import static org.whispersystems.libsignal.util.KeyHelper.generatePreKeys;
 
 
 public class AccountManager {
@@ -56,6 +49,7 @@ public class AccountManager {
     private KeyService keyService;
     private DirectorPreKeyStore preKeyStore;
     private DirectorSignedPreKeyStore signedPreKeyStore;
+    private String TAG = this.getClass().getSimpleName();
 
     public AccountManager(Realm realm, UserService userService, Curve25519 curve25519, KeyService keyService, DirectorPreKeyStore preKeyStore, DirectorSignedPreKeyStore signedPreKeyStore) {
         this.realm = realm;
@@ -66,21 +60,20 @@ public class AccountManager {
         this.signedPreKeyStore = signedPreKeyStore;
     }
 
-    public List listAllAccounts(){
+    public List listAllAccounts() {
         RealmResults<Account> accounts = realm.where(Account.class).findAll();
         return new ArrayList<>(accounts);
     }
 
-    public Account createAccount(String name){
+    public Account createAccount(String name) {
 
         try {
             Account sameName = realm.where(Account.class).equalTo("name", name).findFirst();
-            if(sameName != null)
+            if (sameName != null)
                 return null;
 
             IdentityKeyPair identityKeyPair = KeyHelper.generateIdentityKeyPair();
-            int registrationId  = KeyHelper.generateRegistrationId(false);
-
+            int registrationId = KeyHelper.generateRegistrationId(false);
 
             Account account = new Account();
             account.setId(generateAccountId());
@@ -91,186 +84,185 @@ public class AccountManager {
             account.setRegistrationId(registrationId);
 
 
-            List<PreKeyRecord> preKeyRecords =  KeyHelper.generatePreKeys(0,50);
+            List<PreKeyRecord> preKeyRecords = KeyHelper.generatePreKeys(0, 50);
             RealmList<OneTimeKey> oneTimeKeys = new RealmList<>();
 
-            for(PreKeyRecord record : preKeyRecords){
+            for (PreKeyRecord record : preKeyRecords) {
                 preKeyStore.storePreKey(record.getId(), record);
                 realm.beginTransaction();
-                    OneTimeKey temporaryKey = realm.where(OneTimeKey.class).equalTo("oneTimeKeyId", record.getId()).findFirst();
-                    oneTimeKeys.add(temporaryKey);
+                OneTimeKey temporaryKey = realm.where(OneTimeKey.class).equalTo("oneTimeKeyId", record.getId()).findFirst();
+                oneTimeKeys.add(temporaryKey);
                 realm.commitTransaction();
-
             }
 
             SignedPreKeyRecord signedPreKeyRecord = KeyHelper.generateSignedPreKey(identityKeyPair, 0);
-            signedPreKeyStore.storeSignedPreKey(signedPreKeyRecord.getId(),signedPreKeyRecord);
+            signedPreKeyStore.storeSignedPreKey(signedPreKeyRecord.getId(), signedPreKeyRecord);
 
             SignedKey signedKey = realm.where(SignedKey.class).equalTo("signedKeyId", signedPreKeyRecord.getId()).findFirst();
 
             account.setOneTimeKeys(oneTimeKeys);
 
             realm.beginTransaction();
-                account =  realm.copyToRealmOrUpdate(account);
-                signedKey = realm.copyToRealmOrUpdate(signedKey);
-                signedKey.setAccount(account);
-                account.setSignedKey(signedKey);
+            account = realm.copyToRealmOrUpdate(account);
+            signedKey = realm.copyToRealmOrUpdate(signedKey);
+            signedKey.setAccount(account);
+            account.setSignedKey(signedKey);
 
             realm.commitTransaction();
 
             return account;
         } catch (InvalidKeyException e) {
-            e.printStackTrace();
+            Log.getStackTraceString(e);
             return null;
         }
 
     }
 
-    public String getActiveAccountName(){
+    public String getActiveAccountName() {
         Account activeAccount = realm.where(Account.class).equalTo("active", true).findFirst();
-        return activeAccount==null ? null : activeAccount.getName();
+        return activeAccount == null ? null : activeAccount.getName();
     }
 
-    public Account getActiveAccount(){
+    public Account getActiveAccount() {
         Realm realm = Realm.getDefaultInstance();
         return realm.where(Account.class).equalTo("active", true).findFirst();
     }
 
-    public boolean chooseAccount(String name){
+    public boolean chooseAccount(String name) {
 
         Account anyAccount = realm.where(Account.class).equalTo("name", name).findFirst();
 
-        if(anyAccount == null)
+        if (anyAccount == null)
             return false;
 
         realm.beginTransaction();
-            RealmResults<Account> activeAccounts = realm.where(Account.class).equalTo("active", true).findAll();
+        RealmResults<Account> activeAccounts = realm.where(Account.class).equalTo("active", true).findAll();
 
-            for(Account account : activeAccounts){
-                account.setActive(false);
-                realm.copyToRealmOrUpdate(account);
-            }
+        for (Account account : activeAccounts) {
+            account.setActive(false);
+            realm.copyToRealmOrUpdate(account);
+        }
 
-            Account chosenAccount = realm.where(Account.class).equalTo("name", name).findFirst();
-            chosenAccount.setActive(true);
-            realm.copyToRealmOrUpdate(chosenAccount);
+        Account chosenAccount = realm.where(Account.class).equalTo("name", name).findFirst();
+        chosenAccount.setActive(true);
+        realm.copyToRealmOrUpdate(chosenAccount);
         realm.commitTransaction();
 
         return true;
     }
 
-    public boolean deleteAccount(String name){
+    public boolean deleteAccount(String name) {
 
         Account sameName = realm.where(Account.class).equalTo("name", name).findFirst();
-        if(sameName == null)
+        if (sameName == null)
             return false;
 
         realm.beginTransaction();
-            RealmResults<OneTimeKey> oneTimeKeys = realm.where(OneTimeKey.class).equalTo("account.name", name).findAll();
-            oneTimeKeys.deleteAllFromRealm();
+        RealmResults<OneTimeKey> oneTimeKeys = realm.where(OneTimeKey.class).equalTo("account.name", name).findAll();
+        oneTimeKeys.deleteAllFromRealm();
 
-            RealmResults<Message> messages = realm.where(Message.class).equalTo("account.name", name).findAll();
-            messages.deleteAllFromRealm();
+        RealmResults<Message> messages = realm.where(Message.class).equalTo("account.name", name).findAll();
+        messages.deleteAllFromRealm();
 
-            RealmResults<SignedKey> signedKeys = realm.where(SignedKey.class).equalTo("account.name", name).findAll();
-            signedKeys.deleteAllFromRealm();
+        RealmResults<SignedKey> signedKeys = realm.where(SignedKey.class).equalTo("account.name", name).findAll();
+        signedKeys.deleteAllFromRealm();
 
-            RealmResults<Session> sessions = realm.where(Session.class).equalTo("account.name", name).findAll();
-            sessions.deleteAllFromRealm();
+        RealmResults<Session> sessions = realm.where(Session.class).equalTo("account.name", name).findAll();
+        sessions.deleteAllFromRealm();
 
-            RealmResults<Conversation> conversations = realm.where(Conversation.class).equalTo("account.name", name).findAll();
-            conversations.deleteAllFromRealm();
+        RealmResults<Conversation> conversations = realm.where(Conversation.class).equalTo("account.name", name).findAll();
+        conversations.deleteAllFromRealm();
 
-            RealmResults<ContactKey> contactKeys = realm.where(ContactKey.class).equalTo("account.name", name).findAll();
-            contactKeys.deleteAllFromRealm();
+        RealmResults<ContactKey> contactKeys = realm.where(ContactKey.class).equalTo("account.name", name).findAll();
+        contactKeys.deleteAllFromRealm();
 
-            realm.where(Account.class).equalTo("name", name).findFirst().deleteFromRealm();
+        realm.where(Account.class).equalTo("name", name).findFirst().deleteFromRealm();
         realm.commitTransaction();
 
-        Log.v("HAI/AccountManager", "DELETING ACCOUNT "+name);
-        Log.v("HAI/AccountManager", realm.where(Account.class).findAll().toString());
+        Log.v(TAG, "DELETING ACCOUNT " + name);
+        Log.v(TAG, realm.where(Account.class).findAll().toString());
 
         return true;
     }
 
     /***
      * Logs in as active account
+     *
      * @return success
      */
-
-    public void signUp(final Account account){
+    public void signUp(final Account account) {
 
         Call<ResponseBody> call = userService.signUp(account.getKeyBase64());
-        Log.v("HAI/AccountManager", "Sign up call to : " + call.request().url());
-        Log.v("HAI/AccountManager", "Sign up method : " + call.request().method());
+        Log.v(TAG, "Sign up call to : " + call.request().url());
+        Log.v(TAG, "Sign up method : " + call.request().method());
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 
-                Log.v("HAI/AccountManager", "Sign up response: " + response.message());
-                Log.v("HAI/AccountManager", "Sign up response code: " + response.code());
+                Log.v(TAG, "Sign up response: " + response.message());
+                Log.v(TAG, "Sign up response code: " + response.code());
 
-                if(response.isSuccessful()) {
+                if (response.isSuccessful()) {
                     realm.beginTransaction();
-                        account.setRegistered(true);
-                        realm.insertOrUpdate(account);
+                    account.setRegistered(true);
+                    realm.insertOrUpdate(account);
                     realm.commitTransaction();
-                    Log.v("HAI/AccountManager", "Account " + account.getName() + " registered");
+                    Log.v(TAG, "Account " + account.getName() + " registered");
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.v("HAI/AccountManager", "Account "+account.getName()+" failed to sign up");
-                Log.v("HAI", t.getMessage() + " " +t.getCause() + " ");
-                t.printStackTrace();
+                Log.v(TAG, "Account " + account.getName() + " failed to sign up");
+                Log.v("HAI", t.getMessage() + " " + t.getCause() + " ");
+                Log.getStackTraceString(t);
             }
         });
 
     }
 
-    private String requestCode(){
+    private String requestCode() {
 
         try {
             Realm realm = Realm.getDefaultInstance();
 
             Account active = realm.where(Account.class).equalTo("active", true).equalTo("registered", true).findFirst();
-            if(active == null)
+            if (active == null)
                 return null;
 
             Call<String> requestCodeCall = userService.requestCode(active.getKeyBase64());
-            Response<String> codeCallResponse = null;
+            Response<String> codeCallResponse;
 
             codeCallResponse = requestCodeCall.execute();
 
-            Log.v("HAI/AccountManager", "request code url " + requestCodeCall.request().url());
+            Log.v(TAG, "request code url " + requestCodeCall.request().url());
 
-            if(!codeCallResponse.isSuccessful()){
-                Log.v("HAI/AccountManager", "Failed to fetch code");
+            if (!codeCallResponse.isSuccessful()) {
+                Log.v(TAG, "Failed to fetch code");
                 return null;
             }
 
-            Log.v("HAI/AccountManager", "Fetched code " + codeCallResponse.body());
-            Log.v("HAI/AccountManager", "Fetching status " + codeCallResponse.code());
+            Log.v(TAG, "Fetched code " + codeCallResponse.body());
+            Log.v(TAG, "Fetching status " + codeCallResponse.code());
 
             realm.close();
             return codeCallResponse.body();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.getStackTraceString(e);
             realm.close();
             return null;
         }
     }
 
-    public String logIn(){
+    public String logIn() {
 
         try {
             Realm realm = Realm.getDefaultInstance();
 
             Account active = realm.where(Account.class).equalTo("active", true).equalTo("registered", true).findFirst();
-            if(active == null)
+            if (active == null)
                 return null;
 
             IdentityKeyPair keyPair = new IdentityKeyPair(active.getKeyPair());
@@ -281,53 +273,47 @@ public class AccountManager {
             Call<ResponseBody> loginCall = userService.login(loginDetails);
             Response<ResponseBody> loginCallResponse = loginCall.execute();
 
-            Log.v("HAI/AccountManager", "login call code:" + loginCallResponse.code());
+            Log.v(TAG, "login call code:" + loginCallResponse.code());
 
             String cookie = loginCallResponse.headers().get("Set-Cookie").split(";")[0];
 
             realm.beginTransaction();
-                Account active2 = realm.where(Account.class).equalTo("active", true).findFirst();
-                Log.v("HAI/AccountManager", "Cookie "+cookie);
-                active2.setCookie(cookie);
-                realm.copyToRealmOrUpdate(active2);
+            Account active2 = realm.where(Account.class).equalTo("active", true).findFirst();
+            Log.v(TAG, "Cookie " + cookie);
+            active2.setCookie(cookie);
+            realm.copyToRealmOrUpdate(active2);
             realm.commitTransaction();
 
 
-            if(!loginCallResponse.isSuccessful()){
-                Log.v("HAI/AccountManager", "Failed to login");
+            if (!loginCallResponse.isSuccessful()) {
+                Log.v(TAG, "Failed to login");
                 return null;
             }
 
-            Log.v("HAI/AccountManager", "Login successful");
+            Log.v(TAG, "Login successful");
             realm.close();
             return cookie;
 
-        } catch (IOException e) {
+        } catch (IOException | InvalidKeyException e) {
             realm.close();
-            e.printStackTrace();
-            return null;
-        } catch (InvalidKeyException e) {
-            realm.close();
-            e.printStackTrace();
+            Log.getStackTraceString(e);
             return null;
         }
-
-
     }
 
     public String getOneTimeKey(String keyBase64) throws InvalidKeyException, IOException {
 
         Call<OneTimeKeyTO> getOneTimeKeyCall = keyService.getOneTimeKey(keyBase64);
-        Log.v("HAI/AccountManager", "request code url " + getOneTimeKeyCall.request().url());
+        Log.v(TAG, "request code url " + getOneTimeKeyCall.request().url());
         Response<OneTimeKeyTO> getOneTimeKeyCallResponse = getOneTimeKeyCall.execute();
 
-        if(!getOneTimeKeyCallResponse.isSuccessful()){
-            Log.v("HAI/AccountManager", "Failed to fetch code");
+        if (!getOneTimeKeyCallResponse.isSuccessful()) {
+            Log.v(TAG, "Failed to fetch code");
             return null;
         }
 
-        Log.v("HAI/AccountManager", "Fetched code " + getOneTimeKeyCallResponse.body());
-        Log.v("HAI/AccountManager", "Fetching status " + getOneTimeKeyCallResponse.code());
+        Log.v(TAG, "Fetched code " + getOneTimeKeyCallResponse.body());
+        Log.v(TAG, "Fetching status " + getOneTimeKeyCallResponse.code());
 
         return "Success";
     }
@@ -335,16 +321,16 @@ public class AccountManager {
     public String getSignedKey(String keyBase64) throws InvalidKeyException, IOException {
 
         Call<SignedKeyTO> getSignedKeyCall = keyService.getSignedKey(keyBase64);
-        Log.v("HAI/AccountManager", "request code url " + getSignedKeyCall.request().url());
+        Log.v(TAG, "request code url " + getSignedKeyCall.request().url());
         Response<SignedKeyTO> getSignedKeyCallResponse = getSignedKeyCall.execute();
 
-        if(!getSignedKeyCallResponse.isSuccessful()){
-            Log.v("HAI/AccountManager", "Failed to fetch code");
+        if (!getSignedKeyCallResponse.isSuccessful()) {
+            Log.v(TAG, "Failed to fetch code");
             return null;
         }
 
-        Log.v("HAI/AccountManager", "Fetched code " + getSignedKeyCallResponse.body());
-        Log.v("HAI/AccountManager", "Fetching status " + getSignedKeyCallResponse.code());
+        Log.v(TAG, "Fetched code " + getSignedKeyCallResponse.body());
+        Log.v(TAG, "Fetching status " + getSignedKeyCallResponse.code());
 
         return "Success";
     }
@@ -355,7 +341,7 @@ public class AccountManager {
         Log.d("HAI/ACTIVE ACCOUNT", activeAcc.getName());
 
         if (activeAcc.getOneTimeKeys() == null || activeAcc.getOneTimeKeys().isEmpty()) {
-            Log.d("HAI/AccountManager", "There are no one time keys to be fetched");
+            Log.d(TAG, "There are no one time keys to be fetched");
             return null;
         }
         List<OneTimeKey> otkeys = new ArrayList<>(activeAcc.getOneTimeKeys());
@@ -367,20 +353,20 @@ public class AccountManager {
         Call<ResponseBody> postOneTimeKeysCall = keyService.postOneTimeKeys(otkeysTO, activeAcc.getCookie());
         Response<ResponseBody> postOneTimeKeysResponse = postOneTimeKeysCall.execute();
 
-        Log.v("HAI/AccountManager", "post one time keys call code:" + postOneTimeKeysResponse.code());
-        Log.v("HAI/AccountManager", "post one time keys call keys:" + Arrays.toString(otkeysTO.toArray()));
-        Log.v("HAI/AccountManager", "post one time keys call url:" + postOneTimeKeysCall.request().url());
+        Log.v(TAG, "post one time keys call code:" + postOneTimeKeysResponse.code());
+        Log.v(TAG, "post one time keys call keys:" + Arrays.toString(otkeysTO.toArray()));
+        Log.v(TAG, "post one time keys call url:" + postOneTimeKeysCall.request().url());
 
-        for(String name: postOneTimeKeysResponse.headers().names()){
-            Log.v("HAI/AccountManager", name+" : "+ postOneTimeKeysResponse.headers().get(name));
+        for (String name : postOneTimeKeysResponse.headers().names()) {
+            Log.v(TAG, name + " : " + postOneTimeKeysResponse.headers().get(name));
         }
 
-        if(!postOneTimeKeysResponse.isSuccessful()){
-            Log.v("HAI/AccountManager", "Failed to post one time keys");
+        if (!postOneTimeKeysResponse.isSuccessful()) {
+            Log.v(TAG, "Failed to post one time keys");
             return null;
         }
 
-        Log.v("HAI/AccountManager", "PostOneTimeKeys successful");
+        Log.v(TAG, "PostOneTimeKeys successful");
         realm.close();
         return "Success";
     }
@@ -392,35 +378,31 @@ public class AccountManager {
         Log.d("HAI/ACTIVE ACCOUNT", activeAcc.getName());
 
         if (active.getSignedKey() == null) {
-            Log.d("HAI/AccountManager", "There are no signed keys to be fetched");
+            Log.d(TAG, "There are no signed keys to be fetched");
             return null;
         }
-
 
         Call<ResponseBody> postSignedKeysCall = keyService.postSignedKeys(new SignedKeyTO(active.getSignedKey()), active.getCookie());
         Response<ResponseBody> postSignedKeysResponse = postSignedKeysCall.execute();
 
-        Log.v("HAI/AccountManager", "post signed keys call code:" + postSignedKeysResponse.code());
-        Log.v("HAI/AccountManager", "post signed keys call url:" + postSignedKeysCall.request().url());
+        Log.v(TAG, "post signed keys call code:" + postSignedKeysResponse.code());
+        Log.v(TAG, "post signed keys call url:" + postSignedKeysCall.request().url());
 
-        for(String name: postSignedKeysResponse.headers().names()){
-            Log.v("HAI/AccountManager", name+" : "+ postSignedKeysResponse.headers().get(name));
+        for (String name : postSignedKeysResponse.headers().names()) {
+            Log.v(TAG, name + " : " + postSignedKeysResponse.headers().get(name));
         }
 
-        if(!postSignedKeysResponse.isSuccessful()){
-            Log.v("HAI/AccountManager", "Failed to post signed keys");
+        if (!postSignedKeysResponse.isSuccessful()) {
+            Log.v(TAG, "Failed to post signed keys");
             return null;
         }
 
         realm.close();
-        Log.v("HAI/AccountManager", "PostSignedKeys successful");
+        Log.v(TAG, "PostSignedKeys successful");
         return "Success";
     }
 
-
-
     /**
-     *
      * @return id for new Realm Account object
      */
     private long generateAccountId() {
@@ -431,8 +413,9 @@ public class AccountManager {
             } else {
                 id = realm.where(Account.class).max("id").longValue() + 1;
             }
-        } catch(ArrayIndexOutOfBoundsException ex) {
+        } catch (ArrayIndexOutOfBoundsException e) {
             id = 0;
+            Log.getStackTraceString(e);
         }
         return id;
     }
@@ -446,8 +429,9 @@ public class AccountManager {
             } else {
                 id = realm.where(OneTimeKey.class).max("id").longValue() + 1;
             }
-        } catch(ArrayIndexOutOfBoundsException ex) {
+        } catch (ArrayIndexOutOfBoundsException e) {
             id = 0;
+            Log.getStackTraceString(e);
         }
         realm.close();
         return id;

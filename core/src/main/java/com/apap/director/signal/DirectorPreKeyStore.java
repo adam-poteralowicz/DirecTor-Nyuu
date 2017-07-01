@@ -1,8 +1,9 @@
 package com.apap.director.signal;
 
+import android.util.Log;
+
 import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.OneTimeKey;
-import com.apap.director.db.realm.model.SignedKey;
 
 import org.whispersystems.libsignal.InvalidKeyIdException;
 import org.whispersystems.libsignal.state.PreKeyRecord;
@@ -30,12 +31,12 @@ public class DirectorPreKeyStore implements PreKeyStore {
         try {
             OneTimeKey preKey = realm.where(OneTimeKey.class).equalTo("oneTimeKeyId", preKeyId).findFirst();
 
-            if ( preKey == null )
+            if (preKey == null)
                 throw new InvalidKeyIdException("No such key id");
 
             return new PreKeyRecord(preKey.getSerializedKey());
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.getStackTraceString(e);
             return null;
         }
     }
@@ -43,16 +44,15 @@ public class DirectorPreKeyStore implements PreKeyStore {
     @Override
     public void storePreKey(int preKeyId, PreKeyRecord record) {
         realm.beginTransaction();
-        realm.where(Account.class).equalTo("active", true).findFirst();
+            realm.where(Account.class).equalTo("active", true).findFirst();
             OneTimeKey oneTimeKey = new OneTimeKey();
 
-        long id;
-        if(realm.where(OneTimeKey.class).findFirst() == null){
-            id = 0;
-        }
-        else{
-            id = realm.where(OneTimeKey.class).max("id").longValue()+1;
-        }
+            long id;
+            if (realm.where(OneTimeKey.class).findFirst() == null) {
+                id = 0;
+            } else {
+                id = realm.where(OneTimeKey.class).max("id").longValue() + 1;
+            }
             oneTimeKey.setId(id);
             oneTimeKey.setOneTimeKeyId(preKeyId);
             oneTimeKey.setSerializedKey(record.serialize());

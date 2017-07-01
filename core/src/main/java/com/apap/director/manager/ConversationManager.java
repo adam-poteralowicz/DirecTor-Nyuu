@@ -1,11 +1,14 @@
 package com.apap.director.manager;
 
+import android.util.Log;
+
 import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.Conversation;
 import com.apap.director.db.realm.model.Message;
 import com.apap.director.db.realm.model.Session;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -24,7 +27,7 @@ public class ConversationManager {
 
     }
 
-    public ArrayList<Conversation> listAllConversations() {
+    public List<Conversation> listAllConversations() {
         RealmResults<Conversation> conversations = realm.where(Conversation.class).findAll();
         return new ArrayList<>(conversations);
     }
@@ -55,7 +58,8 @@ public class ConversationManager {
     }
 
     public Conversation addConversation(Contact contact) {
-        if (contact == null) return null;
+        if (contact == null)
+            return null;
 
         Realm realm = Realm.getDefaultInstance();
 
@@ -63,7 +67,7 @@ public class ConversationManager {
         Contact managedContact = realm.copyToRealmOrUpdate(contact);
         Conversation conversation = realm.createObject(Conversation.class, generateConversationId(realm));
         conversation.setContact(contact);
-        RealmList<Session> sessions = new RealmList<Session>();
+        RealmList<Session> sessions = new RealmList<>();
         conversation.setSessions(sessions);
         conversation.setMessages(new RealmList<Message>());
         conversation.setAccount(accountManager.getActiveAccount());
@@ -118,7 +122,9 @@ public class ConversationManager {
 
     public boolean updateConversationSessionsById(Long id, Session session) {
         Conversation conversation = realm.where(Conversation.class).equalTo("id", id).findFirst();
-        if (conversation == null) return false;
+        if (conversation == null)
+            return false;
+
         realm.beginTransaction();
         RealmList<Session> sessions = conversation.getSessions();
         sessions.add(session);
@@ -129,7 +135,9 @@ public class ConversationManager {
 
     public boolean updateConversationSessionsByContactName(String name, Session session) {
         Conversation conversation = realm.where(Conversation.class).equalTo("contact.name", name).findFirst();
-        if (conversation == null) return false;
+        if (conversation == null)
+            return false;
+
         realm.beginTransaction();
         RealmList<Session> sessions = conversation.getSessions();
         sessions.add(session);
@@ -140,7 +148,9 @@ public class ConversationManager {
 
     public boolean updateConversationSessionsByContactId(Long contactId, Session session) {
         Conversation conversation = realm.where(Conversation.class).equalTo("contact.id", contactId).findFirst();
-        if (conversation == null) return false;
+        if (conversation == null)
+            return false;
+
         realm.beginTransaction();
         RealmList<Session> sessions = conversation.getSessions();
         sessions.add(session);
@@ -157,8 +167,9 @@ public class ConversationManager {
             } else {
                 id = realm.where(Conversation.class).max("id").longValue() + 1;
             }
-        } catch (ArrayIndexOutOfBoundsException ex) {
+        } catch (ArrayIndexOutOfBoundsException e) {
             id = 0;
+            Log.getStackTraceString(e);
         }
         return id;
     }

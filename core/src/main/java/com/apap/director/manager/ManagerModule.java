@@ -18,7 +18,7 @@ public class ManagerModule {
 
     @Provides
     @Singleton
-    AccountManager provideAccountManager(Realm realm, UserService userService, Curve25519 curve25519, KeyService keyService, DirectorPreKeyStore preKeyStore, DirectorSignedPreKeyStore signedPreKeyStore){
+    AccountManager provideAccountManager(Realm realm, UserService userService, Curve25519 curve25519, KeyService keyService, DirectorPreKeyStore preKeyStore, DirectorSignedPreKeyStore signedPreKeyStore) {
         return new AccountManager(realm, userService, curve25519, keyService, preKeyStore, signedPreKeyStore);
     }
 

@@ -37,7 +37,7 @@ public class NewAccountActivity extends Activity {
 
         Intent newAccIntent = new Intent(NewAccountActivity.this, LoginActivity.class);
         newAccIntent.putExtra("accountName", accountName);
-        Log.d("DTOR-NewAccount", accountName);
+        Log.d("DTOR/NewAccount", accountName);
         if (!"".equals(accountName)) {
             setResult(Activity.RESULT_OK, newAccIntent);
             finish();

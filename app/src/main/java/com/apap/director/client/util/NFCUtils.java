@@ -1,6 +1,7 @@
 package com.apap.director.client.util;
 
 import android.content.Intent;
+import android.nfc.FormatException;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -16,7 +17,11 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NFCUtils {
+public final class NFCUtils {
+
+    private NFCUtils() {
+        // not called
+    }
 
     public static NdefMessage getNewMessage(String mimeType, byte[] payload) {
         return new NdefMessage(new NdefRecord[]{getNewRecord(mimeType, payload)});
@@ -39,23 +44,10 @@ public class NFCUtils {
                 ndef.writeNdefMessage(message);
                 return true;
             } else {
-                NdefFormatable format = NdefFormatable.get(tag);
-                if (format != null) {
-                    try {
-                        format.connect();
-                        format.format(message);
-                        return true;
-                    } catch (IOException e) {
-                        Log.e(NFCUtils.class.toString(), e.getMessage());
-                        return false;
-                    }
-                } else {
-                    Log.e(NFCUtils.class.toString(), "Error : Undefined format");
-                    return false;
-                }
+                return provideNdefOperations(tag, message);
             }
         } catch (Exception e) {
-            Log.e(NFCUtils.class.toString(), e.getMessage());
+            Log.getStackTraceString(e);
             return false;
         }
     }
@@ -76,22 +68,25 @@ public class NFCUtils {
     }
 
     private static List<NdefMessage> getMessagesFromIntent(Intent intent) {
-        List<NdefMessage> intentMessages = new ArrayList<NdefMessage>();
+        List<NdefMessage> intentMessages = new ArrayList<>();
         String action = intent.getAction();
+
         if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action) || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
             Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-            if (rawMsgs != null) {
-                for (Parcelable msg : rawMsgs) {
-                    if (msg instanceof NdefMessage) {
-                        intentMessages.add((NdefMessage) msg);
-                    }
-                }
-            } else {
+            if (rawMsgs == null) {
                 byte[] empty = new byte[]{};
                 final NdefRecord record = new NdefRecord(NdefRecord.TNF_UNKNOWN, empty, empty, empty);
                 final NdefMessage msg = new NdefMessage(new NdefRecord[]{record});
                 intentMessages = new ArrayList<>();
                 intentMessages.add(msg);
+
+                return intentMessages;
+            }
+
+            for (Parcelable msg : rawMsgs) {
+                if (msg instanceof NdefMessage) {
+                    intentMessages.add((NdefMessage) msg);
+                }
             }
         }
         return intentMessages;
@@ -100,5 +95,22 @@ public class NFCUtils {
     private static NdefRecord getNewRecord(String mimeType, byte[] payload) {
         byte[] mimeBytes = mimeType.getBytes(Charset.forName("US-ASCII"));
         return new NdefRecord(NdefRecord.TNF_MIME_MEDIA, mimeBytes, new byte[0], payload);
+    }
+
+    private static boolean provideNdefOperations(Tag tag, NdefMessage message) {
+        NdefFormatable format = NdefFormatable.get(tag);
+        if (format != null) {
+            try {
+                format.connect();
+                format.format(message);
+                return true;
+            } catch (IOException | FormatException e) {
+                Log.getStackTraceString(e);
+                return false;
+            }
+        } else {
+            Log.e(NFCUtils.class.toString(), "Error : Undefined format");
+            return false;
+        }
     }
 }

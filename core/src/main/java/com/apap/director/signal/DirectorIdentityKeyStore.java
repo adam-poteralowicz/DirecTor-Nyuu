@@ -21,7 +21,7 @@ public class DirectorIdentityKeyStore implements IdentityKeyStore {
     private AccountManager accountManager;
 
     @Inject
-    public DirectorIdentityKeyStore(Realm realm, AccountManager accountManager){
+    public DirectorIdentityKeyStore(Realm realm, AccountManager accountManager) {
         this.accountManager = accountManager;
     }
 
@@ -31,6 +31,7 @@ public class DirectorIdentityKeyStore implements IdentityKeyStore {
             return new IdentityKeyPair(accountManager.getActiveAccount().getKeyPair());
         } catch (InvalidKeyException e) {
             Log.v("HAI/IdentityKeyStore", "Identity key pair not found");
+            Log.getStackTraceString(e);
             return null;
         }
     }
@@ -47,7 +48,7 @@ public class DirectorIdentityKeyStore implements IdentityKeyStore {
         realm.beginTransaction();
             ContactKey sameName = realm.where(ContactKey.class).equalTo("keyBase64", address.getName()).equalTo("deviceId", address.getDeviceId()).findFirst();
 
-            if(sameName != null) {
+            if (sameName != null) {
                 realm.commitTransaction();
                 return;
             }
@@ -57,8 +58,8 @@ public class DirectorIdentityKeyStore implements IdentityKeyStore {
             contactKey.setKeyBase64(address.getName());
 
             Contact contact = realm.where(Contact.class)
-                                .equalTo("id", Long.valueOf(address.getName()))
-                                .findFirst();
+                    .equalTo("id", Long.valueOf(address.getName()))
+                    .findFirst();
 
             contact.getContactKeys().add(contactKey);
             contactKey.setContact(contact);

@@ -48,11 +48,11 @@ public class NewMsgActivity extends Activity {
     @BindView(R.id.conversationView)
     ListView messagesView;
 
-    ArrayAdapter<Message> arrayAdapter;
     private Long contactIdFromIntent;
     private List<Message> myMessages;
     private ArrayAdapterChangeListener<Message, RealmResults<Message>> changeListener;
     private RealmResults<Message> allMessages;
+    private String TAG = this.getClass().getSimpleName();
 
     //TODO: Split this method
 
@@ -75,7 +75,7 @@ public class NewMsgActivity extends Activity {
         contactIdFromIntent = getIntent().getLongExtra("contactId", 1L);
 
         myMessages = new ArrayList<>();
-        arrayAdapter = new MessageAdapter(this, R.layout.item_chat_left, myMessages);
+        ArrayAdapter<Message> arrayAdapter = new MessageAdapter(this, R.layout.item_chat_left, myMessages);
         messagesView.setAdapter(arrayAdapter);
 
         allMessages = realm.where(Message.class).equalTo("conversation.id", contactIdFromIntent).findAll();
@@ -111,7 +111,7 @@ public class NewMsgActivity extends Activity {
 
     @OnItemLongClick(R.id.conversationView)
     public boolean deleteMessage(int position) {
-        Log.v("DTOR/NewMsgActivity", "Deleting message, position: " + position);
+        Log.v(TAG, "Deleting message, position: " + position);
         Long messageId = myMessages.get(position).getId();
         messageManager.deleteMessage(messageId);
         return true;

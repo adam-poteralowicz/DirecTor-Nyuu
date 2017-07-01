@@ -23,7 +23,7 @@ public class AuthUserActivity extends FragmentActivity {
 
     @Inject
     AccountManager
-    accountManager;
+            accountManager;
 
     @BindView(R.id.pager)
     ViewPager viewPager;
@@ -48,13 +48,13 @@ public class AuthUserActivity extends FragmentActivity {
     @Override
     public void onBackPressed() {
         realm.beginTransaction();
-            if (accountManager == null)
-                Log.d("accountManager", "null");
-            if (accountManager.getActiveAccount() == null)
-                Log.d("active account", "null");
-            Account active = accountManager.getActiveAccount();
-            active.setActive(false);
-            realm.copyToRealmOrUpdate(active);
+        if (accountManager == null)
+            Log.d("accountManager", "null");
+        if (accountManager.getActiveAccount() == null)
+            Log.d("active account", "null");
+        Account active = accountManager.getActiveAccount();
+        active.setActive(false);
+        realm.copyToRealmOrUpdate(active);
         realm.commitTransaction();
         Intent selectedIntent = new Intent(AuthUserActivity.this, LoginActivity.class);
         startActivity(selectedIntent);

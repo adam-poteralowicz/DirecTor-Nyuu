@@ -15,6 +15,7 @@ import io.realm.RealmList;
 
 public class MessageManager {
     private Realm realm;
+    private String TAG = this.getClass().getSimpleName();
 
     public MessageManager(Realm realm, AccountManager accountManager) {
         this.realm = realm;
@@ -42,7 +43,7 @@ public class MessageManager {
     public Message addMessage(Conversation conv, String msg, String recipient, Boolean owned) {
 
         Realm realm = Realm.getDefaultInstance();
-        Log.v("HAI/MessageManager", "adding mesage "+msg+" owned: "+owned);
+        Log.v(TAG, "adding message "+msg+" owned: "+owned);
         if (conv == null)
             return null;
         realm.beginTransaction();
@@ -96,8 +97,9 @@ public class MessageManager {
             } else {
                 id = realm.where(Message.class).max("id").longValue() + 1;
             }
-        } catch(ArrayIndexOutOfBoundsException ex) {
+        } catch(ArrayIndexOutOfBoundsException e) {
             id = 0;
+            Log.getStackTraceString(e);
         }
         return id;
     }

@@ -14,10 +14,10 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 @Module
 public class RestModule {
 
-    private static final String BASE_URL = "http://"+Paths.SERVER_IP+":"+Paths.SERVER_PORT;
+    private static final String BASE_URL = "http://" + Paths.SERVER_IP + ":" + Paths.SERVER_PORT;
     private Retrofit retrofit;
 
-    public RestModule(){
+    public RestModule() {
         this.retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(JacksonConverterFactory.create())
@@ -26,13 +26,13 @@ public class RestModule {
 
     @Provides
     @Singleton
-    UserService provideUserService(){
+    UserService provideUserService() {
         return retrofit.create(UserService.class);
     }
 
     @Provides
     @Singleton
-    KeyService provideKeyService(){
+    KeyService provideKeyService() {
         return retrofit.create(KeyService.class);
     }
 

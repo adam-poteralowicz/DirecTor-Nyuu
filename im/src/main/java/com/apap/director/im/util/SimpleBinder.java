@@ -5,9 +5,9 @@ import android.os.Binder;
 
 public class SimpleBinder extends Binder {
 
-    Service service;
+    private Service service;
 
-    public SimpleBinder(Service service){
+    public SimpleBinder(Service service) {
         this.service = service;
     }
 

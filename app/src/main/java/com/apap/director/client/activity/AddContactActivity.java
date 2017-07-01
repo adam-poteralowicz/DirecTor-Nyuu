@@ -38,7 +38,7 @@ import io.realm.Realm;
 
 public class AddContactActivity extends AppCompatActivity {
 
-    private static final String _MIME_TYPE = "text/plain";
+    private static final String MIME_TYPE = "text/plain";
 
     @Inject
     Realm realm;
@@ -52,10 +52,10 @@ public class AddContactActivity extends AppCompatActivity {
     @BindView(R.id.myPublicKey)
     TextView myKeyView;
 
-    private NfcAdapter _nfcAdapter;
-    private Intent _intent;
-    private PendingIntent _pendingIntent;
-    private IntentFilter[] _readIntentFilters;
+    private NfcAdapter nfcAdapter;
+    private Intent intent;
+    private PendingIntent pendingIntent;
+    private IntentFilter[] readIntentFilters;
     private byte[] myPublicKey;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -70,7 +70,7 @@ public class AddContactActivity extends AppCompatActivity {
             myPublicKey = Base64.encode(keyPair.getPublicKey().serialize(), Base64.NO_WRAP | Base64.URL_SAFE);
             myKeyView.setText("My public key: " + new String(myPublicKey));
         } catch (InvalidKeyException e) {
-            e.printStackTrace();
+            Log.getStackTraceString(e);
         }
 
         getSupportActionBar().show();
@@ -89,7 +89,7 @@ public class AddContactActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.atn_nfc) {
             PackageManager pm = getPackageManager();
             if (pm.hasSystemFeature(PackageManager.FEATURE_NFC) && NfcAdapter.getDefaultAdapter(this) != null) {
-                if (_nfcAdapter.isEnabled()) {
+                if (nfcAdapter.isEnabled()) {
                     Toast.makeText(this, "NFC enabled", Toast.LENGTH_LONG).show();
                     useNFC();
                 } else {
@@ -105,13 +105,13 @@ public class AddContactActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        _intent = intent;
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+    protected void onNewIntent(Intent newIntent) {
+        super.onNewIntent(newIntent);
+        intent = newIntent;
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(newIntent.getAction())) {
             _readMessage();
         }
-        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
+        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(newIntent.getAction())) {
             _readMessage();
         }
     }
@@ -123,7 +123,7 @@ public class AddContactActivity extends AppCompatActivity {
         try {
             exchangePublicKeys();
         } catch (InvalidKeyException e) {
-            e.printStackTrace();
+            Log.getStackTraceString(e);
         }
         enableTagWriteMode();
     }
@@ -141,57 +141,57 @@ public class AddContactActivity extends AppCompatActivity {
     }
 
     public void initNFC() {
-        _nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        if (_nfcAdapter.isEnabled()) {
-            _pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass())
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (nfcAdapter.isEnabled()) {
+            pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass())
                     .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
         }
     }
 
     public void useNFC() {
-        if (_nfcAdapter == null) {
+        if (nfcAdapter == null) {
             Toast.makeText(this, "This device does not support NFC", Toast.LENGTH_LONG).show();
             return;
         }
 
-        if (_nfcAdapter.isEnabled()) {
-            _pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass())
+        if (nfcAdapter.isEnabled()) {
+            pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass())
                     .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
             IntentFilter ndefDetected = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
             try {
-                ndefDetected.addDataType(_MIME_TYPE);
+                ndefDetected.addDataType(MIME_TYPE);
             } catch (MalformedMimeTypeException e) {
-                Log.e(this.toString(), e.getMessage());
+                Log.getStackTraceString(e);
             }
-            _readIntentFilters = new IntentFilter[]{ndefDetected};
+            readIntentFilters = new IntentFilter[]{ndefDetected};
         }
     }
 
     private void exchangePublicKeys() throws InvalidKeyException {
-        NdefMessage message = NFCUtils.getNewMessage(_MIME_TYPE, myPublicKey);
+        NdefMessage message = NFCUtils.getNewMessage(MIME_TYPE, myPublicKey);
 
-        if (_nfcAdapter != null) {
-            _nfcAdapter.setNdefPushMessage(message, this);
-            _nfcAdapter.enableForegroundDispatch(this, _pendingIntent, _readIntentFilters, null);
+        if (nfcAdapter != null) {
+            nfcAdapter.setNdefPushMessage(message, this);
+            nfcAdapter.enableForegroundDispatch(this, pendingIntent, readIntentFilters, null);
         }
     }
 
     private void enableTagWriteMode() {
         IntentFilter tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
         IntentFilter[] writeIntentFilters = new IntentFilter[]{tagDetected};
-        _nfcAdapter.enableForegroundDispatch(this, _pendingIntent, writeIntentFilters, null);
+        nfcAdapter.enableForegroundDispatch(this, pendingIntent, writeIntentFilters, null);
     }
 
     public void _readMessage() {
-        List<String> msgs = NFCUtils.getStringsFromNfcIntent(_intent);
+        List<String> msgs = NFCUtils.getStringsFromNfcIntent(intent);
         if (msgs != null) {
             Toast.makeText(this, "Contact public key : " + msgs.get(0), Toast.LENGTH_LONG).show();
             String contactPublicKey = msgs.get(0);
             getSupportActionBar().show();
 
-            Intent intent = new Intent(this, NewContactActivity.class);
-            intent.putExtra("key", contactPublicKey);
-            startActivity(intent);
+            Intent newContactIntent = new Intent(this, NewContactActivity.class);
+            newContactIntent.putExtra("key", contactPublicKey);
+            startActivity(newContactIntent);
         }
     }
 }

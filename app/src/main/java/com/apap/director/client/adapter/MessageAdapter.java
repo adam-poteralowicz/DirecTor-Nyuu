@@ -27,7 +27,6 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         this.activity = context;
         Realm.getDefaultInstance();
         this.messages = objects;
-
     }
 
     @NonNull
@@ -39,13 +38,11 @@ public class MessageAdapter extends ArrayAdapter<Message> {
 
         if (convertView == null) {
             if (getItemViewType(position) == VIEW_TYPE_MINE) {
-
                 convertView = View.inflate(activity, R.layout.item_chat_right, null);
-                holder = new ViewHolder(convertView);
             } else {
                 convertView = View.inflate(activity, R.layout.item_chat_left, null);
-                holder = new ViewHolder(convertView);
             }
+            holder = new ViewHolder(convertView);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();

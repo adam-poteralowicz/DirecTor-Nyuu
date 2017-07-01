@@ -16,7 +16,6 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.apap.director.client.App;
@@ -48,18 +47,18 @@ public class SingleContactActivity extends Activity {
     ConversationManager conversationManager;
 
     @BindView(R.id.contactName)
-    TextView contactNameView;
+    EditText contactName;
     @BindView(R.id.optionsList)
     ListView optionsListView;
     @BindView(R.id.imageView)
     ImageView imageView;
 
+    private String TAG = App.getContext().getClass().getSimpleName();
     List<String> myOptionsList = null;
     BitmapFactory.Options options = new BitmapFactory.Options();
     Intent intent;
     String contactNameFromIntent;
     Long contactIdFromIntent;
-    EditText contactNameEditText;
 
     public void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.single_contact_view);
@@ -69,16 +68,10 @@ public class SingleContactActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         contactIdFromIntent = getIntent().getLongExtra("contactId", 1L);
-        contactNameEditText = (EditText) findViewById(R.id.contactName);
-        imageView = (ImageView) findViewById(R.id.imageView);
         contactNameFromIntent = getIntent().getStringExtra("contactName");
-        contactNameView = (TextView) findViewById(R.id.contactName);
-        contactNameView.setText(contactNameFromIntent);
-        myOptionsList = new ArrayList<>();
-        myOptionsList.add("Send message");
-        myOptionsList.add("Delete from contacts");
-        myOptionsList.add("Return");
+        contactName.setText(contactNameFromIntent);
 
+        initOptions((ArrayList<String>) myOptionsList);
         checkIfAvatarExists();
 
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
@@ -93,11 +86,12 @@ public class SingleContactActivity extends Activity {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Toast.makeText(App.getContext(), myOptionsList.get(position), Toast.LENGTH_LONG).show();
                 switch (position) {
-                    case 0: {
-                        Log.d("DTOR/=/", contactIdFromIntent.toString());
+                    case 0:
+                        Log.d(TAG, contactIdFromIntent.toString());
                         if (conversationManager == null) {
                             Log.d("CONVMAN", "NULL");
                         }
+
                         Conversation conv = conversationManager.getConversationByContactId(contactIdFromIntent);
                         if (conv == null) {
                             realm.beginTransaction();
@@ -114,23 +108,20 @@ public class SingleContactActivity extends Activity {
                                 .putExtra("contactId", contactIdFromIntent);
                         startActivity(intent);
                         break;
-                    }
-                    case 1: {
+                    case 1:
                         contactManager.deleteContact(contactNameFromIntent);
                         startActivity(new Intent(App.getContext(), AuthUserActivity.class));
                         break;
-                    }
-                    case 2: {
+                    case 2:
                         startActivity(new Intent(App.getContext(), AuthUserActivity.class));
                         break;
-                    }
                     default:
                         break;
                 }
             }
         });
 
-        contactNameEditText.setSelectAllOnFocus(true);
+        contactName.setSelectAllOnFocus(true);
 
     }
 
@@ -187,5 +178,11 @@ public class SingleContactActivity extends Activity {
             options.inPreferredConfig = Bitmap.Config.ARGB_8888;
             imageView.setImageBitmap(BitmapFactory.decodeFile(imagePath, options));
         }
+    }
+
+    private void initOptions(ArrayList<String> options) {
+        options.add("Send message");
+        options.add("Delete from contacts");
+        options.add("Return");
     }
 }
