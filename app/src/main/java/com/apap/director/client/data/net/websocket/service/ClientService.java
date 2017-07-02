@@ -4,15 +4,16 @@ import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
 
-import com.apap.director.db.realm.model.ContactKey;
+import com.apap.director.client.data.net.rest.Paths;
+import com.apap.director.client.data.net.rest.service.KeyService;
 import com.apap.director.client.data.net.to.MessageTO;
 import com.apap.director.client.data.net.to.OneTimeKeyTO;
 import com.apap.director.client.data.net.to.SignedKeyTO;
-import com.apap.director.network.rest.Paths;
 import com.apap.director.client.data.store.DirectorIdentityKeyStore;
 import com.apap.director.client.data.store.DirectorPreKeyStore;
 import com.apap.director.client.data.store.DirectorSessionStore;
 import com.apap.director.client.data.store.DirectorSignedPreKeyStore;
+import com.apap.director.client.domain.model.ContactKey;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -41,7 +42,6 @@ import rx.functions.Action1;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompHeader;
 import ua.naiksoftware.stomp.client.StompClient;
-import com.apap.director.client.data.net.rest.service.KeyService;
 
 /**
  * Created by Ala on 07/01/2017.
@@ -117,11 +117,12 @@ public class ClientService {
     }
 
     public static void sendEncryptedMessage(final String to, final String from, final String text) {
+        Realm realm = Realm.getDefaultInstance();
+
         try {
             String address = "/app/message/" + to;
             Log.v(TAG, "Sending framed message! " + address);
 
-            Realm realm = Realm.getDefaultInstance();
             ContactKey contactKey = realm.where(ContactKey.class).equalTo("keyBase64", to).findFirst();
 
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(to, contactKey.getDeviceId());
@@ -156,6 +157,7 @@ public class ClientService {
                     return getSignedKey(to);
                 } catch (IOException | InvalidKeyException e) {
                     Log.getStackTraceString(e);
+
                     return null;
                 }
                 }
@@ -175,6 +177,8 @@ public class ClientService {
 
                 PreKeyBundle preKeyBundle = new PreKeyBundle(0, 0, oneTimeKeyTO.getOneTimeKeyId(), oneTimeKeyEC, signedKeyTO.getSignedKeyId(), signedKeyEC, decodedSignature, contactIdentity);
                 sessionBuilder.process(preKeyBundle);
+                realm.close();
+
             }
 
             SessionCipher sessionCipher = new SessionCipher(sessionStore, preKeyStore, signedPreKeyStore, identityKeyStore, signalProtocolAddress);
@@ -204,6 +208,10 @@ public class ClientService {
 
         } catch (UntrustedIdentityException | InvalidKeyException | IOException | InterruptedException | ExecutionException e) {
             Log.getStackTraceString(e);
+        }
+        finally {
+            realm.close();
+
         }
     }
 

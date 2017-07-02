@@ -2,9 +2,9 @@ package com.apap.director.client.data.store;
 
 import android.util.Log;
 
-import com.apap.director.db.realm.model.Contact;
-import com.apap.director.db.realm.model.ContactKey;
-import com.apap.director.manager.AccountManager;
+import com.apap.director.client.data.manager.AccountManager;
+import com.apap.director.client.domain.model.Contact;
+import com.apap.director.client.domain.model.ContactKey;
 
 import org.whispersystems.libsignal.IdentityKey;
 import org.whispersystems.libsignal.IdentityKeyPair;
@@ -44,18 +44,26 @@ public class DirectorIdentityKeyStore implements IdentityKeyStore {
     @Override
     public void saveIdentity(SignalProtocolAddress address, IdentityKey identityKey) {
 
+        //TODO: refactor, będzie powodowało błędy, nie mam pomysłu, dlaczego zamknięcie na końcu nie działa :(
         Realm realm = Realm.getDefaultInstance();
+
+        realm.close();
+
         realm.beginTransaction();
             ContactKey sameName = realm.where(ContactKey.class).equalTo("keyBase64", address.getName()).equalTo("deviceId", address.getDeviceId()).findFirst();
 
+
             if (sameName != null) {
                 realm.commitTransaction();
+                realm.close();
                 return;
             }
+
 
             ContactKey contactKey = realm.createObject(ContactKey.class);
             contactKey.setDeviceId(address.getDeviceId());
             contactKey.setKeyBase64(address.getName());
+
 
             Contact contact = realm.where(Contact.class)
                     .equalTo("id", Long.valueOf(address.getName()))
@@ -65,6 +73,7 @@ public class DirectorIdentityKeyStore implements IdentityKeyStore {
             contactKey.setContact(contact);
 
         realm.commitTransaction();
+        realm.close();
     }
 
     @Override
@@ -76,6 +85,7 @@ public class DirectorIdentityKeyStore implements IdentityKeyStore {
                 .equalTo("deviceId", address.getDeviceId())
                 .findFirst();
 
+        realm.close();
         return contactKey != null;
 
     }

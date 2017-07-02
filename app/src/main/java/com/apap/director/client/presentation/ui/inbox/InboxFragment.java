@@ -1,4 +1,4 @@
-package com.apap.director.client.ui.inbox;
+package com.apap.director.client.presentation.ui.inbox;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,9 +12,10 @@ import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.client.ui.message.NewMsgActivity;
-import com.apap.director.db.realm.model.Conversation;
-import com.apap.director.manager.ConversationManager;
+import com.apap.director.client.data.manager.ConversationManager;
+import com.apap.director.client.domain.model.Conversation;
+import com.apap.director.client.presentation.ui.message.NewMsgActivity;
+
 
 import java.util.ArrayList;
 
@@ -66,9 +67,9 @@ public class InboxFragment extends Fragment {
         msgListView.setAdapter(arrayAdapter);
 
         final RealmResults<Conversation> conversations = realm.where(Conversation.class).findAll();
-        conversations.addChangeListener(new RealmChangeListener<RealmResults<com.apap.director.db.realm.model.Conversation>>() {
+        conversations.addChangeListener(new RealmChangeListener<RealmResults<Conversation>>() {
             @Override
-            public void onChange(RealmResults<com.apap.director.db.realm.model.Conversation> results) {
+            public void onChange(RealmResults<Conversation> results) {
                 conversations.size();
             }
         });

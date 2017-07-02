@@ -1,0 +1,29 @@
+package com.apap.director.client.presentation.ui.listener;
+
+import android.util.Log;
+import android.widget.ArrayAdapter;
+
+import io.realm.RealmChangeListener;
+import io.realm.RealmModel;
+import io.realm.RealmResults;
+
+
+public class ArrayAdapterChangeListener<E extends RealmModel, T extends RealmResults<E>> implements RealmChangeListener<RealmResults<E>> {
+
+    private ArrayAdapter<E> arrayAdapter;
+    private String name;
+
+    public ArrayAdapterChangeListener(ArrayAdapter<E> arrayAdapter, String name) {
+        this.arrayAdapter = arrayAdapter;
+        this.name = name;
+    }
+
+    @Override
+    public void onChange(RealmResults elements) {
+        Log.v(this.getClass().getSimpleName(), name+ ": Change detected");
+
+        arrayAdapter.clear();
+        arrayAdapter.addAll(elements);
+        arrayAdapter.notifyDataSetChanged();
+    }
+}

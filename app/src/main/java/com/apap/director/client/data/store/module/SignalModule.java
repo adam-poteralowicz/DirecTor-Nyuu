@@ -2,7 +2,7 @@ package com.apap.director.client.data.store.module;
 
 import android.content.Context;
 
-import com.apap.director.manager.AccountManager;
+import com.apap.director.client.data.manager.AccountManager;
 import com.apap.director.client.data.store.DirectorIdentityKeyStore;
 import com.apap.director.client.data.store.DirectorPreKeyStore;
 import com.apap.director.client.data.store.DirectorSessionStore;

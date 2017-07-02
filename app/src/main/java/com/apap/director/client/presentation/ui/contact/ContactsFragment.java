@@ -1,4 +1,4 @@
-package com.apap.director.client.ui.contact;
+package com.apap.director.client.presentation.ui.contact;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,10 +11,11 @@ import android.widget.ListView;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.db.realm.model.Account;
-import com.apap.director.db.realm.model.Contact;
-import com.apap.director.db.realm.util.ArrayAdapterChangeListener;
-import com.apap.director.manager.AccountManager;
+import com.apap.director.client.data.manager.AccountManager;
+import com.apap.director.client.domain.model.Account;
+import com.apap.director.client.domain.model.Contact;
+import com.apap.director.client.presentation.ui.listener.ArrayAdapterChangeListener;
+
 
 import java.util.ArrayList;
 

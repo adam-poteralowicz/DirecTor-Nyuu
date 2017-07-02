@@ -1,4 +1,4 @@
-package com.apap.director.client.ui.contact;
+package com.apap.director.client.presentation.ui.contact;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,9 +10,9 @@ import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.db.realm.model.Contact;
-import com.apap.director.manager.ContactManager;
-import com.apap.director.manager.ConversationManager;
+import com.apap.director.client.data.manager.ContactManager;
+import com.apap.director.client.data.manager.ConversationManager;
+import com.apap.director.client.domain.model.Contact;
 
 import javax.inject.Inject;
 

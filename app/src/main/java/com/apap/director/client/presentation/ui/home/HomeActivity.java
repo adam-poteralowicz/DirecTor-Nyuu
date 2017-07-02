@@ -1,4 +1,4 @@
-package com.apap.director.client.ui.home;
+package com.apap.director.client.presentation.ui.home;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -9,10 +9,11 @@ import android.util.Log;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.client.ui.home.adapter.DirecTorPagerAdapter;
-import com.apap.director.client.ui.login.LoginActivity;
-import com.apap.director.db.realm.model.Account;
-import com.apap.director.manager.AccountManager;
+import com.apap.director.client.data.manager.AccountManager;
+import com.apap.director.client.domain.model.Account;
+import com.apap.director.client.presentation.ui.home.adapter.DirecTorPagerAdapter;
+import com.apap.director.client.presentation.ui.login.LoginActivity;
+
 
 import javax.inject.Inject;
 

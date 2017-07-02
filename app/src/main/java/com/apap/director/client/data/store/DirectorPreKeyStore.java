@@ -2,8 +2,8 @@ package com.apap.director.client.data.store;
 
 import android.util.Log;
 
-import com.apap.director.db.realm.model.Account;
-import com.apap.director.db.realm.model.OneTimeKey;
+import com.apap.director.client.domain.model.Account;
+import com.apap.director.client.domain.model.OneTimeKey;
 
 import org.whispersystems.libsignal.InvalidKeyIdException;
 import org.whispersystems.libsignal.state.PreKeyRecord;
@@ -38,6 +38,9 @@ public class DirectorPreKeyStore implements PreKeyStore {
         } catch (IOException e) {
             Log.getStackTraceString(e);
             return null;
+        }
+        finally {
+            realm.close();
         }
     }
 
@@ -75,6 +78,7 @@ public class DirectorPreKeyStore implements PreKeyStore {
         realm.beginTransaction();
             realm.where(OneTimeKey.class).equalTo("oneTimeKeyId", preKeyId).findFirst().deleteFromRealm();
         realm.commitTransaction();
+        realm.close();
 
     }
 }

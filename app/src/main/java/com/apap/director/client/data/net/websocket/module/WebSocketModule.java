@@ -2,10 +2,11 @@ package com.apap.director.client.data.net.websocket.module;
 
 import android.content.Context;
 
+import com.apap.director.client.data.manager.ContactManager;
+import com.apap.director.client.data.manager.ConversationManager;
+import com.apap.director.client.data.manager.MessageManager;
 import com.apap.director.client.data.net.websocket.service.MessageAction;
-import com.apap.director.manager.ContactManager;
-import com.apap.director.manager.ConversationManager;
-import com.apap.director.manager.MessageManager;
+
 import com.apap.director.client.data.store.DirectorIdentityKeyStore;
 import com.apap.director.client.data.store.DirectorPreKeyStore;
 import com.apap.director.client.data.store.DirectorSessionStore;

@@ -1,4 +1,4 @@
-package com.apap.director.client.ui.home.adapter;
+package com.apap.director.client.presentation.ui.home.adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -6,8 +6,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.client.ui.contact.ContactsFragment;
-import com.apap.director.client.ui.inbox.InboxFragment;
+import com.apap.director.client.presentation.ui.contact.ContactsFragment;
+import com.apap.director.client.presentation.ui.inbox.InboxFragment;
 
 public class DirecTorPagerAdapter extends FragmentPagerAdapter {
 

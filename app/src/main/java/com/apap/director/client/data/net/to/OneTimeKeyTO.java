@@ -2,7 +2,8 @@ package com.apap.director.client.data.net.to;
 
 import android.util.Base64;
 
-import com.apap.director.db.realm.model.OneTimeKey;
+
+import com.apap.director.client.domain.model.OneTimeKey;
 
 import org.whispersystems.libsignal.state.PreKeyRecord;
 

@@ -2,7 +2,8 @@ package com.apap.director.client.data.store;
 
 import android.util.Log;
 
-import com.apap.director.db.realm.model.SignedKey;
+
+import com.apap.director.client.domain.model.SignedKey;
 
 import org.whispersystems.libsignal.InvalidKeyIdException;
 import org.whispersystems.libsignal.state.SignedPreKeyRecord;
@@ -27,8 +28,9 @@ public class DirectorSignedPreKeyStore implements SignedPreKeyStore {
 
     @Override
     public SignedPreKeyRecord loadSignedPreKey(int signedPreKeyId) throws InvalidKeyIdException {
+        Realm realm = Realm.getDefaultInstance();
+
         try {
-            Realm realm = Realm.getDefaultInstance();
 
             SignedKey signedKey = realm.where(SignedKey.class)
                     .equalTo("signedKeyId", signedPreKeyId)
@@ -42,6 +44,9 @@ public class DirectorSignedPreKeyStore implements SignedPreKeyStore {
             Log.getStackTraceString(e);
 
             throw new InvalidKeyIdException("IO exception: " + e.getMessage());
+        }
+        finally {
+            realm.close();
         }
 
     }
@@ -81,6 +86,7 @@ public class DirectorSignedPreKeyStore implements SignedPreKeyStore {
             signedKey.setId(id);
             realm.copyToRealmOrUpdate(signedKey);
         realm.commitTransaction();
+        realm.close();
 
     }
 

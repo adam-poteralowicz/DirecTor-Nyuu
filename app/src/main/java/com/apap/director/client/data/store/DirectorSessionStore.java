@@ -2,9 +2,9 @@ package com.apap.director.client.data.store;
 
 import android.util.Log;
 
-import com.apap.director.db.realm.model.Account;
-import com.apap.director.db.realm.model.ContactKey;
-import com.apap.director.db.realm.model.Session;
+import com.apap.director.client.domain.model.Account;
+import com.apap.director.client.domain.model.ContactKey;
+import com.apap.director.client.domain.model.Session;
 
 import org.whispersystems.libsignal.SignalProtocolAddress;
 import org.whispersystems.libsignal.state.SessionRecord;
@@ -30,8 +30,10 @@ public class DirectorSessionStore implements SessionStore {
 
     @Override
     public SessionRecord loadSession(SignalProtocolAddress address) {
+
+        Realm realm = Realm.getDefaultInstance();
+
         try {
-            Realm realm = Realm.getDefaultInstance();
             Session session = realm.where(Session.class)
                     .equalTo("name", address.getName())
                     .equalTo("deviceId", address.getDeviceId())
@@ -41,6 +43,9 @@ public class DirectorSessionStore implements SessionStore {
         } catch (IOException e) {
             Log.getStackTraceString(e);
             return null;
+        }
+        finally {
+            realm.close();
         }
     }
 
@@ -67,6 +72,7 @@ public class DirectorSessionStore implements SessionStore {
                 realm.copyToRealmOrUpdate(sameName);
                 realm.insertOrUpdate(sameName);
                 realm.commitTransaction();
+                realm.close();
                 return;
             }
 
@@ -85,6 +91,7 @@ public class DirectorSessionStore implements SessionStore {
             session.setSerializedKey(record.serialize());
 
         realm.commitTransaction();
+        realm.close();
 
     }
 
@@ -96,6 +103,7 @@ public class DirectorSessionStore implements SessionStore {
                 .equalTo("deviceId", address.getDeviceId())
                 .findFirst();
 
+        realm.close();
         return session != null;
 
     }
@@ -106,6 +114,7 @@ public class DirectorSessionStore implements SessionStore {
         realm.beginTransaction();
             realm.where(Session.class).equalTo("deviceId", address.getDeviceId()).equalTo("name", address.getName()).findFirst().deleteFromRealm();
         realm.commitTransaction();
+        realm.close();
     }
 
     @Override
@@ -114,5 +123,6 @@ public class DirectorSessionStore implements SessionStore {
         realm.beginTransaction();
             realm.where(Session.class).equalTo("name", name).findAll().deleteAllFromRealm();
         realm.commitTransaction();
+        realm.close();
     }
 }

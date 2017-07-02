@@ -1,4 +1,4 @@
-package com.apap.director.client.ui.message;
+package com.apap.director.client.presentation.ui.message;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
@@ -11,14 +11,14 @@ import android.widget.TextView;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.client.ui.home.adapter.MessageAdapter;
-import com.apap.director.db.realm.model.Account;
-import com.apap.director.db.realm.model.Conversation;
-import com.apap.director.db.realm.model.Message;
-import com.apap.director.db.realm.util.ArrayAdapterChangeListener;
+import com.apap.director.client.data.manager.ConversationManager;
+import com.apap.director.client.data.manager.MessageManager;
+import com.apap.director.client.domain.model.Account;
+import com.apap.director.client.domain.model.Conversation;
+import com.apap.director.client.domain.model.Message;
+import com.apap.director.client.presentation.ui.home.adapter.MessageAdapter;
 import com.apap.director.client.data.net.websocket.service.ClientService;
-import com.apap.director.manager.ConversationManager;
-import com.apap.director.manager.MessageManager;
+import com.apap.director.client.presentation.ui.listener.ArrayAdapterChangeListener;
 
 import java.util.ArrayList;
 import java.util.List;

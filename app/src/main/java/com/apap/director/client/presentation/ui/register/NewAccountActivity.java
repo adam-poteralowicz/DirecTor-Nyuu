@@ -1,4 +1,4 @@
-package com.apap.director.client.ui.register;
+package com.apap.director.client.presentation.ui.register;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,7 +9,7 @@ import android.widget.EditText;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.client.ui.login.LoginActivity;
+import com.apap.director.client.presentation.ui.login.LoginActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

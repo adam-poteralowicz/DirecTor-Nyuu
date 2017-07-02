@@ -1,4 +1,4 @@
-package com.apap.director.client.ui.login;
+package com.apap.director.client.presentation.ui.login;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -17,12 +17,12 @@ import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.client.ui.register.NewAccountActivity;
-import com.apap.director.client.ui.home.HomeActivity;
-import com.apap.director.db.realm.model.Account;
-import com.apap.director.db.realm.util.ArrayAdapterChangeListener;
+import com.apap.director.client.data.manager.AccountManager;
+import com.apap.director.client.domain.model.Account;
+import com.apap.director.client.presentation.ui.listener.ArrayAdapterChangeListener;
+import com.apap.director.client.presentation.ui.register.NewAccountActivity;
+import com.apap.director.client.presentation.ui.home.HomeActivity;
 import com.apap.director.client.data.net.websocket.service.ClientService;
-import com.apap.director.manager.AccountManager;
 import com.apap.director.client.data.net.rest.service.UserService;
 
 import java.io.IOException;

@@ -2,7 +2,8 @@ package com.apap.director.client.data.net.to;
 
 import android.util.Base64;
 
-import com.apap.director.db.realm.model.SignedKey;
+
+import com.apap.director.client.domain.model.SignedKey;
 
 import org.whispersystems.libsignal.state.SignedPreKeyRecord;
 

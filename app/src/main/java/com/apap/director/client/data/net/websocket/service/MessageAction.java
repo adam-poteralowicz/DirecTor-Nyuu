@@ -3,17 +3,17 @@ package com.apap.director.client.data.net.websocket.service;
 import android.util.Base64;
 import android.util.Log;
 
-import com.apap.director.db.realm.model.Contact;
-import com.apap.director.db.realm.model.ContactKey;
-import com.apap.director.db.realm.model.Conversation;
+import com.apap.director.client.data.manager.ContactManager;
+import com.apap.director.client.data.manager.ConversationManager;
+import com.apap.director.client.data.manager.MessageManager;
 import com.apap.director.client.data.net.to.MessageTO;
-import com.apap.director.manager.ContactManager;
-import com.apap.director.manager.ConversationManager;
-import com.apap.director.manager.MessageManager;
 import com.apap.director.client.data.store.DirectorIdentityKeyStore;
 import com.apap.director.client.data.store.DirectorPreKeyStore;
 import com.apap.director.client.data.store.DirectorSessionStore;
 import com.apap.director.client.data.store.DirectorSignedPreKeyStore;
+import com.apap.director.client.domain.model.Contact;
+import com.apap.director.client.domain.model.ContactKey;
+import com.apap.director.client.domain.model.Conversation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.whispersystems.libsignal.DuplicateMessageException;
@@ -60,6 +60,8 @@ public class MessageAction implements Action1<StompMessage> {
 
     @Override
     public void call(StompMessage stompMessage) {
+        Realm localRealm = Realm.getDefaultInstance();
+
         try {
             Log.v(TAG, "PAYLOAD: " + stompMessage.getPayload());
 
@@ -69,13 +71,16 @@ public class MessageAction implements Action1<StompMessage> {
 
 
             Log.v(TAG, "POINTCUT: GET CONTACT");
-            Realm localRealm = Realm.getDefaultInstance();
 
             ContactKey key = localRealm.where(ContactKey.class)
                     .equalTo("keyBase64", frame.getFrom())
                     .equalTo("account.active", true)
                     .findFirst();
+
+            localRealm.close();
+
             Contact contact = key.getContact();
+
 
             Log.v(TAG, "Contact name " + contact.getName());
 
@@ -114,10 +119,17 @@ public class MessageAction implements Action1<StompMessage> {
                 | LegacyMessageException
                 | NoSessionException
                 | IOException e) {
+            localRealm.close();
+
             Log.getStackTraceString(e);
         } catch (InvalidMessageException e) {
+            localRealm.close();
+
             Log.v(TAG, "invalid message");
             Log.getStackTraceString(e);
+        }
+        finally {
+            localRealm.close();
         }
 
     }

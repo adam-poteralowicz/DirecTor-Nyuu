@@ -1,4 +1,4 @@
-package com.apap.director.client.ui.home.adapter;
+package com.apap.director.client.presentation.ui.home.adapter;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
@@ -8,7 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.apap.director.client.R;
-import com.apap.director.db.realm.model.Message;
+import com.apap.director.client.domain.model.Message;
 
 import java.util.List;
 

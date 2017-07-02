@@ -1,4 +1,4 @@
-package com.apap.director.client.ui.contact;
+package com.apap.director.client.presentation.ui.contact;
 
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -20,11 +20,11 @@ import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.client.ui.home.HomeActivity;
+import com.apap.director.client.data.manager.AccountManager;
+import com.apap.director.client.data.manager.ContactManager;
+import com.apap.director.client.data.manager.ConversationManager;
+import com.apap.director.client.presentation.ui.home.HomeActivity;
 import com.apap.director.client.data.util.NFCUtils;
-import com.apap.director.manager.AccountManager;
-import com.apap.director.manager.ContactManager;
-import com.apap.director.manager.ConversationManager;
 
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.InvalidKeyException;

@@ -1,6 +1,6 @@
 package com.apap.director.client.data.net.rest.module;
 
-import com.apap.director.network.rest.Paths;
+import com.apap.director.client.data.net.rest.Paths;
 import com.apap.director.client.data.net.rest.service.KeyService;
 import com.apap.director.client.data.net.rest.service.UserService;
 
