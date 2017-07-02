@@ -15,12 +15,12 @@ android {
             exclude 'META-INF/LGPL2.1'
         }
 
-    compileSdkVersion 24
-    buildToolsVersion "24.0.3"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "com.apap.director.client"
         minSdkVersion 21
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -34,13 +34,14 @@ android {
 }
 
 apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'realm-android'
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:24.0.3'
+    compile 'com.android.support:appcompat-v7:25.3.1'
 
     compile 'com.jakewharton:butterknife:8.4.0'
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
@@ -50,14 +51,10 @@ dependencies {
     compile 'com.google.dagger:dagger:2.7'
     apt "com.google.dagger:dagger-compiler:2.7"
 
-    // Needed for @Generated annotation (missing in Android API jar)
-    // No longer needed in dagger >= 2.1-SNAPSHOT (github.com/google/dagger/issues/95)
-    //compile 'javax.annotation:jsr250-api:1.0'
+
     compile 'info.guardianproject.netcipher:netcipher:2.0.0-alpha1'
     compile 'info.guardianproject.netcipher:netcipher-httpclient:2.0.0-alpha1'
     compile 'cz.msebera.android:httpclient:4.4.1.2'
-    compile project(':im')
-    compile project(':core')
 
     testCompile 'junit:junit:4.12'
 }

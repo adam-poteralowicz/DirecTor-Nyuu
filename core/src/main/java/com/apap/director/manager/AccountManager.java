@@ -11,11 +11,11 @@ import com.apap.director.db.realm.model.Message;
 import com.apap.director.db.realm.model.OneTimeKey;
 import com.apap.director.db.realm.model.Session;
 import com.apap.director.db.realm.model.SignedKey;
-import com.apap.director.db.realm.to.OneTimeKeyTO;
-import com.apap.director.db.realm.to.SignedKeyTO;
-import com.apap.director.network.rest.service.KeyService;
-import com.apap.director.network.rest.service.LoginDetails;
-import com.apap.director.network.rest.service.UserService;
+import com.apap.director.client.data.net.to.OneTimeKeyTO;
+import com.apap.director.client.data.net.to.SignedKeyTO;
+import com.apap.director.client.data.net.rest.service.KeyService;
+import com.apap.director.client.data.net.rest.service.LoginDetails;
+import com.apap.director.client.data.net.rest.service.UserService;
 import com.apap.director.signal.DirectorPreKeyStore;
 import com.apap.director.signal.DirectorSignedPreKeyStore;
 

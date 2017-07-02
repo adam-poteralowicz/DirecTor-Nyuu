@@ -2,13 +2,12 @@ package com.apap.director.manager;
 
 import android.util.Base64;
 import android.util.Log;
-import android.util.StringBuilderPrinter;
 
 import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.Contact;
 import com.apap.director.db.realm.model.ContactKey;
 import com.apap.director.db.realm.model.Conversation;
-import com.apap.director.network.rest.service.KeyService;
+import com.apap.director.client.data.net.rest.service.KeyService;
 
 import org.whispersystems.libsignal.util.ByteUtil;
 

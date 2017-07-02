@@ -1,7 +1,7 @@
 package com.apap.director.manager;
 
-import com.apap.director.network.rest.service.KeyService;
-import com.apap.director.network.rest.service.UserService;
+import com.apap.director.client.data.net.rest.service.KeyService;
+import com.apap.director.client.data.net.rest.service.UserService;
 import com.apap.director.signal.DirectorPreKeyStore;
 import com.apap.director.signal.DirectorSignedPreKeyStore;
 
