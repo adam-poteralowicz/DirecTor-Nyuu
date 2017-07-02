@@ -17,6 +17,7 @@ public class Account extends RealmObject {
     private String name;
     private byte[] keyPair;
     private int registrationId;
+    private String masterPassword;
 
     private String keyBase64;
 
@@ -76,6 +77,14 @@ public class Account extends RealmObject {
 
     public void setCookie(String cookie){
         this.cookie = cookie;
+    }
+
+    public String getMasterPassword() {
+        return masterPassword;
+    }
+
+    public void setMasterPassword(String password) {
+        this.masterPassword = password;
     }
 
     @Override

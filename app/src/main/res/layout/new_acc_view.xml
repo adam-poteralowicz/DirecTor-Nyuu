@@ -14,7 +14,7 @@
         android:layout_marginRight="100dp"/>
 
     <Button
-        android:text="Save"
+        android:text="@string/save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

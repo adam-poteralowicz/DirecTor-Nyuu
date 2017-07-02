@@ -12,18 +12,20 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.data.manager.AccountManager;
+import com.apap.director.client.data.net.rest.service.UserService;
+import com.apap.director.client.data.net.service.ClientService;
 import com.apap.director.client.domain.model.Account;
+import com.apap.director.client.presentation.ui.home.HomeActivity;
 import com.apap.director.client.presentation.ui.listener.ArrayAdapterChangeListener;
 import com.apap.director.client.presentation.ui.register.NewAccountActivity;
-import com.apap.director.client.presentation.ui.home.HomeActivity;
-import com.apap.director.client.data.net.service.ClientService;
-import com.apap.director.client.data.net.rest.service.UserService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,7 +46,8 @@ import info.guardianproject.netcipher.client.StrongBuilder;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-import static java.lang.System.out;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 public class LoginActivity extends AppCompatActivity implements StrongBuilder.Callback<HttpClient> {
 
@@ -60,10 +63,17 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
 
     @BindView(R.id.accountsView)
     ListView accountsListView;
+    @BindView(R.id.loginActivity_dialog)
+    View masterPasswordDialog;
+    @BindView(R.id.masterPasswordVerification_button)
+    Button verificationButton;
+    @BindView(R.id.masterPasswordVerification_editText)
+    EditText masterPasswordEditText;
 
     private ArrayList<Account> accountList;
     private RealmResults<Account> realmAccounts;
     private ArrayAdapterChangeListener<Account, RealmResults<Account>> listener;
+    private String accountName;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -116,7 +126,7 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
-                accountManager.signUp(accountManager.createAccount(data.getStringExtra("accountName")));
+            accountManager.signUp(accountManager.createAccount(data.getStringExtra("accountName")));
         }
     }
 
@@ -130,7 +140,7 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
                     HttpGet get = new HttpGet(HS_URL);
 
                     String result = httpClient.execute(get, new BasicResponseHandler());
-                    out.println(result);
+                    Log.v(TAG, result);
                 } catch (IOException e) {
                     onConnectionException(e);
                 }
@@ -266,6 +276,16 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
         startActivityForResult(newAccIntent, 1);
     }
 
+    @OnClick(R.id.masterPasswordVerification_button)
+    public void verifyInput(View view) {
+        if (verifyMasterPassword(String.valueOf(masterPasswordEditText.getText()))) {
+            deleteAccount(accountName);
+            masterPasswordDialog.setVisibility(GONE);
+        } else {
+            Toast.makeText(this, "Wrong master password", Toast.LENGTH_LONG).show();
+        }
+    }
+
     @OnItemClick(R.id.accountsView)
     public void chooseAccount(int position) {
         boolean success = accountManager.chooseAccount(accountList.get(position).getName());
@@ -273,15 +293,21 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
     }
 
     @OnItemLongClick(R.id.accountsView)
-    public boolean deleteAccount(int position) {
-        String name = accountList.get(position).getName();
-        boolean deleted = accountManager.deleteAccount(name);
+    public boolean displayVerificationDialog(int position) {
+        accountName = accountList.get(position).getName();
+        masterPasswordDialog.setVisibility(VISIBLE);
+        return true;
+    }
 
+    public boolean verifyMasterPassword(String password) {
+        return realm.where(Account.class).equalTo("masterPassword", password) != null;
+    }
+
+    public void deleteAccount(String accountName) {
+        boolean deleted = accountManager.deleteAccount(accountName);
         if (!deleted)
-            Log.v(TAG, name + " account failed to delete");
+            Log.v(TAG, accountName + " account failed to delete");
         else
-            Log.v(TAG, name + " account deleted");
-        
-        return false;
+            Log.v(TAG, accountName + " account deleted");
     }
 }

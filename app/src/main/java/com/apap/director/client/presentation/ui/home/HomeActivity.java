@@ -14,7 +14,6 @@ import com.apap.director.client.domain.model.Account;
 import com.apap.director.client.presentation.ui.home.adapter.DirecTorPagerAdapter;
 import com.apap.director.client.presentation.ui.login.LoginActivity;
 
-
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -25,7 +24,7 @@ public class HomeActivity extends FragmentActivity {
 
     @Inject
     AccountManager
-            accountManager;
+    accountManager;
 
     @BindView(R.id.pager)
     ViewPager viewPager;
@@ -42,7 +41,7 @@ public class HomeActivity extends FragmentActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ButterKnife.bind(this);
 
-        direcTorPagerAdapter = new DirecTorPagerAdapter(getSupportFragmentManager(), 2);
+        direcTorPagerAdapter = new DirecTorPagerAdapter(getSupportFragmentManager(), 3);
         viewPager.setAdapter(direcTorPagerAdapter);
         realm = Realm.getDefaultInstance();
     }

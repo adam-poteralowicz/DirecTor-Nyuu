@@ -10,7 +10,7 @@
     <string name="empty"> </string>
     <string name="yes">yes</string>
     <string name="no">no</string>
-    <string name="client_text">This device will act as a client. Click on Gallery button to pick a local(stored) file</string>
+    <string name="client_text">This device will act as a client. Click on Gallery button to pick a local (stored) file</string>
     <string name="empty_message">No devices found. Turn on P2P and perform discovery from the Action Bar</string>
     <string name="p2p_off_warning">Enable P2P from action bar button above or system settings</string>
     <string name="group_owner_text">"Am I the Group Owner? "</string>
@@ -29,4 +29,15 @@
     <string name="read_button_label">Read message</string>
     <string name="bt_not_found">Bluetooth not found</string>
     <string name="bt_cancelled">Bluetooth cancelled</string>
+    <string name="new_account">New Account</string>
+    <string name="login">Login</string>
+    <string name="save">Save</string>
+    <string name="send">SEND</string>
+    <string name="contact_name">Contact name</string>
+    <string name="provide_master_password">Provide master password</string>
+    <string name="master_password">MASTER PASSWORD</string>
+    <string name="add_contact">Add Contact</string>
+    <string name="set_master_password">Set master password</string>
+    <string name="confirm">Confirm</string>
+    <string name="settings">Settings</string>
 </resources>

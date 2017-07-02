@@ -2,47 +2,40 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:id="@+id/loginActivity_layout">
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:id="@+id/accountsView"
+        android:background="#6666ff"
+        android:layout_above="@+id/newAccButton"
+        android:layout_marginTop="90dp"
+        android:layout_marginLeft="100dp"
+        android:layout_marginRight="100dp"
+        android:layout_marginBottom="80dp"/>
+
+    <include layout="@layout/master_password_verification_dialog"
+        android:id="@+id/loginActivity_dialog" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Login"
+        android:text="@string/login"
         android:id="@+id/postLoginButton"
         android:clickable="true"
         android:onClick="onClick"
-        android:layout_marginBottom="87dp"
+        android:layout_marginBottom="32dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Login"
-        android:id="@+id/button"
-        android:clickable="true"
-        android:onClick="onClick"
-        android:layout_alignStart="@+id/postLoginButton"
-        android:layout_alignBottom="@+id/postLoginButton" />
-
-    <Button
-        android:text="New Account"
+        android:text="@string/new_account"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/newAccButton"
+        android:onClick="newAccount"
         android:layout_above="@+id/postLoginButton"
-        android:layout_centerHorizontal="true"
-        android:onClick="newAccount"/>
-
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/accountsView"
-        android:background="#6666ff"
-        android:layout_above="@+id/newAccButton"
-        android:layout_marginTop="116dp"
-        android:layout_marginLeft="100dp"
-        android:layout_marginRight="100dp"
-        android:layout_marginBottom="30dp"/>
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

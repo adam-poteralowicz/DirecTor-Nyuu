@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <Button
+        android:id="@+id/settingsView_masterPasswordButton"
+        android:text="@string/set_master_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:onClick="newAccount"/>
+    <EditText
+        android:id="@+id/settingsView_editText"
+        android:layout_width="184dp"
+        android:layout_height="64dp"
+        android:layout_below="@id/settingsView_masterPasswordButton"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"/>
+    <Button
+        android:text="@string/confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/settingsView_editText"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/settingsView_confirmButton"
+        android:visibility="gone"/>
+</RelativeLayout>

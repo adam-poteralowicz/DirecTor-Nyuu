@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 
 import com.apap.director.client.App;
@@ -33,7 +34,7 @@ public class NewAccountActivity extends Activity {
     }
 
     @OnClick(R.id.saveAccButton)
-    public void saveAccount() {
+    public void saveAccount(View view) {
         String accountName = String.valueOf(accountNameEditText.getText());
 
         Intent newAccIntent = new Intent(NewAccountActivity.this, LoginActivity.class);
