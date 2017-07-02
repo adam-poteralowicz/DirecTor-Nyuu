@@ -1,4 +1,4 @@
-package com.apap.director.client.data.net.websocket.service;
+package com.apap.director.client.data.net.service;
 
 import android.os.AsyncTask;
 import android.util.Base64;
@@ -9,10 +9,10 @@ import com.apap.director.client.data.net.rest.service.KeyService;
 import com.apap.director.client.data.net.to.MessageTO;
 import com.apap.director.client.data.net.to.OneTimeKeyTO;
 import com.apap.director.client.data.net.to.SignedKeyTO;
-import com.apap.director.client.data.store.DirectorIdentityKeyStore;
-import com.apap.director.client.data.store.DirectorPreKeyStore;
-import com.apap.director.client.data.store.DirectorSessionStore;
-import com.apap.director.client.data.store.DirectorSignedPreKeyStore;
+import com.apap.director.client.data.store.IdentityKeyStoreImpl;
+import com.apap.director.client.data.store.PreKeyStoreImpl;
+import com.apap.director.client.data.store.SessionStoreImpl;
+import com.apap.director.client.data.store.SignedPreKeyStoreImpl;
 import com.apap.director.client.domain.model.ContactKey;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,10 +51,10 @@ public class ClientService {
 
     public static StompClient client;
     private static MessageAction messageAction;
-    private static DirectorSessionStore sessionStore;
-    private static DirectorIdentityKeyStore identityKeyStore;
-    private static DirectorPreKeyStore preKeyStore;
-    private static DirectorSignedPreKeyStore signedPreKeyStore;
+    private static SessionStoreImpl sessionStore;
+    private static IdentityKeyStoreImpl identityKeyStore;
+    private static PreKeyStoreImpl preKeyStore;
+    private static SignedPreKeyStoreImpl signedPreKeyStore;
     private static KeyService keyService;
     private static String TAG = "ClientService";
     private static String MESSAGE = "MESSAGE";
@@ -63,7 +63,7 @@ public class ClientService {
         // not called
     }
 
-    public static void init(MessageAction messageAction, DirectorSessionStore sessionStore, DirectorIdentityKeyStore identityKeyStore, DirectorPreKeyStore preKeyStore, DirectorSignedPreKeyStore signedPreKeyStore, KeyService keyService) {
+    public static void init(MessageAction messageAction, SessionStoreImpl sessionStore, IdentityKeyStoreImpl identityKeyStore, PreKeyStoreImpl preKeyStore, SignedPreKeyStoreImpl signedPreKeyStore, KeyService keyService) {
         ClientService.messageAction = messageAction;
         ClientService.sessionStore = sessionStore;
         ClientService.identityKeyStore = identityKeyStore;

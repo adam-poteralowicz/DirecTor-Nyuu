@@ -1,4 +1,4 @@
-package com.apap.director.client.data.net.websocket.service;
+package com.apap.director.client.data.net.service;
 
 
 import android.util.Log;

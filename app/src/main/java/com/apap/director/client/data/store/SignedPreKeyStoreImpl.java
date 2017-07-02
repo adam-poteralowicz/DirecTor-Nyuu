@@ -17,12 +17,12 @@ import javax.inject.Inject;
 
 import io.realm.Realm;
 
-public class DirectorSignedPreKeyStore implements SignedPreKeyStore {
+public class SignedPreKeyStoreImpl implements SignedPreKeyStore {
 
     private Realm realm;
 
     @Inject
-    public DirectorSignedPreKeyStore(Realm realm) {
+    public SignedPreKeyStoreImpl(Realm realm) {
         this.realm = realm;
     }
 

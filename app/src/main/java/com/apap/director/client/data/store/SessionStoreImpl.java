@@ -19,12 +19,12 @@ import javax.inject.Inject;
 import io.realm.Realm;
 
 
-public class DirectorSessionStore implements SessionStore {
+public class SessionStoreImpl implements SessionStore {
 
     private Realm realm;
 
     @Inject
-    public DirectorSessionStore(Realm realm) {
+    public SessionStoreImpl(Realm realm) {
         this.realm = realm;
     }
 

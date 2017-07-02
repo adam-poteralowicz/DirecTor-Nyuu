@@ -22,7 +22,7 @@ import com.apap.director.client.domain.model.Account;
 import com.apap.director.client.presentation.ui.listener.ArrayAdapterChangeListener;
 import com.apap.director.client.presentation.ui.register.NewAccountActivity;
 import com.apap.director.client.presentation.ui.home.HomeActivity;
-import com.apap.director.client.data.net.websocket.service.ClientService;
+import com.apap.director.client.data.net.service.ClientService;
 import com.apap.director.client.data.net.rest.service.UserService;
 
 import java.io.IOException;

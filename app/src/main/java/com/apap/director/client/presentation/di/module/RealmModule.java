@@ -10,15 +10,11 @@ import io.realm.Realm;
 
 @Module
 public class RealmModule {
-    Context context;
-
-    public RealmModule(Context context){
-        this.context = context;
-    }
 
     @Provides
     @Singleton
-    Realm provideRealm(){
+    Realm provideRealm(Context context){
+        Realm.init(context);
         Realm realm = Realm.getDefaultInstance();
         realm.setAutoRefresh(true);
         return realm;

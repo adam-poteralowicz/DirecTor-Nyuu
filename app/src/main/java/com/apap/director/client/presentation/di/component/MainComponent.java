@@ -1,6 +1,11 @@
 package com.apap.director.client.presentation.di.component;
 
+import android.content.Context;
+
 import com.apap.director.client.App;
+import com.apap.director.client.data.store.IdentityKeyStoreImpl;
+import com.apap.director.client.data.store.PreKeyStoreImpl;
+import com.apap.director.client.presentation.di.module.ContextModule;
 import com.apap.director.client.presentation.di.module.ManagerModule;
 import com.apap.director.client.presentation.di.module.RealmModule;
 import com.apap.director.client.presentation.ui.contact.AddContactActivity;
@@ -12,22 +17,25 @@ import com.apap.director.client.presentation.ui.message.NewMsgActivity;
 import com.apap.director.client.presentation.ui.contact.SingleContactActivity;
 import com.apap.director.client.presentation.ui.contact.ContactsFragment;
 import com.apap.director.client.presentation.ui.inbox.InboxFragment;
-import com.apap.director.client.data.net.websocket.module.WebSocketModule;
-import com.apap.director.client.data.net.websocket.service.MessageAction;
-import com.apap.director.client.data.net.rest.module.RestModule;
+import com.apap.director.client.presentation.di.module.WebSocketModule;
+import com.apap.director.client.data.net.service.MessageAction;
+import com.apap.director.client.presentation.di.module.NetModule;
 import com.apap.director.client.data.net.rest.service.KeyService;
-import com.apap.director.client.data.store.DirectorIdentityKeyStore;
-import com.apap.director.client.data.store.DirectorPreKeyStore;
-import com.apap.director.client.data.store.DirectorSessionStore;
-import com.apap.director.client.data.store.DirectorSignedPreKeyStore;
-import com.apap.director.client.data.store.module.SignalModule;
+import com.apap.director.client.data.store.SessionStoreImpl;
+import com.apap.director.client.data.store.SignedPreKeyStoreImpl;
+import com.apap.director.client.presentation.di.module.SignalModule;
 
 import javax.inject.Singleton;
 
 import dagger.Component;
 
 @Singleton
-@Component(modules = {ManagerModule.class, RealmModule.class, RestModule.class, SignalModule.class, WebSocketModule.class})
+@Component(modules = {ManagerModule.class,
+        RealmModule.class,
+        NetModule.class,
+        SignalModule.class,
+        WebSocketModule.class,
+        ContextModule.class })
 public interface MainComponent {
 
     void inject(AddContactActivity addContactActivity);
@@ -54,11 +62,13 @@ public interface MainComponent {
 
     KeyService getKeyService();
 
-    DirectorIdentityKeyStore getDirectorIdentityKeyStore();
+    IdentityKeyStoreImpl getDirectorIdentityKeyStore();
 
-    DirectorPreKeyStore getDirectorPreKeyStore();
+    PreKeyStoreImpl getDirectorPreKeyStore();
 
-    DirectorSignedPreKeyStore getDirectorSignedPreKeyStore();
+    SignedPreKeyStoreImpl getDirectorSignedPreKeyStore();
 
-    DirectorSessionStore getDirectorSessionStore();
+    SessionStoreImpl getDirectorSessionStore();
+
+    Context context();
 }

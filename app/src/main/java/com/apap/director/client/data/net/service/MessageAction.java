@@ -1,4 +1,4 @@
-package com.apap.director.client.data.net.websocket.service;
+package com.apap.director.client.data.net.service;
 
 import android.util.Base64;
 import android.util.Log;
@@ -7,10 +7,10 @@ import com.apap.director.client.data.manager.ContactManager;
 import com.apap.director.client.data.manager.ConversationManager;
 import com.apap.director.client.data.manager.MessageManager;
 import com.apap.director.client.data.net.to.MessageTO;
-import com.apap.director.client.data.store.DirectorIdentityKeyStore;
-import com.apap.director.client.data.store.DirectorPreKeyStore;
-import com.apap.director.client.data.store.DirectorSessionStore;
-import com.apap.director.client.data.store.DirectorSignedPreKeyStore;
+import com.apap.director.client.data.store.IdentityKeyStoreImpl;
+import com.apap.director.client.data.store.PreKeyStoreImpl;
+import com.apap.director.client.data.store.SessionStoreImpl;
+import com.apap.director.client.data.store.SignedPreKeyStoreImpl;
 import com.apap.director.client.domain.model.Contact;
 import com.apap.director.client.domain.model.ContactKey;
 import com.apap.director.client.domain.model.Conversation;
@@ -42,15 +42,15 @@ import ua.naiksoftware.stomp.client.StompMessage;
 
 public class MessageAction implements Action1<StompMessage> {
 
-    private DirectorPreKeyStore preKeyStore;
-    private DirectorIdentityKeyStore identityKeyStore;
-    private DirectorSessionStore sessionStore;
-    private DirectorSignedPreKeyStore signedPreKeyStore;
+    private PreKeyStoreImpl preKeyStore;
+    private IdentityKeyStoreImpl identityKeyStore;
+    private SessionStoreImpl sessionStore;
+    private SignedPreKeyStoreImpl signedPreKeyStore;
     private MessageManager messageManager;
     private String TAG = this.getClass().getSimpleName();
 
     @Inject
-    public MessageAction(DirectorPreKeyStore preKeyStore, DirectorIdentityKeyStore identityKeyStore, DirectorSessionStore sessionStore, DirectorSignedPreKeyStore signedPreKeyStore, MessageManager messageManager, ContactManager contactManager, ConversationManager conversationManager) {
+    public MessageAction(PreKeyStoreImpl preKeyStore, IdentityKeyStoreImpl identityKeyStore, SessionStoreImpl sessionStore, SignedPreKeyStoreImpl signedPreKeyStore, MessageManager messageManager, ContactManager contactManager, ConversationManager conversationManager) {
         this.preKeyStore = preKeyStore;
         this.identityKeyStore = identityKeyStore;
         this.sessionStore = sessionStore;

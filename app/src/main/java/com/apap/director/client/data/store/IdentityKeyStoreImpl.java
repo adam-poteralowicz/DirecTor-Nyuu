@@ -16,12 +16,12 @@ import javax.inject.Inject;
 
 import io.realm.Realm;
 
-public class DirectorIdentityKeyStore implements IdentityKeyStore {
+public class IdentityKeyStoreImpl implements IdentityKeyStore {
 
     private AccountManager accountManager;
 
     @Inject
-    public DirectorIdentityKeyStore(Realm realm, AccountManager accountManager) {
+    public IdentityKeyStoreImpl(Realm realm, AccountManager accountManager) {
         this.accountManager = accountManager;
     }
 

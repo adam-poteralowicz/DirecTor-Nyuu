@@ -8,8 +8,8 @@ import com.apap.director.client.data.net.rest.service.LoginDetails;
 import com.apap.director.client.data.net.rest.service.UserService;
 import com.apap.director.client.data.net.to.OneTimeKeyTO;
 import com.apap.director.client.data.net.to.SignedKeyTO;
-import com.apap.director.client.data.store.DirectorPreKeyStore;
-import com.apap.director.client.data.store.DirectorSignedPreKeyStore;
+import com.apap.director.client.data.store.PreKeyStoreImpl;
+import com.apap.director.client.data.store.SignedPreKeyStoreImpl;
 import com.apap.director.client.domain.model.Account;
 import com.apap.director.client.domain.model.ContactKey;
 import com.apap.director.client.domain.model.Conversation;
@@ -47,11 +47,11 @@ public class AccountManager {
     private UserService userService;
     private Curve25519 curve25519;
     private KeyService keyService;
-    private DirectorPreKeyStore preKeyStore;
-    private DirectorSignedPreKeyStore signedPreKeyStore;
+    private PreKeyStoreImpl preKeyStore;
+    private SignedPreKeyStoreImpl signedPreKeyStore;
     private String TAG = this.getClass().getSimpleName();
 
-    public AccountManager(Realm realm, UserService userService, Curve25519 curve25519, KeyService keyService, DirectorPreKeyStore preKeyStore, DirectorSignedPreKeyStore signedPreKeyStore) {
+    public AccountManager(Realm realm, UserService userService, Curve25519 curve25519, KeyService keyService, PreKeyStoreImpl preKeyStore, SignedPreKeyStoreImpl signedPreKeyStore) {
         this.realm = realm;
         this.userService = userService;
         this.curve25519 = curve25519;

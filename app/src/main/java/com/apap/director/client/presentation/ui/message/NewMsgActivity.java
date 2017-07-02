@@ -17,7 +17,7 @@ import com.apap.director.client.domain.model.Account;
 import com.apap.director.client.domain.model.Conversation;
 import com.apap.director.client.domain.model.Message;
 import com.apap.director.client.presentation.ui.home.adapter.MessageAdapter;
-import com.apap.director.client.data.net.websocket.service.ClientService;
+import com.apap.director.client.data.net.service.ClientService;
 import com.apap.director.client.presentation.ui.listener.ArrayAdapterChangeListener;
 
 import java.util.ArrayList;
