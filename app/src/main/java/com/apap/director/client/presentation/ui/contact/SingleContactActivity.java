@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
+import com.apap.director.client.data.db.entity.AccountEntity;
+import com.apap.director.client.data.db.entity.ContactEntity;
 import com.apap.director.client.data.db.entity.ConversationEntity;
 import com.apap.director.client.data.db.service.DbContactService;
 import com.apap.director.client.data.manager.AccountManager;
@@ -102,14 +104,8 @@ public class SingleContactActivity extends Activity implements SingleContactCont
 
                         ConversationEntity conv = conversationManager.getConversationByContactId(contactIdFromIntent);
                         if (conv == null) {
-
                             conv = conversationManager.createConversation();
-                            realm.beginTransaction();
-                            conv.setContact(dbContactService.getContactById(contactIdFromIntent));
-                            conv.setAccount(accountManager.getActiveAccount());
-                            //TODO - conversation.setSessions();
-                            realm.copyToRealmOrUpdate(conv);
-                            realm.commitTransaction();
+                            singleContactPresenter.decorateConversation(conv, contactIdFromIntent);
                         }
 
                         intent = new Intent(App.getContext(), NewMsgActivity.class)
@@ -165,6 +161,22 @@ public class SingleContactActivity extends Activity implements SingleContactCont
     @Override
     public void showAvatar(String imagePath, BitmapFactory.Options options) {
         imageView.setImageBitmap(BitmapFactory.decodeFile(imagePath, options));
+    }
+
+    @Override
+    public void setConversationContact(ConversationEntity conversation, ContactEntity contact) {
+        realm.beginTransaction();
+        conversation.setContact(contact);
+        realm.copyToRealmOrUpdate(conversation);
+        realm.commitTransaction();
+    }
+
+    @Override
+    public void setConversationAccount(ConversationEntity conversation, AccountEntity account) {
+        realm.beginTransaction();
+        conversation.setAccount(account);
+        realm.copyToRealmOrUpdate(conversation);
+        realm.commitTransaction();
     }
 
     @OnClick(R.id.imageView)

@@ -6,6 +6,9 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.apap.director.client.data.db.entity.ContactEntity;
+import com.apap.director.client.data.db.entity.ConversationEntity;
+import com.apap.director.client.data.db.service.DbContactService;
+import com.apap.director.client.data.manager.AccountManager;
 import com.apap.director.client.data.manager.ContactManager;
 import com.apap.director.client.presentation.ui.base.contract.presenter.BasePresenter;
 import com.apap.director.client.presentation.ui.contact.contract.SingleContactContract;
@@ -24,11 +27,13 @@ public class SingleContactPresenter implements BasePresenter, SingleContactContr
 
     @Inject
     Realm realm;
-
     @Inject
     ContactManager contactManager;
+    @Inject
+    AccountManager accountManager;
 
     private SingleContactContract.View view;
+    private DbContactService dbContactService;
 
     @Inject
     SingleContactPresenter(SingleContactContract.View view) {
@@ -69,5 +74,11 @@ public class SingleContactPresenter implements BasePresenter, SingleContactContr
         cursor.close();
 
         view.showAvatar(imagePath, options);
+    }
+
+    @Override
+    public void decorateConversation(ConversationEntity conversation, Long contactId) {
+        view.setConversationAccount(conversation, accountManager.getActiveAccount());
+        view.setConversationContact(conversation, dbContactService.getContactById(contactId));
     }
 }
