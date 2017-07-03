@@ -1,4 +1,4 @@
-package com.apap.director.client.domain.model;
+package com.apap.director.client.data.db.entity;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
@@ -9,11 +9,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class SignedKey extends RealmObject {
+public class OneTimeKeyEntity extends RealmObject {
 
     @PrimaryKey
     private long id;
-    private int signedKeyId;
+    private int oneTimeKeyId;
     private byte[] serializedKey;
-    private Account account;
+    private AccountEntity account;
+
 }

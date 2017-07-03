@@ -1,4 +1,4 @@
-package com.apap.director.client.domain.model;
+package com.apap.director.client.data.db.entity;
 
 import java.util.Date;
 import io.realm.RealmObject;
@@ -10,7 +10,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Message extends RealmObject {
+public class MessageEntity extends RealmObject {
+
     @PrimaryKey
     private long id;
     private String sender;
@@ -18,8 +19,8 @@ public class Message extends RealmObject {
     private String content;
     private Date date;
     private Boolean mine;
-    private Account account;
-    private Conversation conversation;
+    private AccountEntity account;
+    private ConversationEntity conversation;
 
     public Boolean isMine() {
         return mine;

@@ -2,9 +2,9 @@ package com.apap.director.client.data.store;
 
 import android.util.Log;
 
+import com.apap.director.client.data.db.entity.ContactEntity;
 import com.apap.director.client.data.manager.AccountManager;
-import com.apap.director.client.domain.model.Contact;
-import com.apap.director.client.domain.model.ContactKey;
+import com.apap.director.client.data.db.entity.ContactKeyEntity;
 
 import org.whispersystems.libsignal.IdentityKey;
 import org.whispersystems.libsignal.IdentityKeyPair;
@@ -50,7 +50,7 @@ public class IdentityKeyStoreImpl implements IdentityKeyStore {
         realm.close();
 
         realm.beginTransaction();
-            ContactKey sameName = realm.where(ContactKey.class).equalTo("keyBase64", address.getName()).equalTo("deviceId", address.getDeviceId()).findFirst();
+            ContactKeyEntity sameName = realm.where(ContactKeyEntity.class).equalTo("keyBase64", address.getName()).equalTo("deviceId", address.getDeviceId()).findFirst();
 
 
             if (sameName != null) {
@@ -60,12 +60,12 @@ public class IdentityKeyStoreImpl implements IdentityKeyStore {
             }
 
 
-            ContactKey contactKey = realm.createObject(ContactKey.class);
+            ContactKeyEntity contactKey = realm.createObject(ContactKeyEntity.class);
             contactKey.setDeviceId(address.getDeviceId());
             contactKey.setKeyBase64(address.getName());
 
 
-            Contact contact = realm.where(Contact.class)
+            ContactEntity contact = realm.where(ContactEntity.class)
                     .equalTo("id", Long.valueOf(address.getName()))
                     .findFirst();
 
@@ -80,7 +80,7 @@ public class IdentityKeyStoreImpl implements IdentityKeyStore {
     public boolean isTrustedIdentity(SignalProtocolAddress address, IdentityKey identityKey) {
 
         Realm realm = Realm.getDefaultInstance();
-        ContactKey contactKey = realm.where(ContactKey.class)
+        ContactKeyEntity contactKey = realm.where(ContactKeyEntity.class)
                 .equalTo("keyBase64", address.getName())
                 .equalTo("deviceId", address.getDeviceId())
                 .findFirst();

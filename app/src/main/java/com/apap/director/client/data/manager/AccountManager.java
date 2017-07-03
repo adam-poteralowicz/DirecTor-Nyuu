@@ -3,6 +3,12 @@ package com.apap.director.client.data.manager;
 import android.util.Base64;
 import android.util.Log;
 
+import com.apap.director.client.data.db.entity.AccountEntity;
+import com.apap.director.client.data.db.entity.ContactKeyEntity;
+import com.apap.director.client.data.db.entity.ConversationEntity;
+import com.apap.director.client.data.db.entity.OneTimeKeyEntity;
+import com.apap.director.client.data.db.entity.SessionEntity;
+import com.apap.director.client.data.db.entity.SignedKeyEntity;
 import com.apap.director.client.data.net.rest.service.KeyService;
 import com.apap.director.client.data.net.rest.service.LoginDetails;
 import com.apap.director.client.data.net.rest.service.UserService;
@@ -10,13 +16,7 @@ import com.apap.director.client.data.net.to.OneTimeKeyTO;
 import com.apap.director.client.data.net.to.SignedKeyTO;
 import com.apap.director.client.data.store.PreKeyStoreImpl;
 import com.apap.director.client.data.store.SignedPreKeyStoreImpl;
-import com.apap.director.client.domain.model.Account;
-import com.apap.director.client.domain.model.ContactKey;
-import com.apap.director.client.domain.model.Conversation;
-import com.apap.director.client.domain.model.Message;
-import com.apap.director.client.domain.model.OneTimeKey;
-import com.apap.director.client.domain.model.Session;
-import com.apap.director.client.domain.model.SignedKey;
+import com.apap.director.client.data.db.entity.MessageEntity;
 
 
 import org.whispersystems.curve25519.Curve25519;
@@ -61,21 +61,21 @@ public class AccountManager {
     }
 
     public List listAllAccounts() {
-        RealmResults<Account> accounts = realm.where(Account.class).findAll();
+        RealmResults<AccountEntity> accounts = realm.where(AccountEntity.class).findAll();
         return new ArrayList<>(accounts);
     }
 
-    public Account createAccount(String name) {
+    public AccountEntity createAccount(String name) {
 
         try {
-            Account sameName = realm.where(Account.class).equalTo("name", name).findFirst();
+            AccountEntity sameName = realm.where(AccountEntity.class).equalTo("name", name).findFirst();
             if (sameName != null)
                 return null;
 
             IdentityKeyPair identityKeyPair = KeyHelper.generateIdentityKeyPair();
             int registrationId = KeyHelper.generateRegistrationId(false);
 
-            Account account = new Account();
+            AccountEntity account = new AccountEntity();
             account.setId(generateAccountId());
             account.setKeyPair(identityKeyPair.serialize());
             account.setName(name);
@@ -85,12 +85,12 @@ public class AccountManager {
 
 
             List<PreKeyRecord> preKeyRecords = KeyHelper.generatePreKeys(0, 50);
-            RealmList<OneTimeKey> oneTimeKeys = new RealmList<>();
+            RealmList<OneTimeKeyEntity> oneTimeKeys = new RealmList<>();
 
             for (PreKeyRecord record : preKeyRecords) {
                 preKeyStore.storePreKey(record.getId(), record);
                 realm.beginTransaction();
-                OneTimeKey temporaryKey = realm.where(OneTimeKey.class).equalTo("oneTimeKeyId", record.getId()).findFirst();
+                OneTimeKeyEntity temporaryKey = realm.where(OneTimeKeyEntity.class).equalTo("oneTimeKeyId", record.getId()).findFirst();
                 oneTimeKeys.add(temporaryKey);
                 realm.commitTransaction();
             }
@@ -98,7 +98,7 @@ public class AccountManager {
             SignedPreKeyRecord signedPreKeyRecord = KeyHelper.generateSignedPreKey(identityKeyPair, 0);
             signedPreKeyStore.storeSignedPreKey(signedPreKeyRecord.getId(), signedPreKeyRecord);
 
-            SignedKey signedKey = realm.where(SignedKey.class).equalTo("signedKeyId", signedPreKeyRecord.getId()).findFirst();
+            SignedKeyEntity signedKey = realm.where(SignedKeyEntity.class).equalTo("signedKeyId", signedPreKeyRecord.getId()).findFirst();
 
             account.setOneTimeKeys(oneTimeKeys);
 
@@ -119,33 +119,33 @@ public class AccountManager {
     }
 
     public String getActiveAccountName() {
-        Account activeAccount = realm.where(Account.class).equalTo("active", true).findFirst();
+        AccountEntity activeAccount = realm.where(AccountEntity.class).equalTo("active", true).findFirst();
         return activeAccount == null ? null : activeAccount.getName();
     }
 
-    public Account getActiveAccount() {
+    public AccountEntity getActiveAccount() {
         Realm realm = Realm.getDefaultInstance();
-        Account account = realm.where(Account.class).equalTo("active", true).findFirst();
+        AccountEntity account = realm.where(AccountEntity.class).equalTo("active", true).findFirst();
         realm.close();
         return account;
     }
 
     public boolean chooseAccount(String name) {
 
-        Account anyAccount = realm.where(Account.class).equalTo("name", name).findFirst();
+        AccountEntity anyAccount = realm.where(AccountEntity.class).equalTo("name", name).findFirst();
 
         if (anyAccount == null)
             return false;
 
         realm.beginTransaction();
-        RealmResults<Account> activeAccounts = realm.where(Account.class).equalTo("active", true).findAll();
+        RealmResults<AccountEntity> activeAccounts = realm.where(AccountEntity.class).equalTo("active", true).findAll();
 
-        for (Account account : activeAccounts) {
+        for (AccountEntity account : activeAccounts) {
             account.setActive(false);
             realm.copyToRealmOrUpdate(account);
         }
 
-        Account chosenAccount = realm.where(Account.class).equalTo("name", name).findFirst();
+        AccountEntity chosenAccount = realm.where(AccountEntity.class).equalTo("name", name).findFirst();
         chosenAccount.setActive(true);
         realm.copyToRealmOrUpdate(chosenAccount);
         realm.commitTransaction();
@@ -155,34 +155,34 @@ public class AccountManager {
 
     public boolean deleteAccount(String name) {
 
-        Account sameName = realm.where(Account.class).equalTo("name", name).findFirst();
+        AccountEntity sameName = realm.where(AccountEntity.class).equalTo("name", name).findFirst();
         if (sameName == null)
             return false;
 
         realm.beginTransaction();
-        RealmResults<OneTimeKey> oneTimeKeys = realm.where(OneTimeKey.class).equalTo("account.name", name).findAll();
+        RealmResults<OneTimeKeyEntity> oneTimeKeys = realm.where(OneTimeKeyEntity.class).equalTo("account.name", name).findAll();
         oneTimeKeys.deleteAllFromRealm();
 
-        RealmResults<Message> messages = realm.where(Message.class).equalTo("account.name", name).findAll();
+        RealmResults<MessageEntity> messages = realm.where(MessageEntity.class).equalTo("account.name", name).findAll();
         messages.deleteAllFromRealm();
 
-        RealmResults<SignedKey> signedKeys = realm.where(SignedKey.class).equalTo("account.name", name).findAll();
+        RealmResults<SignedKeyEntity> signedKeys = realm.where(SignedKeyEntity.class).equalTo("account.name", name).findAll();
         signedKeys.deleteAllFromRealm();
 
-        RealmResults<Session> sessions = realm.where(Session.class).equalTo("account.name", name).findAll();
+        RealmResults<SessionEntity> sessions = realm.where(SessionEntity.class).equalTo("account.name", name).findAll();
         sessions.deleteAllFromRealm();
 
-        RealmResults<Conversation> conversations = realm.where(Conversation.class).equalTo("account.name", name).findAll();
+        RealmResults<ConversationEntity> conversations = realm.where(ConversationEntity.class).equalTo("account.name", name).findAll();
         conversations.deleteAllFromRealm();
 
-        RealmResults<ContactKey> contactKeys = realm.where(ContactKey.class).equalTo("account.name", name).findAll();
+        RealmResults<ContactKeyEntity> contactKeys = realm.where(ContactKeyEntity.class).equalTo("account.name", name).findAll();
         contactKeys.deleteAllFromRealm();
 
-        realm.where(Account.class).equalTo("name", name).findFirst().deleteFromRealm();
+        realm.where(AccountEntity.class).equalTo("name", name).findFirst().deleteFromRealm();
         realm.commitTransaction();
 
         Log.v(TAG, "DELETING ACCOUNT " + name);
-        Log.v(TAG, realm.where(Account.class).findAll().toString());
+        Log.v(TAG, realm.where(AccountEntity.class).findAll().toString());
 
         return true;
     }
@@ -192,7 +192,7 @@ public class AccountManager {
      *
      * @return success
      */
-    public void signUp(final Account account) {
+    public void signUp(final AccountEntity account) {
 
         Call<ResponseBody> call = userService.signUp(account.getKeyBase64());
         Log.v(TAG, "Sign up call to : " + call.request().url());
@@ -210,13 +210,13 @@ public class AccountManager {
                     account.setRegistered(true);
                     realm.insertOrUpdate(account);
                     realm.commitTransaction();
-                    Log.v(TAG, "Account " + account.getName() + " registered");
+                    Log.v(TAG, "AccountEntity " + account.getName() + " registered");
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.v(TAG, "Account " + account.getName() + " failed to sign up");
+                Log.v(TAG, "AccountEntity " + account.getName() + " failed to sign up");
                 Log.v("HAI", t.getMessage() + " " + t.getCause() + " ");
                 Log.getStackTraceString(t);
             }
@@ -229,7 +229,7 @@ public class AccountManager {
 
         try {
 
-            Account active = realm.where(Account.class).equalTo("active", true).equalTo("registered", true).findFirst();
+            AccountEntity active = realm.where(AccountEntity.class).equalTo("active", true).equalTo("registered", true).findFirst();
             if (active == null)
                 return null;
 
@@ -266,7 +266,7 @@ public class AccountManager {
 
         try {
 
-            Account active = realm.where(Account.class).equalTo("active", true).equalTo("registered", true).findFirst();
+            AccountEntity active = realm.where(AccountEntity.class).equalTo("active", true).equalTo("registered", true).findFirst();
             if (active == null)
                 return null;
 
@@ -283,7 +283,7 @@ public class AccountManager {
             String cookie = loginCallResponse.headers().get("Set-Cookie").split(";")[0];
 
             realm.beginTransaction();
-            Account active2 = realm.where(Account.class).equalTo("active", true).findFirst();
+            AccountEntity active2 = realm.where(AccountEntity.class).equalTo("active", true).findFirst();
             Log.v(TAG, "Cookie " + cookie);
             active2.setCookie(cookie);
             realm.copyToRealmOrUpdate(active2);
@@ -345,7 +345,7 @@ public class AccountManager {
 
     public String postOneTimeKeys() throws IOException {
         Realm realm2 = Realm.getDefaultInstance();
-        Account activeAcc = realm.where(Account.class).equalTo("active", true).equalTo("registered", true).findFirst();
+        AccountEntity activeAcc = realm.where(AccountEntity.class).equalTo("active", true).equalTo("registered", true).findFirst();
         Log.d("HAI/ACTIVE ACCOUNT", activeAcc.getName());
         realm2.close();
 
@@ -354,9 +354,9 @@ public class AccountManager {
             return null;
         }
 
-        List<OneTimeKey> otkeys = new ArrayList<>(activeAcc.getOneTimeKeys());
+        List<OneTimeKeyEntity> otkeys = new ArrayList<>(activeAcc.getOneTimeKeys());
         List<OneTimeKeyTO> otkeysTO = new ArrayList<>();
-        for (OneTimeKey otk : otkeys) {
+        for (OneTimeKeyEntity otk : otkeys) {
             Log.d("OTK", new String(otk.getSerializedKey()));
             otkeysTO.add(new OneTimeKeyTO(otk));
         }
@@ -384,8 +384,8 @@ public class AccountManager {
 
     public String postSignedKey() throws IOException {
         Realm realm = Realm.getDefaultInstance();
-        Account activeAcc = realm.where(Account.class).equalTo("active", true).equalTo("registered", true).findFirst();
-        Account active = realm.copyFromRealm(activeAcc);
+        AccountEntity activeAcc = realm.where(AccountEntity.class).equalTo("active", true).equalTo("registered", true).findFirst();
+        AccountEntity active = realm.copyFromRealm(activeAcc);
         Log.d("HAI/ACTIVE ACCOUNT", activeAcc.getName());
 
         realm.close();
@@ -415,15 +415,15 @@ public class AccountManager {
     }
 
     /**
-     * @return id for new Realm Account object
+     * @return id for new Realm AccountEntity object
      */
     private long generateAccountId() {
         long id;
         try {
-            if (realm.where(Account.class).max("id") == null) {
+            if (realm.where(AccountEntity.class).max("id") == null) {
                 id = 0;
             } else {
-                id = realm.where(Account.class).max("id").longValue() + 1;
+                id = realm.where(AccountEntity.class).max("id").longValue() + 1;
             }
         } catch (ArrayIndexOutOfBoundsException e) {
             id = 0;
@@ -436,10 +436,10 @@ public class AccountManager {
         Realm realm = Realm.getDefaultInstance();
         long id;
         try {
-            if (realm.where(OneTimeKey.class).max("id") == null) {
+            if (realm.where(OneTimeKeyEntity.class).max("id") == null) {
                 id = 0;
             } else {
-                id = realm.where(OneTimeKey.class).max("id").longValue() + 1;
+                id = realm.where(OneTimeKeyEntity.class).max("id").longValue() + 1;
             }
         } catch (ArrayIndexOutOfBoundsException e) {
             id = 0;

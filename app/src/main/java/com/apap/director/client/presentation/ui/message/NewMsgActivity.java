@@ -11,11 +11,11 @@ import android.widget.TextView;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
+import com.apap.director.client.data.db.entity.AccountEntity;
+import com.apap.director.client.data.db.entity.ConversationEntity;
+import com.apap.director.client.data.db.entity.MessageEntity;
 import com.apap.director.client.data.manager.ConversationManager;
 import com.apap.director.client.data.manager.MessageManager;
-import com.apap.director.client.domain.model.Account;
-import com.apap.director.client.domain.model.Conversation;
-import com.apap.director.client.domain.model.Message;
 import com.apap.director.client.presentation.ui.home.adapter.MessageAdapter;
 import com.apap.director.client.data.net.service.ClientService;
 import com.apap.director.client.presentation.ui.listener.ArrayAdapterChangeListener;
@@ -49,9 +49,9 @@ public class NewMsgActivity extends Activity {
     ListView messagesView;
 
     private Long contactIdFromIntent;
-    private List<Message> myMessages;
-    private ArrayAdapterChangeListener<Message, RealmResults<Message>> changeListener;
-    private RealmResults<Message> allMessages;
+    private List<MessageEntity> myMessages;
+    private ArrayAdapterChangeListener<MessageEntity, RealmResults<MessageEntity>> changeListener;
+    private RealmResults<MessageEntity> allMessages;
     private String TAG = this.getClass().getSimpleName();
 
     //TODO: Split this method
@@ -75,10 +75,10 @@ public class NewMsgActivity extends Activity {
         contactIdFromIntent = getIntent().getLongExtra("contactId", 1L);
 
         myMessages = new ArrayList<>();
-        ArrayAdapter<Message> arrayAdapter = new MessageAdapter(this, R.layout.item_chat_left, myMessages);
+        ArrayAdapter<MessageEntity> arrayAdapter = new MessageAdapter(this, R.layout.item_chat_left, myMessages);
         messagesView.setAdapter(arrayAdapter);
 
-        allMessages = realm.where(Message.class).equalTo("conversation.id", contactIdFromIntent).findAll();
+        allMessages = realm.where(MessageEntity.class).equalTo("conversation.id", contactIdFromIntent).findAll();
         myMessages.addAll(allMessages);
         arrayAdapter.notifyDataSetChanged();
 
@@ -103,9 +103,9 @@ public class NewMsgActivity extends Activity {
         if ("".equals(newMessage))
             return;
 
-        Conversation conversation = conversationManager.getConversationByContactId(contactIdFromIntent);
+        ConversationEntity conversation = conversationManager.getConversationByContactId(contactIdFromIntent);
 
-        ClientService.sendEncryptedMessage(conversation.getContact().getContactKeys().get(0).getKeyBase64(), realm.where(Account.class).equalTo("active", true).findFirst().getKeyBase64(), newMessage);
+        ClientService.sendEncryptedMessage(conversation.getContact().getContactKeys().get(0).getKeyBase64(), realm.where(AccountEntity.class).equalTo("active", true).findFirst().getKeyBase64(), newMessage);
         newMessageField.setText("");
     }
 

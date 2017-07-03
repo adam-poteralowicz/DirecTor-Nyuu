@@ -3,6 +3,7 @@ package com.apap.director.client.data.net.service;
 import android.util.Base64;
 import android.util.Log;
 
+import com.apap.director.client.data.db.entity.ContactEntity;
 import com.apap.director.client.data.manager.ContactManager;
 import com.apap.director.client.data.manager.ConversationManager;
 import com.apap.director.client.data.manager.MessageManager;
@@ -11,9 +12,8 @@ import com.apap.director.client.data.store.IdentityKeyStoreImpl;
 import com.apap.director.client.data.store.PreKeyStoreImpl;
 import com.apap.director.client.data.store.SessionStoreImpl;
 import com.apap.director.client.data.store.SignedPreKeyStoreImpl;
-import com.apap.director.client.domain.model.Contact;
-import com.apap.director.client.domain.model.ContactKey;
-import com.apap.director.client.domain.model.Conversation;
+import com.apap.director.client.data.db.entity.ContactKeyEntity;
+import com.apap.director.client.data.db.entity.ConversationEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.whispersystems.libsignal.DuplicateMessageException;
@@ -72,19 +72,19 @@ public class MessageAction implements Action1<StompMessage> {
 
             Log.v(TAG, "POINTCUT: GET CONTACT");
 
-            ContactKey key = localRealm.where(ContactKey.class)
+            ContactKeyEntity key = localRealm.where(ContactKeyEntity.class)
                     .equalTo("keyBase64", frame.getFrom())
                     .equalTo("account.active", true)
                     .findFirst();
 
             localRealm.close();
 
-            Contact contact = key.getContact();
+            ContactEntity contact = key.getContact();
 
 
-            Log.v(TAG, "Contact name " + contact.getName());
+            Log.v(TAG, "ContactEntity name " + contact.getName());
 
-            Conversation conversation = localRealm.where(Conversation.class).equalTo("contact.id", contact.getId()).findFirst();
+            ConversationEntity conversation = localRealm.where(ConversationEntity.class).equalTo("contact.id", contact.getId()).findFirst();
 
             SignalProtocolAddress address = new SignalProtocolAddress(frame.getFrom(), 0);
             SessionCipher cipher = new SessionCipher(sessionStore, preKeyStore, signedPreKeyStore, identityKeyStore, address);
@@ -94,7 +94,7 @@ public class MessageAction implements Action1<StompMessage> {
             SessionState sessionState = mySession.getSessionState();
 
             if (mySession == null) {
-                Log.v(TAG, "Session is null");
+                Log.v(TAG, "SessionEntity is null");
                 sessionStore.storeSession(address, new SessionRecord());
             }
 

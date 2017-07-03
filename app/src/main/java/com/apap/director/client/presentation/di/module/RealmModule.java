@@ -7,15 +7,19 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 @Module
 public class RealmModule {
 
     @Provides
     @Singleton
-    Realm provideRealm(Context context){
-        Realm.init(context);
-        Realm realm = Realm.getDefaultInstance();
+    Realm provideRealm(){
+        RealmConfiguration configuration = new RealmConfiguration.Builder()
+                .deleteRealmIfMigrationNeeded()
+                .build();
+
+        Realm realm = Realm.getInstance(configuration);
         realm.setAutoRefresh(true);
         return realm;
     }

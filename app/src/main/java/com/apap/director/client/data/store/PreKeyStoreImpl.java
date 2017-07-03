@@ -2,8 +2,8 @@ package com.apap.director.client.data.store;
 
 import android.util.Log;
 
-import com.apap.director.client.domain.model.Account;
-import com.apap.director.client.domain.model.OneTimeKey;
+import com.apap.director.client.data.db.entity.AccountEntity;
+import com.apap.director.client.data.db.entity.OneTimeKeyEntity;
 
 import org.whispersystems.libsignal.InvalidKeyIdException;
 import org.whispersystems.libsignal.state.PreKeyRecord;
@@ -29,7 +29,7 @@ public class PreKeyStoreImpl implements PreKeyStore {
     public PreKeyRecord loadPreKey(int preKeyId) throws InvalidKeyIdException {
         Realm realm = Realm.getDefaultInstance();
         try {
-            OneTimeKey preKey = realm.where(OneTimeKey.class).equalTo("oneTimeKeyId", preKeyId).findFirst();
+            OneTimeKeyEntity preKey = realm.where(OneTimeKeyEntity.class).equalTo("oneTimeKeyId", preKeyId).findFirst();
 
             if (preKey == null)
                 throw new InvalidKeyIdException("No such key id");
@@ -47,14 +47,14 @@ public class PreKeyStoreImpl implements PreKeyStore {
     @Override
     public void storePreKey(int preKeyId, PreKeyRecord record) {
         realm.beginTransaction();
-            realm.where(Account.class).equalTo("active", true).findFirst();
-            OneTimeKey oneTimeKey = new OneTimeKey();
+            realm.where(AccountEntity.class).equalTo("active", true).findFirst();
+            OneTimeKeyEntity oneTimeKey = new OneTimeKeyEntity();
 
             long id;
-            if (realm.where(OneTimeKey.class).findFirst() == null) {
+            if (realm.where(OneTimeKeyEntity.class).findFirst() == null) {
                 id = 0;
             } else {
-                id = realm.where(OneTimeKey.class).max("id").longValue() + 1;
+                id = realm.where(OneTimeKeyEntity.class).max("id").longValue() + 1;
             }
             oneTimeKey.setId(id);
             oneTimeKey.setOneTimeKeyId(preKeyId);
@@ -67,7 +67,7 @@ public class PreKeyStoreImpl implements PreKeyStore {
     @Override
     public boolean containsPreKey(int preKeyId) {
 
-        return realm.where(OneTimeKey.class).equalTo("oneTimeKeyId", preKeyId).findFirst() != null;
+        return realm.where(OneTimeKeyEntity.class).equalTo("oneTimeKeyId", preKeyId).findFirst() != null;
 
     }
 
@@ -76,7 +76,7 @@ public class PreKeyStoreImpl implements PreKeyStore {
 
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
-            realm.where(OneTimeKey.class).equalTo("oneTimeKeyId", preKeyId).findFirst().deleteFromRealm();
+            realm.where(OneTimeKeyEntity.class).equalTo("oneTimeKeyId", preKeyId).findFirst().deleteFromRealm();
         realm.commitTransaction();
         realm.close();
 

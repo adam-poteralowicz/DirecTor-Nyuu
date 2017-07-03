@@ -8,21 +8,21 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.apap.director.client.R;
-import com.apap.director.client.domain.model.Message;
+import com.apap.director.client.data.db.entity.MessageEntity;
 
 import java.util.List;
 
 import io.realm.Realm;
 
 
-public class MessageAdapter extends ArrayAdapter<Message> {
+public class MessageAdapter extends ArrayAdapter<MessageEntity> {
     private Activity activity;
-    private List<Message> messages;
+    private List<MessageEntity> messages;
 
     private static final int VIEW_TYPE_MINE = 0;
     private static final int VIEW_TYPE_OTHER = 1;
 
-    public MessageAdapter(Activity context, int resource, List<Message> objects) {
+    public MessageAdapter(Activity context, int resource, List<MessageEntity> objects) {
         super(context, resource, objects);
         this.activity = context;
         Realm.getDefaultInstance();
@@ -34,7 +34,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         ViewHolder holder;
 
-        Message message = getItem(position);
+        MessageEntity message = getItem(position);
 
         if (convertView == null) {
             if (getItemViewType(position) == VIEW_TYPE_MINE) {

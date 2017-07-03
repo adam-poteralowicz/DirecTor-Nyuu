@@ -3,7 +3,7 @@ package com.apap.director.client.data.store;
 import android.util.Log;
 
 
-import com.apap.director.client.domain.model.SignedKey;
+import com.apap.director.client.data.db.entity.SignedKeyEntity;
 
 import org.whispersystems.libsignal.InvalidKeyIdException;
 import org.whispersystems.libsignal.state.SignedPreKeyRecord;
@@ -32,7 +32,7 @@ public class SignedPreKeyStoreImpl implements SignedPreKeyStore {
 
         try {
 
-            SignedKey signedKey = realm.where(SignedKey.class)
+            SignedKeyEntity signedKey = realm.where(SignedKeyEntity.class)
                     .equalTo("signedKeyId", signedPreKeyId)
                     .findFirst();
 
@@ -54,10 +54,10 @@ public class SignedPreKeyStoreImpl implements SignedPreKeyStore {
     @Override
     public List<SignedPreKeyRecord> loadSignedPreKeys() {
         try {
-            List<SignedKey> list = realm.where(SignedKey.class).findAll();
+            List<SignedKeyEntity> list = realm.where(SignedKeyEntity.class).findAll();
             List<SignedPreKeyRecord> records = new ArrayList<>(list.size());
 
-            for (SignedKey preKey : list) {
+            for (SignedKeyEntity preKey : list) {
                 records.add(new SignedPreKeyRecord(preKey.getSerializedKey()));
             }
 
@@ -73,15 +73,15 @@ public class SignedPreKeyStoreImpl implements SignedPreKeyStore {
     public void storeSignedPreKey(int signedPreKeyId, SignedPreKeyRecord record) {
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
-            SignedKey signedKey = new SignedKey();
+            SignedKeyEntity signedKey = new SignedKeyEntity();
             signedKey.setSerializedKey(record.serialize());
             signedKey.setSignedKeyId(signedPreKeyId);
 
             long id;
-            if (realm.where(SignedKey.class).findFirst() == null) {
+            if (realm.where(SignedKeyEntity.class).findFirst() == null) {
                 id = 0;
             } else {
-                id = realm.where(SignedKey.class).max("id").longValue() + 1;
+                id = realm.where(SignedKeyEntity.class).max("id").longValue() + 1;
             }
             signedKey.setId(id);
             realm.copyToRealmOrUpdate(signedKey);
@@ -92,12 +92,12 @@ public class SignedPreKeyStoreImpl implements SignedPreKeyStore {
 
     @Override
     public boolean containsSignedPreKey(int signedPreKeyId) {
-        return realm.where(SignedKey.class).equalTo("signedKeyId", signedPreKeyId).findFirst() != null;
+        return realm.where(SignedKeyEntity.class).equalTo("signedKeyId", signedPreKeyId).findFirst() != null;
     }
 
     @Override
     public void removeSignedPreKey(int signedPreKeyId) {
-        realm.where(SignedKey.class).equalTo("signedKeyId", signedPreKeyId).findFirst().deleteFromRealm();
+        realm.where(SignedKeyEntity.class).equalTo("signedKeyId", signedPreKeyId).findFirst().deleteFromRealm();
     }
 
 

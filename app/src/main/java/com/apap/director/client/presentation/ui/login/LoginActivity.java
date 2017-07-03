@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,10 +18,11 @@ import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
+import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.manager.AccountManager;
 import com.apap.director.client.data.net.rest.service.UserService;
 import com.apap.director.client.data.net.service.ClientService;
-import com.apap.director.client.domain.model.Account;
+import com.apap.director.client.presentation.ui.common.view.NetActivity;
 import com.apap.director.client.presentation.ui.home.HomeActivity;
 import com.apap.director.client.presentation.ui.listener.ArrayAdapterChangeListener;
 import com.apap.director.client.presentation.ui.register.NewAccountActivity;
@@ -38,18 +38,14 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnItemClick;
 import butterknife.OnItemLongClick;
-import cz.msebera.android.httpclient.client.HttpClient;
-import cz.msebera.android.httpclient.client.methods.HttpGet;
-import cz.msebera.android.httpclient.impl.client.BasicResponseHandler;
 import info.guardianproject.netcipher.NetCipher;
-import info.guardianproject.netcipher.client.StrongBuilder;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-public class LoginActivity extends AppCompatActivity implements StrongBuilder.Callback<HttpClient> {
+public class LoginActivity extends NetActivity {
 
     private static final String HS_URL = "http://3zk5ak4bcbfvwgha.onion";
     private String TAG = App.getContext().getClass().getSimpleName();
@@ -70,9 +66,9 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
     @BindView(R.id.masterPasswordVerification_editText)
     EditText masterPasswordEditText;
 
-    private ArrayList<Account> accountList;
-    private RealmResults<Account> realmAccounts;
-    private ArrayAdapterChangeListener<Account, RealmResults<Account>> listener;
+    private ArrayList<AccountEntity> accountList;
+    private RealmResults<AccountEntity> realmAccounts;
+    private ArrayAdapterChangeListener<AccountEntity, RealmResults<AccountEntity>> listener;
     private String accountName;
 
     @Override
@@ -83,10 +79,10 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
         ((App) getApplication()).getComponent().inject(this);
         ButterKnife.bind(this);
 
-        realmAccounts = realm.where(Account.class).findAll();
+        realmAccounts = realm.where(AccountEntity.class).findAll();
 
         accountList = new ArrayList<>();
-        ArrayAdapter<Account> arrayAdapter = new ArrayAdapter<>(
+        ArrayAdapter<AccountEntity> arrayAdapter = new ArrayAdapter<>(
                 getApplicationContext(),
                 android.R.layout.simple_list_item_single_choice,
                 accountList);
@@ -128,67 +124,6 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
         if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
             accountManager.signUp(accountManager.createAccount(data.getStringExtra("accountName")));
         }
-    }
-
-    @Override
-    public void onConnected(final HttpClient httpClient) {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    Log.d("HS_URL", HS_URL);
-                    HttpGet get = new HttpGet(HS_URL);
-
-                    String result = httpClient.execute(get, new BasicResponseHandler());
-                    Log.v(TAG, result);
-                } catch (IOException e) {
-                    onConnectionException(e);
-                }
-            }
-        }.start();
-    }
-
-    @Override
-    public void onConnectionException(Exception e) {
-        Log.e(getClass().getSimpleName(),
-                "Exception connecting to hidden service", e);
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(LoginActivity.this, R.string.msg_crash, Toast.LENGTH_LONG)
-                        .show();
-                finish();
-            }
-        });
-    }
-
-    @Override
-    public void onTimeout() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast
-                        .makeText(LoginActivity.this, R.string.msg_timeout, Toast.LENGTH_LONG)
-                        .show();
-                Log.d("onTimeout", String.valueOf(R.string.msg_timeout));
-                finish();
-            }
-        });
-    }
-
-    @Override
-    public void onInvalid() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast
-                        .makeText(LoginActivity.this, R.string.msg_invalid, Toast.LENGTH_LONG)
-                        .show();
-                Log.d("onInvalid", String.valueOf(R.string.msg_invalid));
-                finish();
-            }
-        });
     }
 
     @Override
@@ -257,7 +192,7 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
             Log.v(TAG, "Chosen account: " + accountManager.getActiveAccount() + " cookie" + accountManager.getActiveAccount().getCookie());
 
             realm.beginTransaction();
-            Account account = realm.where(Account.class).equalTo("active", true).findFirst();
+            AccountEntity account = realm.where(AccountEntity.class).equalTo("active", true).findFirst();
             String cookie2 = account.getCookie();
             Log.v(TAG, "cookie2 " + cookie2);
             realm.commitTransaction();
@@ -300,7 +235,7 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
     }
 
     public boolean verifyMasterPassword(String password) {
-        return realm.where(Account.class).equalTo("masterPassword", password) != null;
+        return realm.where(AccountEntity.class).equalTo("masterPassword", password) != null;
     }
 
     public void deleteAccount(String accountName) {

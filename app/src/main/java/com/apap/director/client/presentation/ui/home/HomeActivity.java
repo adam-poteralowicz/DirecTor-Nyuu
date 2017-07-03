@@ -9,8 +9,8 @@ import android.util.Log;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
+import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.manager.AccountManager;
-import com.apap.director.client.domain.model.Account;
 import com.apap.director.client.presentation.ui.home.adapter.DirecTorPagerAdapter;
 import com.apap.director.client.presentation.ui.login.LoginActivity;
 
@@ -53,7 +53,7 @@ public class HomeActivity extends FragmentActivity {
             Log.d("accountManager", "null");
         if (accountManager.getActiveAccount() == null)
             Log.d("active account", "null");
-        Account active = accountManager.getActiveAccount();
+        AccountEntity active = accountManager.getActiveAccount();
         active.setActive(false);
         realm.copyToRealmOrUpdate(active);
         realm.commitTransaction();

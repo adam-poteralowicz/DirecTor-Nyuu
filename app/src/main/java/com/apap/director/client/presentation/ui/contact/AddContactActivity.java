@@ -186,7 +186,7 @@ public class AddContactActivity extends AppCompatActivity {
     public void _readMessage() {
         List<String> msgs = NFCUtils.getStringsFromNfcIntent(intent);
         if (msgs != null) {
-            Toast.makeText(this, "Contact public key : " + msgs.get(0), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "ContactEntity public key : " + msgs.get(0), Toast.LENGTH_LONG).show();
             String contactPublicKey = msgs.get(0);
             getSupportActionBar().show();
 

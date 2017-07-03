@@ -38,7 +38,7 @@ public final class NFCUtils {
                     return false;
                 }
                 if (ndef.getMaxSize() < size) {
-                    Log.e(NFCUtils.class.toString(), "Error : Message exceeds the max tag size " + ndef.getMaxSize());
+                    Log.e(NFCUtils.class.toString(), "Error : MessageEntity exceeds the max tag size " + ndef.getMaxSize());
                     return false;
                 }
                 ndef.writeNdefMessage(message);

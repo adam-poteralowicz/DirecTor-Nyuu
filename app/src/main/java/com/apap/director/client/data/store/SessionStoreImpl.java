@@ -2,9 +2,9 @@ package com.apap.director.client.data.store;
 
 import android.util.Log;
 
-import com.apap.director.client.domain.model.Account;
-import com.apap.director.client.domain.model.ContactKey;
-import com.apap.director.client.domain.model.Session;
+import com.apap.director.client.data.db.entity.AccountEntity;
+import com.apap.director.client.data.db.entity.ContactKeyEntity;
+import com.apap.director.client.data.db.entity.SessionEntity;
 
 import org.whispersystems.libsignal.SignalProtocolAddress;
 import org.whispersystems.libsignal.state.SessionRecord;
@@ -34,7 +34,7 @@ public class SessionStoreImpl implements SessionStore {
         Realm realm = Realm.getDefaultInstance();
 
         try {
-            Session session = realm.where(Session.class)
+            SessionEntity session = realm.where(SessionEntity.class)
                     .equalTo("name", address.getName())
                     .equalTo("deviceId", address.getDeviceId())
                     .findFirst();
@@ -51,10 +51,10 @@ public class SessionStoreImpl implements SessionStore {
 
     @Override
     public List<Integer> getSubDeviceSessions(String name) {
-        List<Session> list = realm.where(Session.class).equalTo("name", name).findAll();
+        List<SessionEntity> list = realm.where(SessionEntity.class).equalTo("name", name).findAll();
         List<Integer> subDeviceSessions = new ArrayList<>(list.size());
 
-        for (Session session : list) {
+        for (SessionEntity session : list) {
             subDeviceSessions.add(session.getDeviceId());
         }
 
@@ -66,7 +66,7 @@ public class SessionStoreImpl implements SessionStore {
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
 
-            Session sameName = realm.where(Session.class).equalTo("name", address.getName()).equalTo("deviceId", address.getDeviceId()).findFirst();
+            SessionEntity sameName = realm.where(SessionEntity.class).equalTo("name", address.getName()).equalTo("deviceId", address.getDeviceId()).findFirst();
             if (sameName != null) {
                 sameName.setSerializedKey(record.serialize());
                 realm.copyToRealmOrUpdate(sameName);
@@ -78,14 +78,14 @@ public class SessionStoreImpl implements SessionStore {
 
             long id = 0;
 
-            if (realm.where(Session.class).findFirst() != null) {
-                id = realm.where(Session.class).max("id").longValue() + 1;
+            if (realm.where(SessionEntity.class).findFirst() != null) {
+                id = realm.where(SessionEntity.class).max("id").longValue() + 1;
             }
 
-            Session session = realm.createObject(Session.class, id);
-            session.setAccount(realm.where(Account.class).equalTo("active", true).findFirst());
+            SessionEntity session = realm.createObject(SessionEntity.class, id);
+            session.setAccount(realm.where(AccountEntity.class).equalTo("active", true).findFirst());
             session.setName(address.getName());
-            ContactKey contactKey = realm.where(ContactKey.class).equalTo("keyBase64", address.getName()).findFirst();
+            ContactKeyEntity contactKey = realm.where(ContactKeyEntity.class).equalTo("keyBase64", address.getName()).findFirst();
             session.setConversation(contactKey.getContact().getConversation());
             session.setDeviceId(address.getDeviceId());
             session.setSerializedKey(record.serialize());
@@ -98,7 +98,7 @@ public class SessionStoreImpl implements SessionStore {
     @Override
     public boolean containsSession(SignalProtocolAddress address) {
         Realm realm = Realm.getDefaultInstance();
-        Session session = realm.where(Session.class)
+        SessionEntity session = realm.where(SessionEntity.class)
                 .equalTo("name", address.getName())
                 .equalTo("deviceId", address.getDeviceId())
                 .findFirst();
@@ -112,7 +112,7 @@ public class SessionStoreImpl implements SessionStore {
     public void deleteSession(SignalProtocolAddress address) {
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
-            realm.where(Session.class).equalTo("deviceId", address.getDeviceId()).equalTo("name", address.getName()).findFirst().deleteFromRealm();
+            realm.where(SessionEntity.class).equalTo("deviceId", address.getDeviceId()).equalTo("name", address.getName()).findFirst().deleteFromRealm();
         realm.commitTransaction();
         realm.close();
     }
@@ -121,7 +121,7 @@ public class SessionStoreImpl implements SessionStore {
     public void deleteAllSessions(String name) {
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
-            realm.where(Session.class).equalTo("name", name).findAll().deleteAllFromRealm();
+            realm.where(SessionEntity.class).equalTo("name", name).findAll().deleteAllFromRealm();
         realm.commitTransaction();
         realm.close();
     }

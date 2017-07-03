@@ -9,6 +9,8 @@ import com.apap.director.client.data.store.SessionStoreImpl;
 import com.apap.director.client.data.store.SignedPreKeyStoreImpl;
 
 import org.whispersystems.curve25519.Curve25519;
+import org.whispersystems.libsignal.state.SignalProtocolStore;
+import org.whispersystems.libsignal.state.SignedPreKeyStore;
 
 import javax.inject.Singleton;
 

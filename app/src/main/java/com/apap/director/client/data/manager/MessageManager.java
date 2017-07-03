@@ -2,9 +2,9 @@ package com.apap.director.client.data.manager;
 
 import android.util.Log;
 
-import com.apap.director.client.domain.model.Account;
-import com.apap.director.client.domain.model.Conversation;
-import com.apap.director.client.domain.model.Message;
+import com.apap.director.client.data.db.entity.AccountEntity;
+import com.apap.director.client.data.db.entity.ConversationEntity;
+import com.apap.director.client.data.db.entity.MessageEntity;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,26 +21,26 @@ public class MessageManager {
         this.realm = realm;
     }
 
-    public List<Message> listAllMessages(Conversation conversation) {
+    public List<MessageEntity> listAllMessages(ConversationEntity conversation) {
         return realm.copyFromRealm(conversation.getMessages());
     }
 
-    public Message getMessage(Long id) {
-        Message message = realm.where(Message.class).equalTo("id", id).findFirst();
+    public MessageEntity getMessage(Long id) {
+        MessageEntity message = realm.where(MessageEntity.class).equalTo("id", id).findFirst();
         if (message != null) {
             return message;
         } else
             return null;
     }
 
-    public List<Message> getMessages(Conversation conversation) {
+    public List<MessageEntity> getMessages(ConversationEntity conversation) {
         if (conversation.getMessages() != null) {
             return new ArrayList<>(conversation.getMessages());
         }
         return null;
     }
 
-    public Message addMessage(Conversation conv, String msg, String recipient, Boolean owned) {
+    public MessageEntity addMessage(ConversationEntity conv, String msg, String recipient, Boolean owned) {
 
         Realm realm = Realm.getDefaultInstance();
         Log.v(TAG, "adding message "+msg+" owned: "+owned);
@@ -49,15 +49,15 @@ public class MessageManager {
             return null;
         }
         realm.beginTransaction();
-        Conversation conversation = realm.where(Conversation.class).equalTo("id", conv.getId()).findFirst();
-        Message message = realm.createObject(Message.class, generateMessageId(realm));
+        ConversationEntity conversation = realm.where(ConversationEntity.class).equalTo("id", conv.getId()).findFirst();
+        MessageEntity message = realm.createObject(MessageEntity.class, generateMessageId(realm));
         message.setConversation(conv);
         message.setContent(msg);
         message.setDate(new Date());
         message.setRecipient(recipient);
-        message.setAccount(realm.where(Account.class).equalTo("active", true).findFirst());
+        message.setAccount(realm.where(AccountEntity.class).equalTo("active", true).findFirst());
         message.setMine(owned);
-        RealmList<Message> conversationMsg = conversation.getMessages();
+        RealmList<MessageEntity> conversationMsg = conversation.getMessages();
         conversationMsg.add(message);
         conversation.setMessages(conversationMsg);
         realm.copyToRealmOrUpdate(message);
@@ -69,7 +69,7 @@ public class MessageManager {
 
     public boolean deleteMessage(Long id) {
         Realm realm = Realm.getDefaultInstance();
-        Message messageToDelete = realm.where(Message.class).equalTo("id", id).findFirst();
+        MessageEntity messageToDelete = realm.where(MessageEntity.class).equalTo("id", id).findFirst();
         realm.close();
         if (messageToDelete != null) {
             realm.beginTransaction();
@@ -80,7 +80,7 @@ public class MessageManager {
     }
 
     public boolean updateMessage(Long id, Boolean ownership) {
-        Message message = realm.where(Message.class).equalTo("id", id).findFirst();
+        MessageEntity message = realm.where(MessageEntity.class).equalTo("id", id).findFirst();
         if (message == null)
             return false;
         realm.beginTransaction();
@@ -95,10 +95,10 @@ public class MessageManager {
     private long generateMessageId(Realm realm) {
         long id;
         try {
-            if (realm.where(Message.class).max("id") == null) {
+            if (realm.where(MessageEntity.class).max("id") == null) {
                 id = 0;
             } else {
-                id = realm.where(Message.class).max("id").longValue() + 1;
+                id = realm.where(MessageEntity.class).max("id").longValue() + 1;
             }
         } catch(ArrayIndexOutOfBoundsException e) {
             id = 0;

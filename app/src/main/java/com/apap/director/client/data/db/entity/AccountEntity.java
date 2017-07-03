@@ -1,4 +1,4 @@
-package com.apap.director.client.domain.model;
+package com.apap.director.client.data.db.entity;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Account extends RealmObject {
+public class AccountEntity extends RealmObject {
 
     @PrimaryKey
     private long id;
@@ -21,45 +21,45 @@ public class Account extends RealmObject {
 
     private String keyBase64;
 
-    private RealmList<Contact> contacts;
-    private RealmList<OneTimeKey> oneTimeKeys;
-    private SignedKey signedKey;
-    private RealmList<Session> sessions;
+    private RealmList<ContactEntity> contacts;
+    private RealmList<OneTimeKeyEntity> oneTimeKeys;
+    private SignedKeyEntity signedKey;
+    private RealmList<SessionEntity> sessions;
     private boolean registered;
     private boolean active;
     private String cookie;
 
 
 
-    public RealmList<Contact> getContacts() {
+    public RealmList<ContactEntity> getContacts() {
         return contacts;
     }
 
-    public void setContacts(RealmList<Contact> contacts) {
+    public void setContacts(RealmList<ContactEntity> contacts) {
         this.contacts = contacts;
     }
 
-    public RealmList<OneTimeKey> getOneTimeKeys() {
+    public RealmList<OneTimeKeyEntity> getOneTimeKeys() {
         return oneTimeKeys;
     }
 
-    public void setOneTimeKeys(RealmList<OneTimeKey> oneTimeKeys) {
+    public void setOneTimeKeys(RealmList<OneTimeKeyEntity> oneTimeKeys) {
         this.oneTimeKeys = oneTimeKeys;
     }
 
-    public SignedKey getSignedKey() {
+    public SignedKeyEntity getSignedKey() {
         return signedKey;
     }
 
-    public void setSignedKey(SignedKey signedKey) {
+    public void setSignedKey(SignedKeyEntity signedKey) {
         this.signedKey = signedKey;
     }
 
-    public RealmList<Session> getSessions() {
+    public RealmList<SessionEntity> getSessions() {
         return sessions;
     }
 
-    public void setSessions(RealmList<Session> sessions) {
+    public void setSessions(RealmList<SessionEntity> sessions) {
         this.sessions = sessions;
     }
 

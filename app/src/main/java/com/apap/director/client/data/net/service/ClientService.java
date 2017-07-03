@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
 
+import com.apap.director.client.data.db.entity.ContactKeyEntity;
 import com.apap.director.client.data.net.rest.Paths;
 import com.apap.director.client.data.net.rest.service.KeyService;
 import com.apap.director.client.data.net.to.MessageTO;
@@ -13,7 +14,6 @@ import com.apap.director.client.data.store.IdentityKeyStoreImpl;
 import com.apap.director.client.data.store.PreKeyStoreImpl;
 import com.apap.director.client.data.store.SessionStoreImpl;
 import com.apap.director.client.data.store.SignedPreKeyStoreImpl;
-import com.apap.director.client.domain.model.ContactKey;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -123,7 +123,7 @@ public class ClientService {
             String address = "/app/message/" + to;
             Log.v(TAG, "Sending framed message! " + address);
 
-            ContactKey contactKey = realm.where(ContactKey.class).equalTo("keyBase64", to).findFirst();
+            ContactKeyEntity contactKey = realm.where(ContactKeyEntity.class).equalTo("keyBase64", to).findFirst();
 
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(to, contactKey.getDeviceId());
 

@@ -10,9 +10,9 @@ import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
+import com.apap.director.client.data.db.entity.ContactEntity;
 import com.apap.director.client.data.manager.ContactManager;
 import com.apap.director.client.data.manager.ConversationManager;
-import com.apap.director.client.domain.model.Contact;
 
 import javax.inject.Inject;
 
@@ -46,7 +46,7 @@ public class NewContactActivity extends Activity {
 
         ((App) getApplication()).getComponent().inject(this);
         contactPublicKey = getIntent().getExtras().getString("key");
-        textView.setText("Contact public key: " + contactPublicKey);
+        textView.setText("ContactEntity public key: " + contactPublicKey);
     }
 
     @OnClick(R.id.saveContactButton)
@@ -61,7 +61,7 @@ public class NewContactActivity extends Activity {
         contactManager.addContact(name, contactPublicKey);
 
         Realm realm = Realm.getDefaultInstance();
-        Contact contact = realm.where(Contact.class).equalTo("name", name).findFirst();
+        ContactEntity contact = realm.where(ContactEntity.class).equalTo("name", name).findFirst();
         conversationManager.addConversation(contact);
         realm.close();
 

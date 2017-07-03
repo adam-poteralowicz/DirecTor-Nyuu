@@ -11,9 +11,9 @@ import android.widget.ListView;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
+import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.manager.AccountManager;
-import com.apap.director.client.domain.model.Account;
-import com.apap.director.client.domain.model.Contact;
+import com.apap.director.client.data.db.entity.ContactEntity;
 import com.apap.director.client.presentation.ui.listener.ArrayAdapterChangeListener;
 
 
@@ -36,10 +36,10 @@ public class ContactsFragment extends Fragment {
     @BindView(R.id.contactsView)
     ListView contactsListView;
 
-    private ArrayList<Contact> contactList;
+    private ArrayList<ContactEntity> contactList;
     private Realm realm;
-    private ArrayAdapterChangeListener<Contact, RealmResults<Contact>> changeListener;
-    private RealmResults<Contact> allContacts;
+    private ArrayAdapterChangeListener<ContactEntity, RealmResults<ContactEntity>> changeListener;
+    private RealmResults<ContactEntity> allContacts;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -56,12 +56,12 @@ public class ContactsFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         realm = Realm.getDefaultInstance();
 
-        Account active = realm.where(Account.class).equalTo("active", true).findFirst();
+        AccountEntity active = realm.where(AccountEntity.class).equalTo("active", true).findFirst();
 
-        allContacts = realm.where(Contact.class).equalTo("account.id", active.getId()).findAll();
+        allContacts = realm.where(ContactEntity.class).equalTo("account.id", active.getId()).findAll();
 
         contactList = new ArrayList<>(allContacts);
-        ArrayAdapter<Contact> arrayAdapter = new ArrayAdapter<>(
+        ArrayAdapter<ContactEntity> arrayAdapter = new ArrayAdapter<>(
                 App.getContext(),
                 android.R.layout.simple_list_item_1,
                 contactList);

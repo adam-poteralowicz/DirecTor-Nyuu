@@ -3,7 +3,7 @@ package com.apap.director.client.data.net.to;
 import android.util.Base64;
 
 
-import com.apap.director.client.domain.model.OneTimeKey;
+import com.apap.director.client.data.db.entity.OneTimeKeyEntity;
 
 import org.whispersystems.libsignal.state.PreKeyRecord;
 
@@ -33,7 +33,7 @@ public class OneTimeKeyTO {
         return oneTimeKeyId;
     }
 
-    public OneTimeKeyTO(OneTimeKey oneTimeKey) {
+    public OneTimeKeyTO(OneTimeKeyEntity oneTimeKey) {
         try {
             this.keyId = oneTimeKey.getId();
             PreKeyRecord record = new PreKeyRecord(oneTimeKey.getSerializedKey());

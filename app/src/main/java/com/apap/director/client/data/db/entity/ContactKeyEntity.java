@@ -1,4 +1,4 @@
-package com.apap.director.client.domain.model;
+package com.apap.director.client.data.db.entity;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
@@ -9,13 +9,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ContactKey extends RealmObject {
+public class ContactKeyEntity extends RealmObject {
 
     @PrimaryKey
     private long id;
 
-    private Account account;
-    private Contact contact;
+    private AccountEntity account;
+    private ContactEntity contact;
     private byte[] serialized;
     private int deviceId;
     private String keyBase64;

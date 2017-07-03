@@ -12,8 +12,8 @@ import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
+import com.apap.director.client.data.db.entity.ConversationEntity;
 import com.apap.director.client.data.manager.ConversationManager;
-import com.apap.director.client.domain.model.Conversation;
 import com.apap.director.client.presentation.ui.message.NewMsgActivity;
 
 
@@ -37,8 +37,8 @@ public class InboxFragment extends Fragment {
     @BindView(R.id.msgList)
     ListView msgListView;
 
-    private ArrayList<Conversation> conversationList;
-    private ArrayAdapter<Conversation> arrayAdapter;
+    private ArrayList<ConversationEntity> conversationList;
+    private ArrayAdapter<ConversationEntity> arrayAdapter;
     private Realm realm;
 
     @Override
@@ -56,7 +56,7 @@ public class InboxFragment extends Fragment {
         realm = Realm.getDefaultInstance();
 
         conversationList = new ArrayList<>();
-        RealmResults<Conversation> conversationResults = realm.where(Conversation.class).findAll();
+        RealmResults<ConversationEntity> conversationResults = realm.where(ConversationEntity.class).findAll();
         if (!conversationResults.isEmpty())
             conversationList.addAll(realm.copyFromRealm(conversationResults));
         arrayAdapter = new ArrayAdapter<>(
@@ -66,10 +66,10 @@ public class InboxFragment extends Fragment {
 
         msgListView.setAdapter(arrayAdapter);
 
-        final RealmResults<Conversation> conversations = realm.where(Conversation.class).findAll();
-        conversations.addChangeListener(new RealmChangeListener<RealmResults<Conversation>>() {
+        final RealmResults<ConversationEntity> conversations = realm.where(ConversationEntity.class).findAll();
+        conversations.addChangeListener(new RealmChangeListener<RealmResults<ConversationEntity>>() {
             @Override
-            public void onChange(RealmResults<Conversation> results) {
+            public void onChange(RealmResults<ConversationEntity> results) {
                 conversations.size();
             }
         });

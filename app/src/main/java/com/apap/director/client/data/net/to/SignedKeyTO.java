@@ -3,7 +3,7 @@ package com.apap.director.client.data.net.to;
 import android.util.Base64;
 
 
-import com.apap.director.client.domain.model.SignedKey;
+import com.apap.director.client.data.db.entity.SignedKeyEntity;
 
 import org.whispersystems.libsignal.state.SignedPreKeyRecord;
 
@@ -29,7 +29,7 @@ public class SignedKeyTO {
     }
 
 
-    public SignedKeyTO(SignedKey signedKey) {
+    public SignedKeyTO(SignedKeyEntity signedKey) {
         try {
             SignedPreKeyRecord record = new SignedPreKeyRecord(signedKey.getSerializedKey());
             this.keyBase64 = Base64.encodeToString(record.getKeyPair().getPublicKey().serialize(), Base64.NO_WRAP | Base64.URL_SAFE);

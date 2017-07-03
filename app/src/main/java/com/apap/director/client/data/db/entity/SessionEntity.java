@@ -1,4 +1,4 @@
-package com.apap.director.client.domain.model;
+package com.apap.director.client.data.db.entity;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
@@ -9,14 +9,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Session extends RealmObject {
+public class SessionEntity extends RealmObject {
 
     @PrimaryKey
     private long id;
-    private Conversation conversation;
+    private ConversationEntity conversation;
     private int deviceId;
     private byte[] serializedKey;
-    private Account account;
+    private AccountEntity account;
     private String name;
 
 

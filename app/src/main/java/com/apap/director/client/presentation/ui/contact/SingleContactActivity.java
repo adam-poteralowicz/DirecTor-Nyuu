@@ -20,11 +20,11 @@ import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
+import com.apap.director.client.data.db.entity.ContactEntity;
+import com.apap.director.client.data.db.entity.ConversationEntity;
 import com.apap.director.client.data.manager.AccountManager;
 import com.apap.director.client.data.manager.ContactManager;
 import com.apap.director.client.data.manager.ConversationManager;
-import com.apap.director.client.domain.model.Contact;
-import com.apap.director.client.domain.model.Conversation;
 import com.apap.director.client.presentation.ui.home.HomeActivity;
 import com.apap.director.client.presentation.ui.message.NewMsgActivity;
 
@@ -95,11 +95,11 @@ public class SingleContactActivity extends Activity {
                             Log.d("CONVMAN", "NULL");
                         }
 
-                        Conversation conv = conversationManager.getConversationByContactId(contactIdFromIntent);
+                        ConversationEntity conv = conversationManager.getConversationByContactId(contactIdFromIntent);
                         if (conv == null) {
                             realm.beginTransaction();
-                            Conversation conversation = realm.createObject(Conversation.class, conversationManager.generateConversationId(realm));
-                            conversation.setContact(realm.where(Contact.class).equalTo("id", contactIdFromIntent).findFirst());
+                            ConversationEntity conversation = realm.createObject(ConversationEntity.class, conversationManager.generateConversationId(realm));
+                            conversation.setContact(realm.where(ContactEntity.class).equalTo("id", contactIdFromIntent).findFirst());
                             conversation.setAccount(accountManager.getActiveAccount());
                             //TODO - conversation.setSessions();
                             realm.copyToRealmOrUpdate(conversation);
@@ -174,8 +174,8 @@ public class SingleContactActivity extends Activity {
     }
 
     public void checkIfAvatarExists() {
-        if (realm.where(Contact.class).equalTo("id", contactIdFromIntent).findFirst().getImage() != null) {
-            String imagePath = realm.where(Contact.class).equalTo("id", contactIdFromIntent).findFirst().getImage();
+        if (realm.where(ContactEntity.class).equalTo("id", contactIdFromIntent).findFirst().getImage() != null) {
+            String imagePath = realm.where(ContactEntity.class).equalTo("id", contactIdFromIntent).findFirst().getImage();
             Log.v("Image path: ", imagePath);
 
             options.inPreferredConfig = Bitmap.Config.ARGB_8888;

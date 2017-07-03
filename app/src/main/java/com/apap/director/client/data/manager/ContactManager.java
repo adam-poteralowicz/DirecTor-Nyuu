@@ -3,11 +3,11 @@ package com.apap.director.client.data.manager;
 import android.util.Base64;
 import android.util.Log;
 
+import com.apap.director.client.data.db.entity.AccountEntity;
+import com.apap.director.client.data.db.entity.ContactEntity;
+import com.apap.director.client.data.db.entity.ContactKeyEntity;
+import com.apap.director.client.data.db.entity.ConversationEntity;
 import com.apap.director.client.data.net.rest.service.KeyService;
-import com.apap.director.client.domain.model.Account;
-import com.apap.director.client.domain.model.Contact;
-import com.apap.director.client.domain.model.ContactKey;
-import com.apap.director.client.domain.model.Conversation;
 
 import org.whispersystems.libsignal.util.ByteUtil;
 
@@ -31,18 +31,18 @@ public class ContactManager {
         this.accountManager = manager;
     }
 
-    public List<Contact> listAllContacts() {
-        RealmResults<Contact> contacts = realm.where(Contact.class).findAll();
+    public List<ContactEntity> listAllContacts() {
+        RealmResults<ContactEntity> contacts = realm.where(ContactEntity.class).findAll();
         return new ArrayList<>(contacts);
     }
 
-    public Contact getContact(String name) {
-        return realm.where(Contact.class).equalTo("name", name).findFirst();
+    public ContactEntity getContact(String name) {
+        return realm.where(ContactEntity.class).equalTo("name", name).findFirst();
     }
 
-    public Contact getContactByContactKey(String keyBase64) {
+    public ContactEntity getContactByContactKey(String keyBase64) {
 
-        ContactKey contactKey = realm.where(ContactKey.class).equalTo("keyBase64", keyBase64).findFirst();
+        ContactKeyEntity contactKey = realm.where(ContactKeyEntity.class).equalTo("keyBase64", keyBase64).findFirst();
 
         if (contactKey == null) {
             return null;
@@ -54,7 +54,7 @@ public class ContactManager {
 
         Realm localRealm = Realm.getDefaultInstance();
 
-        Contact sameName = localRealm.where(Contact.class).equalTo("name", name).findFirst();
+        ContactEntity sameName = localRealm.where(ContactEntity.class).equalTo("name", name).findFirst();
         if (sameName != null) {
 
             localRealm.close();
@@ -62,12 +62,12 @@ public class ContactManager {
         }
 
         localRealm.beginTransaction();
-        Contact contact = localRealm.createObject(Contact.class, generateContactId(localRealm));
+        ContactEntity contact = localRealm.createObject(ContactEntity.class, generateContactId(localRealm));
         contact.setName(name);
 
-        RealmList<ContactKey> keys = new RealmList<>();
-        ContactKey contactKey = localRealm.createObject(ContactKey.class, generateContactKeyId(localRealm));
-        contactKey.setAccount(localRealm.where(Account.class).equalTo("active", true).findFirst());
+        RealmList<ContactKeyEntity> keys = new RealmList<>();
+        ContactKeyEntity contactKey = localRealm.createObject(ContactKeyEntity.class, generateContactKeyId(localRealm));
+        contactKey.setAccount(localRealm.where(AccountEntity.class).equalTo("active", true).findFirst());
 
         byte[] decodedKey = Base64.decode(keyBase64, Base64.NO_WRAP | Base64.URL_SAFE);
         contactKey.setSerialized(decodedKey);
@@ -79,7 +79,7 @@ public class ContactManager {
         contactKey.setDeviceId(0);
         keys.add(contactKey);
         contact.setContactKeys(keys);
-        contact.setAccount(localRealm.where(Account.class).equalTo("active", true).findFirst());
+        contact.setAccount(localRealm.where(AccountEntity.class).equalTo("active", true).findFirst());
 
         contactKey.setContact(contact);
 
@@ -88,14 +88,14 @@ public class ContactManager {
     }
 
     public boolean deleteContact(String name) {
-        Contact contactToDelete = realm.where(Contact.class).equalTo("name", name).findFirst();
+        ContactEntity contactToDelete = realm.where(ContactEntity.class).equalTo("name", name).findFirst();
         if (contactToDelete == null)
             return false;
 
         realm.beginTransaction();
         contactToDelete.getContactKeys().deleteAllFromRealm();
 
-        Conversation conversationToDelete = contactToDelete.getConversation();
+        ConversationEntity conversationToDelete = contactToDelete.getConversation();
         conversationToDelete.getSessions().deleteAllFromRealm();
         conversationToDelete.getMessages().deleteAllFromRealm();
         conversationToDelete.deleteFromRealm();
@@ -105,8 +105,8 @@ public class ContactManager {
         return true;
     }
 
-    public boolean updateContact(String name, String image, Conversation conversation, ContactKey contactKey) {
-        Contact contact = realm.where(Contact.class).equalTo("name", name).findFirst();
+    public boolean updateContact(String name, String image, ConversationEntity conversation, ContactKeyEntity contactKey) {
+        ContactEntity contact = realm.where(ContactEntity.class).equalTo("name", name).findFirst();
         if (contact == null)
             return false;
         realm.beginTransaction();
@@ -118,7 +118,7 @@ public class ContactManager {
         }
         if (contactKey != null) {
             if (!contact.getContactKeys().isEmpty()) {
-                RealmList<ContactKey> contactKeys = contact.getContactKeys();
+                RealmList<ContactKeyEntity> contactKeys = contact.getContactKeys();
                 contactKeys.add(contactKey);
             } else contact.setContactKeys(new RealmList<>(contactKey));
         }
@@ -130,10 +130,10 @@ public class ContactManager {
     private long generateContactId(Realm realm) {
         long id;
         try {
-            if (realm.where(Contact.class).max("id") == null) {
+            if (realm.where(ContactEntity.class).max("id") == null) {
                 id = 0;
             } else {
-                id = realm.where(Contact.class).max("id").longValue() + 1;
+                id = realm.where(ContactEntity.class).max("id").longValue() + 1;
             }
         } catch (ArrayIndexOutOfBoundsException e) {
             id = 0;
@@ -145,10 +145,10 @@ public class ContactManager {
     private long generateContactKeyId(Realm realm) {
         long id;
         try {
-            if (realm.where(ContactKey.class).max("id") == null) {
+            if (realm.where(ContactKeyEntity.class).max("id") == null) {
                 id = 0;
             } else {
-                id = realm.where(ContactKey.class).max("id").longValue() + 1;
+                id = realm.where(ContactKeyEntity.class).max("id").longValue() + 1;
             }
         } catch (ArrayIndexOutOfBoundsException e) {
             id = 0;
