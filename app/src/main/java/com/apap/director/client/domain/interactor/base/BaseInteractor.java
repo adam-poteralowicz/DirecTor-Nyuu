@@ -1,6 +1,5 @@
 package com.apap.director.client.domain.interactor.base;
 
-import butterknife.Optional;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -10,11 +9,11 @@ import lombok.NonNull;
 
 public abstract class BaseInteractor<Data, Parameter> {
 
-    Disposable disposable;
+    private Disposable disposable;
 
     public abstract Observable<Data>  buildObservable(Parameter parameter);
 
-    public void execute(Parameter parameter, @NonNull Consumer<Data> callback) {
+    public void execute(@NonNull Consumer<Data> callback, Parameter parameter) {
         disposable = buildObservable(parameter)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
