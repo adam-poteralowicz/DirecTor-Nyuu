@@ -60,11 +60,6 @@ public class AccountManager {
         this.signedPreKeyStore = signedPreKeyStore;
     }
 
-    public List listAllAccounts() {
-        RealmResults<AccountEntity> accounts = realm.where(AccountEntity.class).findAll();
-        return new ArrayList<>(accounts);
-    }
-
     public AccountEntity createAccount(String name) {
 
         try {

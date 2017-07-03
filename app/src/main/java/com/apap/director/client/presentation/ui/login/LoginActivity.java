@@ -32,7 +32,9 @@ import com.apap.director.client.presentation.ui.login.presenter.LoginPresenter;
 import com.apap.director.client.presentation.ui.register.NewAccountActivity;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
@@ -51,8 +53,8 @@ import static android.view.View.VISIBLE;
 
 public class LoginActivity extends NetActivity implements LoginContract.View {
 
-    private final static String TAG = App.getContext().getClass().getSimpleName();
-    private final static int LAYOUT_ID = R.layout.login_view;
+    private static final String TAG = App.getContext().getClass().getSimpleName();
+    private static final int LAYOUT_ID = R.layout.login_view;
 
     @Inject
     AccountManager accountManager;
@@ -73,38 +75,34 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     EditText masterPasswordEditText;
 
     private ArrayList<AccountEntity> accountList;
+    private ArrayAdapter<AccountEntity> arrayAdapter;
     private RealmResults<AccountEntity> realmAccounts;
-    private ArrayAdapterChangeListener<AccountEntity, RealmResults<AccountEntity>> listener;
     private String accountName;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(LAYOUT_ID);
+
         ButterKnife.bind(this);
 
         setUpInjection();
+        setUpArrayAdapter();
+    }
 
-
-        realmAccounts = realm.where(AccountEntity.class).findAll();
-
+    private void setUpArrayAdapter() {
+        //TODO: change to RecyclerView
         accountList = new ArrayList<>();
-        ArrayAdapter<AccountEntity> arrayAdapter = new ArrayAdapter<>(
+        arrayAdapter = new ArrayAdapter<>(
                 getApplicationContext(),
                 android.R.layout.simple_list_item_single_choice,
                 accountList);
         accountsListView.setAdapter(arrayAdapter);
-
-        arrayAdapter.addAll(realmAccounts);
-        arrayAdapter.notifyDataSetChanged();
-
-        listener = new ArrayAdapterChangeListener<>(arrayAdapter, "login activity");
-        realmAccounts.addChangeListener(listener);
     }
 
     private void setUpInjection() {
         DaggerLoginComponent.builder()
-                .loginContractModule(new LoginContractModule(this))
+                .loginContractModule(new LoginContractModule(new WeakReference<LoginContract.View>(this)))
                 .build()
                 .inject(this);
     }
@@ -142,20 +140,12 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
 
     @Override
     protected void onStart() {
-        realmAccounts.addChangeListener(listener);
         super.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        realmAccounts.removeChangeListener(listener);
-        super.onStop();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        realmAccounts.removeChangeListener(listener);
     }
 
     @Override
@@ -261,7 +251,14 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     }
 
     @Override
-    public void handleException(Exception exception) {
+    public void refreshAccountList(List<AccountEntity> newList) {
+        arrayAdapter.clear();
+        arrayAdapter.addAll(newList);
+        arrayAdapter.notifyDataSetChanged();
+    }
 
+    @Override
+    public void handleException(Throwable throwable) {
+        // TODO notify user
     }
 }

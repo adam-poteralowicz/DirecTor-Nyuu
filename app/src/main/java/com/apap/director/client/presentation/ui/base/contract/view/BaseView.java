@@ -5,5 +5,5 @@ package com.apap.director.client.presentation.ui.base.contract.view;
  */
 
 public interface BaseView {
-    void handleException(Exception exception);
+    void handleException(Throwable throwable);
 }
