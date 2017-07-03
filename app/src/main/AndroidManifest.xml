@@ -13,10 +13,6 @@
         <activity
             android:name=".presentation.ui.login.LoginActivity"
             android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
 
         <!-- Used for transferring files  after a successful connection -->
@@ -31,6 +27,12 @@
         <activity android:name=".presentation.ui.contact.NewContactActivity"/>
         <activity android:name=".presentation.ui.contact.SingleContactActivity"
             android:configChanges="orientation|screenSize" />
+        <activity android:name=".presentation.ui.splash.SplashActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
