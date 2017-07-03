@@ -10,7 +10,6 @@ import dagger.Provides;
  * Created by Adam on 2017-07-03.
  */
 
-
 @Module
 public class NewContactContractModule {
 

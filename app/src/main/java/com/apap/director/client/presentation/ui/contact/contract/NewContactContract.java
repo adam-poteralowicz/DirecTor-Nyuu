@@ -1,7 +1,5 @@
 package com.apap.director.client.presentation.ui.contact.contract;
 
-import android.content.Context;
-
 import com.apap.director.client.presentation.ui.base.contract.presenter.BasePresenter;
 import com.apap.director.client.presentation.ui.base.contract.view.BaseView;
 
@@ -12,11 +10,12 @@ import com.apap.director.client.presentation.ui.base.contract.view.BaseView;
 public interface NewContactContract {
 
     interface View extends BaseView {
-
+        void showToast(String text);
+        void addConversation(String contactName);
     }
 
     interface Presenter extends BasePresenter {
-        void addContact(String name, String publicKey, Context context);
+        void addContact(String name, String publicKey);
         void addConversation(String contactName);
     }
 }

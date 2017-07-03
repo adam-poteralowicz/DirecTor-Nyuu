@@ -30,7 +30,6 @@ import com.apap.director.client.presentation.ui.login.presenter.LoginPresenter;
 import com.apap.director.client.presentation.ui.register.NewAccountActivity;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -258,6 +257,6 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
 
     @Override
     public void handleException(Throwable throwable) {
-        // TODO notify user
+        Log.getStackTraceString(throwable);
     }
 }

@@ -29,9 +29,6 @@ public class HomePresenter implements BasePresenter, HomeContract.Presenter {
 
     @Override
     public void logOut(AccountEntity account) {
-        realm.beginTransaction();
-        account.setActive(false);
-        realm.copyToRealmOrUpdate(account);
-        realm.commitTransaction();
+        view.logOut(account);
     }
 }

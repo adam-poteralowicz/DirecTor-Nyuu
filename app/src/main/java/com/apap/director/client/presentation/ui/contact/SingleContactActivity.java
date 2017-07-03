@@ -4,9 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -20,26 +18,31 @@ import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.client.data.db.entity.ContactEntity;
 import com.apap.director.client.data.db.entity.ConversationEntity;
+import com.apap.director.client.data.db.service.DbContactService;
 import com.apap.director.client.data.manager.AccountManager;
 import com.apap.director.client.data.manager.ContactManager;
 import com.apap.director.client.data.manager.ConversationManager;
+import com.apap.director.client.presentation.ui.contact.contract.SingleContactContract;
+import com.apap.director.client.presentation.ui.contact.di.component.DaggerSingleContactComponent;
+import com.apap.director.client.presentation.ui.contact.di.module.SingleContactContractModule;
+import com.apap.director.client.presentation.ui.contact.presenter.SingleContactPresenter;
 import com.apap.director.client.presentation.ui.home.HomeActivity;
 import com.apap.director.client.presentation.ui.message.NewMsgActivity;
 
-
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.realm.Realm;
 
-public class SingleContactActivity extends Activity {
+public class SingleContactActivity extends Activity implements SingleContactContract.View {
 
+    @Inject
+    SingleContactPresenter singleContactPresenter;
     @Inject
     Realm realm;
     @Inject
@@ -62,11 +65,12 @@ public class SingleContactActivity extends Activity {
     Intent intent;
     String contactNameFromIntent;
     Long contactIdFromIntent;
+    DbContactService dbContactService;
 
     public void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.single_contact_view);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        ((App) getApplication()).getComponent().inject(this);
+        setUpInjection();
         ButterKnife.bind(this);
         super.onCreate(savedInstanceState);
 
@@ -74,20 +78,21 @@ public class SingleContactActivity extends Activity {
         contactNameFromIntent = getIntent().getStringExtra("contactName");
         contactName.setText(contactNameFromIntent);
 
-        initOptions((ArrayList<String>) myOptionsList);
-        checkIfAvatarExists();
+        singleContactPresenter.checkAvatar(options, contactIdFromIntent);
+        singleContactPresenter.initOptions(myOptionsList);
 
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
                 App.getContext(),
                 android.R.layout.simple_list_item_1,
                 myOptionsList);
-
         optionsListView.setAdapter(arrayAdapter);
+
         optionsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Toast.makeText(App.getContext(), myOptionsList.get(position), Toast.LENGTH_LONG).show();
+
                 switch (position) {
                     case 0:
                         Log.d(TAG, contactIdFromIntent.toString());
@@ -97,12 +102,13 @@ public class SingleContactActivity extends Activity {
 
                         ConversationEntity conv = conversationManager.getConversationByContactId(contactIdFromIntent);
                         if (conv == null) {
+
+                            conv = conversationManager.createConversation();
                             realm.beginTransaction();
-                            ConversationEntity conversation = realm.createObject(ConversationEntity.class, conversationManager.generateConversationId(realm));
-                            conversation.setContact(realm.where(ContactEntity.class).equalTo("id", contactIdFromIntent).findFirst());
-                            conversation.setAccount(accountManager.getActiveAccount());
+                            conv.setContact(dbContactService.getContactById(contactIdFromIntent));
+                            conv.setAccount(accountManager.getActiveAccount());
                             //TODO - conversation.setSessions();
-                            realm.copyToRealmOrUpdate(conversation);
+                            realm.copyToRealmOrUpdate(conv);
                             realm.commitTransaction();
                         }
 
@@ -125,7 +131,6 @@ public class SingleContactActivity extends Activity {
         });
 
         contactName.setSelectAllOnFocus(true);
-
     }
 
     @Override
@@ -133,21 +138,10 @@ public class SingleContactActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
-            Uri pickedImage = data.getData();
-
             String[] filePath = {MediaStore.Images.Media.DATA};
-            Cursor cursor = getContentResolver().query(pickedImage, filePath, null, null, null);
-            assert cursor != null;
-            cursor.moveToFirst();
-            String imagePath = cursor.getString(cursor.getColumnIndex(filePath[0]));
-            contactManager.updateContact(contactNameFromIntent, imagePath, null, null);
+            Cursor cursor = getContentResolver().query(data.getData(), filePath, null, null, null);
 
-            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-            Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
-
-            cursor.close();
-
-            imageView.setImageBitmap(bitmap);
+            singleContactPresenter.getAvatar(cursor, filePath, contactNameFromIntent, options);
         }
     }
 
@@ -159,33 +153,32 @@ public class SingleContactActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-
         Intent selectedIntent = new Intent(SingleContactActivity.this, HomeActivity.class);
         startActivity(selectedIntent);
-
     }
 
+    @Override
+    public void handleException(Throwable throwable) {
+        Log.getStackTraceString(throwable);
+    }
+
+    @Override
+    public void showAvatar(String imagePath, BitmapFactory.Options options) {
+        imageView.setImageBitmap(BitmapFactory.decodeFile(imagePath, options));
+    }
+
+    @OnClick(R.id.imageView)
     public void uploadAvatar(View view) {
-        if (view.getId() == R.id.imageView) {
-            Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-            photoPickerIntent.setType("image/*");
-            startActivityForResult(photoPickerIntent, 1);
-        }
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        photoPickerIntent.setType("image/*");
+        startActivityForResult(photoPickerIntent, 1);
     }
 
-    public void checkIfAvatarExists() {
-        if (realm.where(ContactEntity.class).equalTo("id", contactIdFromIntent).findFirst().getImage() != null) {
-            String imagePath = realm.where(ContactEntity.class).equalTo("id", contactIdFromIntent).findFirst().getImage();
-            Log.v("Image path: ", imagePath);
-
-            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-            imageView.setImageBitmap(BitmapFactory.decodeFile(imagePath, options));
-        }
-    }
-
-    private void initOptions(ArrayList<String> options) {
-        options.add("Send message");
-        options.add("Delete from contacts");
-        options.add("Return");
+    private void setUpInjection() {
+        DaggerSingleContactComponent.builder()
+                .mainComponent(((App) getApplication()).getComponent())
+                .singleContactContractModule(new SingleContactContractModule(this))
+                .build()
+                .inject(this);
     }
 }

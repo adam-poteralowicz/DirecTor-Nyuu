@@ -13,7 +13,6 @@ import com.apap.director.client.presentation.di.module.NetModule;
 import com.apap.director.client.presentation.di.module.RealmModule;
 import com.apap.director.client.presentation.di.module.RepositoryModule;
 import com.apap.director.client.presentation.di.module.SignalModule;
-import com.mobsandgeeks.saripaar.annotation.Or;
 
 import info.guardianproject.netcipher.client.StrongOkHttpClientBuilder;
 import info.guardianproject.netcipher.proxy.OrbotHelper;
