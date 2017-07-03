@@ -10,25 +10,21 @@ import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.client.data.db.entity.ContactEntity;
-import com.apap.director.client.data.manager.ContactManager;
 import com.apap.director.client.data.manager.ConversationManager;
+import com.apap.director.client.presentation.ui.contact.presenter.NewContactPresenter;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.realm.Realm;
 
 public class NewContactActivity extends Activity {
 
     @Inject
-    ContactManager
-            contactManager;
+    ConversationManager conversationManager;
     @Inject
-    ConversationManager
-            conversationManager;
+    NewContactPresenter newContactPresenter;
 
     @BindView(R.id.contactNameEditText)
     EditText contactNameEditText;
@@ -52,18 +48,9 @@ public class NewContactActivity extends Activity {
     @OnClick(R.id.saveContactButton)
     public void addContact() {
 
-        if (contactNameEditText.getText().length() == 0) {
-            Toast.makeText(this, "Type a valid name", Toast.LENGTH_SHORT);
-            return;
-        }
-
-        String name = String.valueOf(contactNameEditText.getText());
-        contactManager.addContact(name, contactPublicKey);
-
-        Realm realm = Realm.getDefaultInstance();
-        ContactEntity contact = realm.where(ContactEntity.class).equalTo("name", name).findFirst();
-        conversationManager.addConversation(contact);
-        realm.close();
+        String contactName = String.valueOf(contactNameEditText.getText());
+        newContactPresenter.addContact(contactName, contactPublicKey, this);
+        newContactPresenter.addConversation(contactName);
 
         Toast.makeText(this, contactPublicKey, Toast.LENGTH_LONG).show();
 
