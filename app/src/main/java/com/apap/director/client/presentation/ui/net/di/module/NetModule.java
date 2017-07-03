@@ -1,4 +1,4 @@
-package com.apap.director.client.presentation.di.module;
+package com.apap.director.client.presentation.ui.net.di.module;
 
 import com.apap.director.client.data.net.rest.Paths;
 import com.apap.director.client.data.net.rest.service.KeyService;

@@ -12,13 +12,13 @@ import retrofit2.http.Path;
 public interface UserService {
 
     @POST(value = "/user/{userId}")
-    Observable<ResponseBody> signUp(@Path("userId") String userId);
+    Call<ResponseBody> signUp(@Path("userId") String userId);
 
     @GET(value = "/user/code/{userId}")
-    Observable<String> requestCode(@Path("userId") String userId);
+    Call<String> requestCode(@Path("userId") String userId);
 
     @POST(value = "/login")
     @Headers("Content-Type: application/json")
-    Observable<ResponseBody> login(@Body LoginDetails details);
+    Call<ResponseBody> login(@Body LoginDetails details);
 
 }

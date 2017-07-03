@@ -25,6 +25,8 @@ import com.apap.director.client.data.net.service.ClientService;
 import com.apap.director.client.presentation.ui.common.view.NetActivity;
 import com.apap.director.client.presentation.ui.home.HomeActivity;
 import com.apap.director.client.presentation.ui.listener.ArrayAdapterChangeListener;
+import com.apap.director.client.presentation.ui.login.di.component.DaggerLoginComponent;
+import com.apap.director.client.presentation.ui.login.presenter.LoginPresenter;
 import com.apap.director.client.presentation.ui.register.NewAccountActivity;
 
 import java.io.IOException;
@@ -47,7 +49,6 @@ import static android.view.View.VISIBLE;
 
 public class LoginActivity extends NetActivity {
 
-    private static final String HS_URL = "http://3zk5ak4bcbfvwgha.onion";
     private String TAG = App.getContext().getClass().getSimpleName();
 
     @Inject
@@ -56,6 +57,8 @@ public class LoginActivity extends NetActivity {
     UserService userService;
     @Inject
     Realm realm;
+    @Inject
+    LoginPresenter loginPresenter;
 
     @BindView(R.id.accountsView)
     ListView accountsListView;
@@ -76,7 +79,9 @@ public class LoginActivity extends NetActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_view);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        ((App) getApplication()).getComponent().inject(this);
+
+        DaggerLoginComponent.builder().build().inject(this);
+
         ButterKnife.bind(this);
 
         realmAccounts = realm.where(AccountEntity.class).findAll();
@@ -93,6 +98,10 @@ public class LoginActivity extends NetActivity {
 
         listener = new ArrayAdapterChangeListener<>(arrayAdapter, "login activity");
         realmAccounts.addChangeListener(listener);
+    }
+
+    private void setUpInjection() {
+
     }
 
     @Override

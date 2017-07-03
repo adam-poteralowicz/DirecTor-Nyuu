@@ -3,6 +3,8 @@ package com.apap.director.client.presentation.di.component;
 import android.content.Context;
 
 import com.apap.director.client.App;
+import com.apap.director.client.data.manager.AccountManager;
+import com.apap.director.client.data.net.rest.service.UserService;
 import com.apap.director.client.data.store.IdentityKeyStoreImpl;
 import com.apap.director.client.data.store.PreKeyStoreImpl;
 import com.apap.director.client.presentation.di.module.ContextModule;
@@ -19,7 +21,7 @@ import com.apap.director.client.presentation.ui.contact.ContactsFragment;
 import com.apap.director.client.presentation.ui.inbox.InboxFragment;
 import com.apap.director.client.presentation.di.module.WebSocketModule;
 import com.apap.director.client.data.net.service.MessageAction;
-import com.apap.director.client.presentation.di.module.NetModule;
+import com.apap.director.client.presentation.ui.net.di.module.NetModule;
 import com.apap.director.client.data.net.rest.service.KeyService;
 import com.apap.director.client.data.store.SessionStoreImpl;
 import com.apap.director.client.data.store.SignedPreKeyStoreImpl;
@@ -28,6 +30,7 @@ import com.apap.director.client.presentation.di.module.SignalModule;
 import javax.inject.Singleton;
 
 import dagger.Component;
+import io.realm.Realm;
 
 @Singleton
 @Component(modules = {ManagerModule.class,
@@ -48,8 +51,6 @@ public interface MainComponent {
 
     void inject(NewMsgActivity newMsgActivity);
 
-    void inject(LoginActivity loginActivity);
-
     void inject(NewAccountActivity newAccountActivity);
 
     void inject(HomeActivity homeActivity);
@@ -69,6 +70,12 @@ public interface MainComponent {
     SignedPreKeyStoreImpl getDirectorSignedPreKeyStore();
 
     SessionStoreImpl getDirectorSessionStore();
+
+    AccountManager accountManager();
+
+    UserService userService();
+
+    Realm realm();
 
     Context context();
 }

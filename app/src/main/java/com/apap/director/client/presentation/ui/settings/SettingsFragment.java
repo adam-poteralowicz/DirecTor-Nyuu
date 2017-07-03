@@ -11,7 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.apap.director.client.R;
-import com.apap.director.client.domain.model.Account;
+import com.apap.director.client.data.db.entity.AccountEntity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,7 +28,7 @@ public class SettingsFragment extends Fragment {
     @BindView(R.id.settingsView_confirmButton)
     Button confirmButton;
 
-    Account account;
+    AccountEntity account;
     private Realm realm;
     private String TAG = getClass().getSimpleName();
 
@@ -44,7 +44,7 @@ public class SettingsFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         realm = Realm.getDefaultInstance();
-        account = realm.where(Account.class).equalTo("active", true).findFirst();
+        account = realm.where(AccountEntity.class).equalTo("active", true).findFirst();
     }
 
     @Override
