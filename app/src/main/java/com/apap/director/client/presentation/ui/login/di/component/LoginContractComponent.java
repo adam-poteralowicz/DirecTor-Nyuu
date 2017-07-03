@@ -12,6 +12,6 @@ import dagger.Component;
 
 @Activity
 @Component(modules = {LoginContractModule.class}, dependencies = {MainComponent.class})
-public interface LoginComponent {
+public interface LoginContractComponent {
     void inject(LoginActivity loginActivity);
 }

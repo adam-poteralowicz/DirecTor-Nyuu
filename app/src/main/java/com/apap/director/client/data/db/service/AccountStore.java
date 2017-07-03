@@ -8,12 +8,12 @@ import javax.inject.Inject;
 
 import io.realm.Realm;
 
-public class DbAccountService {
+public class AccountStore {
 
     private Realm realm;
 
     @Inject
-    public DbAccountService(Realm realm) {
+    public AccountStore(Realm realm) {
         this.realm = realm;
     }
 

@@ -2,33 +2,56 @@ package com.apap.director.client.presentation.ui.register;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.presentation.ui.login.LoginActivity;
+import com.apap.director.client.presentation.ui.register.contract.RegisterContract;
+import com.apap.director.client.presentation.ui.register.di.component.DaggerRegisterContractComponent;
+import com.apap.director.client.presentation.ui.register.di.module.RegisterContractModule;
+import com.apap.director.client.presentation.ui.register.presenter.RegisterPresenter;
+import com.mobsandgeeks.saripaar.ValidationError;
+import com.mobsandgeeks.saripaar.Validator;
+import com.mobsandgeeks.saripaar.annotation.NotEmpty;
+
+import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class NewAccountActivity extends Activity {
+public class NewAccountActivity extends Activity implements Validator.ValidationListener, RegisterContract.View {
 
+    @NotEmpty
     @BindView(R.id.contactNameEditText)
     EditText accountNameEditText;
+
+    @BindView(R.id.saveAccButton)
+    Button saveButton;
+
+    @Inject
+    RegisterPresenter presenter;
+
+    private Validator validator;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_acc_view);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        ((App) getApplication()).getComponent().inject(this);
         ButterKnife.bind(this);
+
+        saveButton.setEnabled(false);
+
+        setUpInjection();
+        setUpValidator();
 
         accountNameEditText.setHint("ACCOUNT NAME");
     }
@@ -37,13 +60,40 @@ public class NewAccountActivity extends Activity {
     public void saveAccount(View view) {
         String accountName = String.valueOf(accountNameEditText.getText());
 
-        Intent newAccIntent = new Intent(NewAccountActivity.this, LoginActivity.class);
-        newAccIntent.putExtra("accountName", accountName);
-        Log.d("DTOR/NewAccount", accountName);
-        if (!"".equals(accountName)) {
-            setResult(Activity.RESULT_OK, newAccIntent);
-            finish();
-        }
+        presenter.signUp(accountName);
     }
 
+    private void setUpValidator() {
+        validator = new Validator(this);
+        validator.setValidationListener(this);
+        validator.validate();
+    }
+
+    private void setUpInjection() {
+        DaggerRegisterContractComponent.builder()
+                .mainComponent(((App) getApplication()).getComponent())
+                .registerContractModule(new RegisterContractModule(this))
+                .build()
+                .inject(this);
+    }
+
+    @Override
+    public void onValidationSucceeded() {
+        saveButton.setEnabled(true);
+    }
+
+    @Override
+    public void onValidationFailed(List<ValidationError> errors) {
+        saveButton.setEnabled(false);
+    }
+
+    @Override
+    public void handleException(Throwable throwable) {
+        //TODO implement
+    }
+
+    @Override
+    public void handleSuccess() {
+        finish();
+    }
 }

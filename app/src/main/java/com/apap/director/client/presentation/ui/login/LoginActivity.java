@@ -2,7 +2,6 @@ package com.apap.director.client.presentation.ui.login;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,13 +19,12 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.manager.AccountManager;
-import com.apap.director.client.data.net.rest.service.UserService;
+import com.apap.director.client.data.net.rest.service.RestAccountService;
 import com.apap.director.client.data.net.service.ClientService;
 import com.apap.director.client.presentation.ui.common.view.NetActivity;
 import com.apap.director.client.presentation.ui.home.HomeActivity;
-import com.apap.director.client.presentation.ui.listener.ArrayAdapterChangeListener;
 import com.apap.director.client.presentation.ui.login.contract.LoginContract;
-import com.apap.director.client.presentation.ui.login.di.component.DaggerLoginComponent;
+import com.apap.director.client.presentation.ui.login.di.component.DaggerLoginContractComponent;
 import com.apap.director.client.presentation.ui.login.di.module.LoginContractModule;
 import com.apap.director.client.presentation.ui.login.presenter.LoginPresenter;
 import com.apap.director.client.presentation.ui.register.NewAccountActivity;
@@ -59,7 +57,7 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     @Inject
     AccountManager accountManager;
     @Inject
-    UserService userService;
+    RestAccountService restAccountService;
     @Inject
     Realm realm;
     @Inject
@@ -101,8 +99,9 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     }
 
     private void setUpInjection() {
-        DaggerLoginComponent.builder()
-                .loginContractModule(new LoginContractModule(new WeakReference<LoginContract.View>(this)))
+        DaggerLoginContractComponent.builder()
+                .mainComponent(((App) getApplication()).getComponent())
+                .loginContractModule(new LoginContractModule(this))
                 .build()
                 .inject(this);
     }

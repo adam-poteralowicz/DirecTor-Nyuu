@@ -11,7 +11,7 @@ import com.apap.director.client.data.db.entity.SessionEntity;
 import com.apap.director.client.data.db.entity.SignedKeyEntity;
 import com.apap.director.client.data.net.rest.service.KeyService;
 import com.apap.director.client.data.net.rest.service.LoginDetails;
-import com.apap.director.client.data.net.rest.service.UserService;
+import com.apap.director.client.data.net.rest.service.RestAccountService;
 import com.apap.director.client.data.net.to.OneTimeKeyTO;
 import com.apap.director.client.data.net.to.SignedKeyTO;
 import com.apap.director.client.data.store.PreKeyStoreImpl;
@@ -44,16 +44,16 @@ import retrofit2.Response;
 public class AccountManager {
 
     private Realm realm;
-    private UserService userService;
+    private RestAccountService restAccountService;
     private Curve25519 curve25519;
     private KeyService keyService;
     private PreKeyStoreImpl preKeyStore;
     private SignedPreKeyStoreImpl signedPreKeyStore;
     private String TAG = this.getClass().getSimpleName();
 
-    public AccountManager(Realm realm, UserService userService, Curve25519 curve25519, KeyService keyService, PreKeyStoreImpl preKeyStore, SignedPreKeyStoreImpl signedPreKeyStore) {
+    public AccountManager(Realm realm, RestAccountService restAccountService, Curve25519 curve25519, KeyService keyService, PreKeyStoreImpl preKeyStore, SignedPreKeyStoreImpl signedPreKeyStore) {
         this.realm = realm;
-        this.userService = userService;
+        this.restAccountService = restAccountService;
         this.curve25519 = curve25519;
         this.keyService = keyService;
         this.preKeyStore = preKeyStore;
@@ -189,71 +189,73 @@ public class AccountManager {
      */
     public void signUp(final AccountEntity account) {
 
-        Call<ResponseBody> call = userService.signUp(account.getKeyBase64());
-        Log.v(TAG, "Sign up call to : " + call.request().url());
-        Log.v(TAG, "Sign up method : " + call.request().method());
-
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-
-                Log.v(TAG, "Sign up response: " + response.message());
-                Log.v(TAG, "Sign up response code: " + response.code());
-
-                if (response.isSuccessful()) {
-                    realm.beginTransaction();
-                    account.setRegistered(true);
-                    realm.insertOrUpdate(account);
-                    realm.commitTransaction();
-                    Log.v(TAG, "AccountEntity " + account.getName() + " registered");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.v(TAG, "AccountEntity " + account.getName() + " failed to sign up");
-                Log.v("HAI", t.getMessage() + " " + t.getCause() + " ");
-                Log.getStackTraceString(t);
-            }
-        });
+//        Call<ResponseBody> call = restAccountService.signUp(account.getKeyBase64());
+//        Log.v(TAG, "Sign up call to : " + call.request().url());
+//        Log.v(TAG, "Sign up method : " + call.request().method());
+//
+//        call.enqueue(new Callback<ResponseBody>() {
+//            @Override
+//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//
+//                Log.v(TAG, "Sign up response: " + response.message());
+//                Log.v(TAG, "Sign up response code: " + response.code());
+//
+//                if (response.isSuccessful()) {
+//                    realm.beginTransaction();
+//                    account.setRegistered(true);
+//                    realm.insertOrUpdate(account);
+//                    realm.commitTransaction();
+//                    Log.v(TAG, "AccountEntity " + account.getName() + " registered");
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                Log.v(TAG, "AccountEntity " + account.getName() + " failed to sign up");
+//                Log.v("HAI", t.getMessage() + " " + t.getCause() + " ");
+//                Log.getStackTraceString(t);
+//            }
+//        });
 
     }
 
     private String requestCode() {
-        Realm realm2 = Realm.getDefaultInstance();
+//        Realm realm2 = Realm.getDefaultInstance();
+//
+//        try {
+//
+//            AccountEntity active = realm.where(AccountEntity.class).equalTo("active", true).equalTo("registered", true).findFirst();
+//            if (active == null)
+//                return null;
 
-        try {
+           // Call<String> requestCodeCall = restAccountService.requestCode(active.getKeyBase64());
+ //           Response<String> codeCallResponse;
 
-            AccountEntity active = realm.where(AccountEntity.class).equalTo("active", true).equalTo("registered", true).findFirst();
-            if (active == null)
-                return null;
+           // codeCallResponse = requestCodeCall.execute();
 
-            Call<String> requestCodeCall = userService.requestCode(active.getKeyBase64());
-            Response<String> codeCallResponse;
+          //  Log.v(TAG, "request code url " + requestCodeCall.request().url());
 
-            codeCallResponse = requestCodeCall.execute();
+          //  if (!codeCallResponse.isSuccessful()) {
+          //      Log.v(TAG, "Failed to fetch code");
+         //       return null;
+         //   }
 
-            Log.v(TAG, "request code url " + requestCodeCall.request().url());
+          //  Log.v(TAG, "Fetched code " + codeCallResponse.body());
+         //   Log.v(TAG, "Fetching status " + codeCallResponse.code());
 
-            if (!codeCallResponse.isSuccessful()) {
-                Log.v(TAG, "Failed to fetch code");
-                return null;
-            }
+  //          realm2.close();
+          //  return codeCallResponse.body();
 
-            Log.v(TAG, "Fetched code " + codeCallResponse.body());
-            Log.v(TAG, "Fetching status " + codeCallResponse.code());
+      //  } catch (IOException e) {
+//            Log.getStackTraceString(e);
+//            realm2.close();
+//            return null;
+//        }
+//        finally {
+//            realm2.close();
+//        }
 
-            realm2.close();
-            return codeCallResponse.body();
-
-        } catch (IOException e) {
-            Log.getStackTraceString(e);
-            realm2.close();
-            return null;
-        }
-        finally {
-            realm2.close();
-        }
+ return null;
     }
 
     public String logIn() {
@@ -270,7 +272,7 @@ public class AccountManager {
 
             LoginDetails loginDetails = new LoginDetails(active.getKeyBase64(), Base64.encodeToString(signature, Base64.URL_SAFE | Base64.NO_WRAP));
 
-            Call<ResponseBody> loginCall = userService.login(loginDetails);
+            Call<ResponseBody> loginCall = restAccountService.login(loginDetails);
             Response<ResponseBody> loginCallResponse = loginCall.execute();
 
             Log.v(TAG, "login call code:" + loginCallResponse.code());

@@ -1,16 +1,23 @@
-package com.apap.director.client.presentation.ui.net.di.module;
+package com.apap.director.client.presentation.di.module;
+
+import android.content.Context;
+import android.content.Intent;
 
 import com.apap.director.client.data.net.rest.Paths;
 import com.apap.director.client.data.net.rest.service.KeyService;
-import com.apap.director.client.data.net.rest.service.UserService;
+import com.apap.director.client.data.net.rest.service.RestAccountService;
 import com.apap.director.client.data.net.service.HttpService;
 import com.apap.director.client.data.net.service.WebSocketService;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import info.guardianproject.netcipher.client.StrongBuilder;
+import info.guardianproject.netcipher.client.StrongConnectionBuilder;
+import info.guardianproject.netcipher.client.StrongOkHttpClientBuilder;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -21,16 +28,16 @@ public class NetModule {
     //only in affected classes' component
 
     private static final String BASE_URL = "http://" + Paths.SERVER_IP + ":" + Paths.SERVER_PORT;
-    private final OkHttpClient client;
+    private OkHttpClient client;
 
-    public NetModule(OkHttpClient client) {
-        this.client = client;
+    public NetModule(OkHttpClient okHttpClient) {
+        this.client = okHttpClient;
     }
 
     @Provides
     @Singleton
-    UserService provideUserService(Retrofit retrofit) {
-        return retrofit.create(UserService.class);
+    RestAccountService provideRestAccountService(Retrofit retrofit) {
+        return retrofit.create(RestAccountService.class);
     }
 
     @Provides
@@ -41,18 +48,18 @@ public class NetModule {
 
     @Provides
     @Singleton
-    OkHttpClient provideOkHttpClient() {
+    OkHttpClient provideOkHttpClient(Context context) {
         return client;
     }
 
     @Provides
     @Singleton
-    Retrofit provideRetrofit() {
+    Retrofit provideRetrofit(OkHttpClient okHttpClient) {
         return new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .client(client)
+                .client(okHttpClient)
                 .build();
     }
 
@@ -62,9 +69,4 @@ public class NetModule {
         return new WebSocketService();
     }
 
-    @Provides
-    @Singleton
-    HttpService provideHttpService() {
-        return new HttpService();
-    }
 }

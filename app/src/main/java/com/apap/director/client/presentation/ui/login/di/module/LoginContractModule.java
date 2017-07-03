@@ -11,15 +11,15 @@ import dagger.Provides;
 @Module
 public class LoginContractModule {
 
-    private WeakReference<LoginContract.View> view;
+    private LoginContract.View view;
 
-    public LoginContractModule(WeakReference<LoginContract.View> view) {
+    public LoginContractModule(LoginContract.View view) {
         this.view = view;
     }
 
     @Provides
     @Activity
-    public WeakReference<LoginContract.View> provideView() {
+    public LoginContract.View provideView() {
         return view;
     }
 }

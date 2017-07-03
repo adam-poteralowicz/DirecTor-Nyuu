@@ -9,13 +9,13 @@ import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 
-public interface UserService {
+public interface RestAccountService {
 
     @POST(value = "/user/{userId}")
-    Call<ResponseBody> signUp(@Path("userId") String userId);
+    Observable<ResponseBody> signUp(@Path("userId") String userId);
 
     @GET(value = "/user/code/{userId}")
-    Call<String> requestCode(@Path("userId") String userId);
+    Observable<String> requestCode(@Path("userId") String userId);
 
     @POST(value = "/login")
     @Headers("Content-Type: application/json")

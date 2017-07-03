@@ -11,6 +11,10 @@ import android.widget.Toast;
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.data.manager.ConversationManager;
+import com.apap.director.client.presentation.ui.contact.contract.NewContactContract;
+import com.apap.director.client.presentation.ui.contact.di.component.DaggerNewContactComponent;
+import com.apap.director.client.presentation.ui.contact.di.component.NewContactComponent;
+import com.apap.director.client.presentation.ui.contact.di.module.NewContactContractModule;
 import com.apap.director.client.presentation.ui.contact.presenter.NewContactPresenter;
 
 import javax.inject.Inject;
@@ -19,7 +23,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class NewContactActivity extends Activity {
+public class NewContactActivity extends Activity implements NewContactContract.View {
 
     @Inject
     ConversationManager conversationManager;
@@ -40,9 +44,16 @@ public class NewContactActivity extends Activity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ButterKnife.bind(this);
 
-        ((App) getApplication()).getComponent().inject(this);
         contactPublicKey = getIntent().getExtras().getString("key");
         textView.setText("ContactEntity public key: " + contactPublicKey);
+    }
+
+    private void setUpInjection() {
+        DaggerNewContactComponent.builder()
+                .mainComponent(((App) getApplication()).getComponent())
+                .newContactContractModule(new NewContactContractModule(this))
+                .build()
+                .inject(this);
     }
 
     @OnClick(R.id.saveContactButton)
@@ -56,5 +67,10 @@ public class NewContactActivity extends Activity {
 
         Intent intent = new Intent(this, AddContactActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void handleException(Throwable throwable) {
+
     }
 }
