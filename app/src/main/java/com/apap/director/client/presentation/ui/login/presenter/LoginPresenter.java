@@ -5,9 +5,6 @@ import com.apap.director.client.presentation.ui.login.contract.LoginContract;
 
 import javax.inject.Inject;
 
-/**
- * Created by Alicja Michniewicz on 03/07/2017.
- */
 
 public class LoginPresenter implements BasePresenter {
 

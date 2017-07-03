@@ -25,7 +25,9 @@ import com.apap.director.client.data.net.service.ClientService;
 import com.apap.director.client.presentation.ui.common.view.NetActivity;
 import com.apap.director.client.presentation.ui.home.HomeActivity;
 import com.apap.director.client.presentation.ui.listener.ArrayAdapterChangeListener;
+import com.apap.director.client.presentation.ui.login.contract.LoginContract;
 import com.apap.director.client.presentation.ui.login.di.component.DaggerLoginComponent;
+import com.apap.director.client.presentation.ui.login.di.module.LoginContractModule;
 import com.apap.director.client.presentation.ui.login.presenter.LoginPresenter;
 import com.apap.director.client.presentation.ui.register.NewAccountActivity;
 
@@ -47,9 +49,10 @@ import io.realm.RealmResults;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-public class LoginActivity extends NetActivity {
+public class LoginActivity extends NetActivity implements LoginContract.View {
 
-    private String TAG = App.getContext().getClass().getSimpleName();
+    private final static String TAG = App.getContext().getClass().getSimpleName();
+    private final static int LAYOUT_ID = R.layout.login_view;
 
     @Inject
     AccountManager accountManager;
@@ -77,12 +80,11 @@ public class LoginActivity extends NetActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login_view);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-        DaggerLoginComponent.builder().build().inject(this);
-
+        setContentView(LAYOUT_ID);
         ButterKnife.bind(this);
+
+        setUpInjection();
+
 
         realmAccounts = realm.where(AccountEntity.class).findAll();
 
@@ -101,7 +103,10 @@ public class LoginActivity extends NetActivity {
     }
 
     private void setUpInjection() {
-
+        DaggerLoginComponent.builder()
+                .loginContractModule(new LoginContractModule(this))
+                .build()
+                .inject(this);
     }
 
     @Override
@@ -253,5 +258,10 @@ public class LoginActivity extends NetActivity {
             Log.v(TAG, accountName + " account failed to delete");
         else
             Log.v(TAG, accountName + " account deleted");
+    }
+
+    @Override
+    public void handleException(Exception exception) {
+
     }
 }
