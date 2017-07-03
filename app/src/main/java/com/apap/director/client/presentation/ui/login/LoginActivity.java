@@ -25,12 +25,16 @@ import com.apap.director.client.data.net.service.ClientService;
 import com.apap.director.client.presentation.ui.common.view.NetActivity;
 import com.apap.director.client.presentation.ui.home.HomeActivity;
 import com.apap.director.client.presentation.ui.listener.ArrayAdapterChangeListener;
+import com.apap.director.client.presentation.ui.login.contract.LoginContract;
 import com.apap.director.client.presentation.ui.login.di.component.DaggerLoginComponent;
+import com.apap.director.client.presentation.ui.login.di.module.LoginContractModule;
 import com.apap.director.client.presentation.ui.login.presenter.LoginPresenter;
 import com.apap.director.client.presentation.ui.register.NewAccountActivity;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
@@ -47,9 +51,10 @@ import io.realm.RealmResults;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-public class LoginActivity extends NetActivity {
+public class LoginActivity extends NetActivity implements LoginContract.View {
 
-    private String TAG = App.getContext().getClass().getSimpleName();
+    private static final String TAG = App.getContext().getClass().getSimpleName();
+    private static final int LAYOUT_ID = R.layout.login_view;
 
     @Inject
     AccountManager accountManager;
@@ -70,38 +75,36 @@ public class LoginActivity extends NetActivity {
     EditText masterPasswordEditText;
 
     private ArrayList<AccountEntity> accountList;
+    private ArrayAdapter<AccountEntity> arrayAdapter;
     private RealmResults<AccountEntity> realmAccounts;
-    private ArrayAdapterChangeListener<AccountEntity, RealmResults<AccountEntity>> listener;
     private String accountName;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login_view);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-        DaggerLoginComponent.builder().build().inject(this);
+        setContentView(LAYOUT_ID);
 
         ButterKnife.bind(this);
 
-        realmAccounts = realm.where(AccountEntity.class).findAll();
+        setUpInjection();
+        setUpArrayAdapter();
+    }
 
+    private void setUpArrayAdapter() {
+        //TODO: change to RecyclerView
         accountList = new ArrayList<>();
-        ArrayAdapter<AccountEntity> arrayAdapter = new ArrayAdapter<>(
+        arrayAdapter = new ArrayAdapter<>(
                 getApplicationContext(),
                 android.R.layout.simple_list_item_single_choice,
                 accountList);
         accountsListView.setAdapter(arrayAdapter);
-
-        arrayAdapter.addAll(realmAccounts);
-        arrayAdapter.notifyDataSetChanged();
-
-        listener = new ArrayAdapterChangeListener<>(arrayAdapter, "login activity");
-        realmAccounts.addChangeListener(listener);
     }
 
     private void setUpInjection() {
-
+        DaggerLoginComponent.builder()
+                .loginContractModule(new LoginContractModule(new WeakReference<LoginContract.View>(this)))
+                .build()
+                .inject(this);
     }
 
     @Override
@@ -137,20 +140,12 @@ public class LoginActivity extends NetActivity {
 
     @Override
     protected void onStart() {
-        realmAccounts.addChangeListener(listener);
         super.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        realmAccounts.removeChangeListener(listener);
-        super.onStop();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        realmAccounts.removeChangeListener(listener);
     }
 
     @Override
@@ -253,5 +248,17 @@ public class LoginActivity extends NetActivity {
             Log.v(TAG, accountName + " account failed to delete");
         else
             Log.v(TAG, accountName + " account deleted");
+    }
+
+    @Override
+    public void refreshAccountList(List<AccountEntity> newList) {
+        arrayAdapter.clear();
+        arrayAdapter.addAll(newList);
+        arrayAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void handleException(Throwable throwable) {
+        // TODO notify user
     }
 }

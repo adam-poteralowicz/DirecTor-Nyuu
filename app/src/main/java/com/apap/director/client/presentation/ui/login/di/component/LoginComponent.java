@@ -10,10 +10,6 @@ import com.apap.director.client.presentation.ui.login.di.module.LoginContractMod
 
 import dagger.Component;
 
-/**
- * Created by Alicja Michniewicz on 03/07/2017.
- */
-
 @Activity
 @Component(modules = {LoginContractModule.class}, dependencies = {MainComponent.class})
 public interface LoginComponent {
