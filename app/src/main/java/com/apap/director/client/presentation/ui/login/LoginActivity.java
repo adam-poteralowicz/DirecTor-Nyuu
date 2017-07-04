@@ -147,10 +147,6 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
         super.onDestroy();
     }
 
-    @Override
-    public void onBackPressed() {
-        ClientService.disconnect();
-    }
 
     @OnClick(R.id.postLoginButton)
     public void onClick(View view) {
