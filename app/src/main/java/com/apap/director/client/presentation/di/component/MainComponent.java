@@ -3,6 +3,7 @@ package com.apap.director.client.presentation.di.component;
 import android.content.Context;
 
 import com.apap.director.client.data.manager.AccountManager;
+import com.apap.director.client.data.manager.MessageManager;
 import com.apap.director.client.data.net.rest.service.KeyService;
 import com.apap.director.client.data.net.rest.service.RestAccountService;
 import com.apap.director.client.data.net.service.MessageAction;
@@ -18,10 +19,8 @@ import com.apap.director.client.presentation.di.module.RealmModule;
 import com.apap.director.client.presentation.di.module.RepositoryModule;
 import com.apap.director.client.presentation.di.module.SignalModule;
 import com.apap.director.client.presentation.di.module.WebSocketModule;
-import com.apap.director.client.presentation.ui.contact.AddContactActivity;
 import com.apap.director.client.presentation.ui.contact.ContactsFragment;
 import com.apap.director.client.presentation.ui.inbox.InboxFragment;
-import com.apap.director.client.presentation.ui.message.NewMsgActivity;
 
 import javax.inject.Singleton;
 
@@ -39,13 +38,9 @@ import io.realm.Realm;
         ContextModule.class})
 public interface MainComponent {
 
-    void inject(AddContactActivity addContactActivity);
-
     void inject(ContactsFragment contactsFragment);
 
     void inject(InboxFragment inboxFragment);
-
-    void inject(NewMsgActivity newMsgActivity);
 
     MessageAction getMessageAction();
 
@@ -68,4 +63,6 @@ public interface MainComponent {
     AccountRepository accountRepository();
 
     Context context();
+
+    MessageManager messageManager();
 }

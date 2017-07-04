@@ -16,9 +16,13 @@ import com.apap.director.client.data.db.entity.ConversationEntity;
 import com.apap.director.client.data.db.entity.MessageEntity;
 import com.apap.director.client.data.manager.ConversationManager;
 import com.apap.director.client.data.manager.MessageManager;
-import com.apap.director.client.presentation.ui.home.adapter.MessageAdapter;
 import com.apap.director.client.data.net.service.ClientService;
+import com.apap.director.client.presentation.ui.home.adapter.MessageAdapter;
 import com.apap.director.client.presentation.ui.listener.ArrayAdapterChangeListener;
+import com.apap.director.client.presentation.ui.message.contract.NewMsgContract;
+import com.apap.director.client.presentation.ui.message.di.DaggerNewMsgComponent;
+import com.apap.director.client.presentation.ui.message.di.NewMsgContractModule;
+import com.apap.director.client.presentation.ui.message.presenter.NewMsgPresenter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +36,7 @@ import butterknife.OnItemLongClick;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-public class NewMsgActivity extends Activity {
+public class NewMsgActivity extends Activity implements NewMsgContract.View {
 
     @Inject
     Realm realm;
@@ -40,6 +44,8 @@ public class NewMsgActivity extends Activity {
     MessageManager messageManager;
     @Inject
     ConversationManager conversationManager;
+    @Inject
+    NewMsgPresenter newMsgPresenter;
 
     @BindView(R.id.messengerField)
     EditText newMessageField;
@@ -50,44 +56,25 @@ public class NewMsgActivity extends Activity {
 
     private Long contactIdFromIntent;
     private List<MessageEntity> myMessages;
+    private ArrayAdapter<MessageEntity> arrayAdapter;
+    private String TAG = this.getClass().getSimpleName();
     private ArrayAdapterChangeListener<MessageEntity, RealmResults<MessageEntity>> changeListener;
     private RealmResults<MessageEntity> allMessages;
-    private String TAG = this.getClass().getSimpleName();
-
-    //TODO: Split this method
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        ((App) getApplication()).getComponent().inject(this);
-
-        ClientService.sendMessage("NewMsgActivity");
         setContentView(R.layout.new_msg_view);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        ClientService.sendMessage("NewMsgActivity");
+        setUpInjection();
         ButterKnife.bind(this);
+        autorefreshMessages();
+        decorateMsgScreen();
 
-        if (getIntent().getStringExtra("recipient") != null) {
-            recipient.setText(getIntent().getStringExtra("recipient"));
-        } else {
-            recipient.setText(getIntent().getStringExtra("msgTitle"));
-        }
-
-        contactIdFromIntent = getIntent().getLongExtra("contactId", 1L);
-
-        myMessages = new ArrayList<>();
-        ArrayAdapter<MessageEntity> arrayAdapter = new MessageAdapter(this, R.layout.item_chat_left, myMessages);
-        messagesView.setAdapter(arrayAdapter);
-
-        allMessages = realm.where(MessageEntity.class).equalTo("conversation.id", contactIdFromIntent).findAll();
-        myMessages.addAll(allMessages);
-        arrayAdapter.notifyDataSetChanged();
-
-        changeListener = new ArrayAdapterChangeListener<>(arrayAdapter, "message activity listener");
-        allMessages.addChangeListener(changeListener);
-
-        messagesView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
-        messagesView.setStackFromBottom(true);
-
+        arrayAdapter = setUpAdapter();
+        newMsgPresenter.getMessageList();
+        allMessages.addChangeListener(new ArrayAdapterChangeListener<>(arrayAdapter, "message activity listener"));
     }
 
     @Override
@@ -95,6 +82,18 @@ public class NewMsgActivity extends Activity {
         allMessages.removeChangeListener(changeListener);
         super.onDestroy();
         realm.close();
+    }
+
+    @Override
+    public void refreshMessageList(List<MessageEntity> newList) {
+        arrayAdapter.clear();
+        myMessages.addAll(newList);
+        arrayAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void handleException(Throwable throwable) {
+        Log.getStackTraceString(throwable);
     }
 
     @OnClick(R.id.sendButton)
@@ -117,6 +116,35 @@ public class NewMsgActivity extends Activity {
         return true;
     }
 
+    private void setUpInjection() {
+        DaggerNewMsgComponent.builder()
+                .mainComponent(((App) getApplication()).getComponent())
+                .newMsgContractModule(new NewMsgContractModule(this))
+                .build()
+                .inject(this);
+    }
+
+    private ArrayAdapter<MessageEntity> setUpAdapter() {
+        myMessages = new ArrayList<>();
+        arrayAdapter = new MessageAdapter(this, R.layout.item_chat_left, myMessages);
+        messagesView.setAdapter(arrayAdapter);
+
+        return arrayAdapter;
+    }
+
+    private void autorefreshMessages() {
+        messagesView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
+        messagesView.setStackFromBottom(true);
+    }
+
+    private void decorateMsgScreen() {
+        if (getIntent().getStringExtra("recipient") != null) {
+            recipient.setText(getIntent().getStringExtra("recipient"));
+        } else {
+            recipient.setText(getIntent().getStringExtra("msgTitle"));
+        }
+        contactIdFromIntent = getIntent().getLongExtra("contactId", 1L);
+    }
 }
 
 

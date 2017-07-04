@@ -6,16 +6,11 @@ import com.apap.director.client.presentation.ui.home.contract.HomeContract;
 
 import javax.inject.Inject;
 
-import io.realm.Realm;
-
 /**
  * Created by Adam on 2017-07-03.
  */
 
 public class HomePresenter implements BasePresenter, HomeContract.Presenter {
-
-    @Inject
-    Realm realm;
 
     private HomeContract.View view;
 

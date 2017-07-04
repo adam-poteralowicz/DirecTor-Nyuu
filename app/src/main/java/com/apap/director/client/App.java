@@ -1,12 +1,10 @@
 package com.apap.director.client;
 
 import android.app.Application;
-import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.apap.director.client.data.net.service.ClientService;
 import com.apap.director.client.presentation.di.component.DaggerMainComponent;
 import com.apap.director.client.presentation.di.component.MainComponent;
 import com.apap.director.client.presentation.di.module.ContextModule;
@@ -16,9 +14,6 @@ import com.apap.director.client.presentation.di.module.RealmModule;
 import com.apap.director.client.presentation.di.module.RepositoryModule;
 import com.apap.director.client.presentation.di.module.SignalModule;
 import com.apap.director.client.presentation.ui.login.LoginActivity;
-import com.mobsandgeeks.saripaar.annotation.Or;
-
-import javax.inject.Inject;
 
 import info.guardianproject.netcipher.client.StrongOkHttpClientBuilder;
 import info.guardianproject.netcipher.proxy.OrbotHelper;

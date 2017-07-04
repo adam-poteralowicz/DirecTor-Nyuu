@@ -1,6 +1,5 @@
 package com.apap.director.client.presentation.ui.register.presenter;
 
-import android.accounts.Account;
 import android.util.Log;
 
 import com.apap.director.client.data.db.entity.AccountEntity;
@@ -34,7 +33,7 @@ public class RegisterPresenter implements RegisterContract.Presenter {
 
     @Override
     public void signUp(String name) {
-        Log.v(RegisterPresenter.class.getSimpleName(), "Signing up as "+name);
+        Log.v(RegisterPresenter.class.getSimpleName(), "Signing up as " + name);
         createAccountInteractor.execute(name, new Callback<AccountEntity>() {
             @Override
             public void onAccept(AccountEntity data) {

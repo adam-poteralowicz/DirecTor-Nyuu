@@ -43,7 +43,6 @@ import butterknife.OnItemClick;
 import butterknife.OnItemLongClick;
 import info.guardianproject.netcipher.NetCipher;
 import io.realm.Realm;
-import io.realm.RealmResults;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -73,7 +72,6 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
 
     private ArrayList<AccountEntity> accountList;
     private ArrayAdapter<AccountEntity> arrayAdapter;
-    private RealmResults<AccountEntity> realmAccounts;
     private String accountName;
 
     @Override

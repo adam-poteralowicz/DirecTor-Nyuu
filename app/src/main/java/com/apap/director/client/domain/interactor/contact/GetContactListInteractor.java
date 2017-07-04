@@ -24,7 +24,7 @@ public class GetContactListInteractor extends BaseInteractor<List<ContactEntity>
     }
 
     @Override
-    public Observable<List<ContactEntity>> buildObservable(Void aVoid) {
+    public Observable<List<ContactEntity>> buildObservable(Void unused) {
         return contactRepository.getContactList();
     }
 }
