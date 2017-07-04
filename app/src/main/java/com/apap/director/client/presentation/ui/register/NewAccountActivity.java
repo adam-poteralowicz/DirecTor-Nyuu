@@ -14,6 +14,7 @@ import com.apap.director.client.presentation.ui.register.di.module.RegisterContr
 import com.apap.director.client.presentation.ui.register.presenter.RegisterPresenter;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
+import com.mobsandgeeks.saripaar.annotation.Length;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 
 import java.util.List;
@@ -26,7 +27,7 @@ import butterknife.OnClick;
 
 public class NewAccountActivity extends Activity implements Validator.ValidationListener, RegisterContract.View {
 
-    @NotEmpty
+    @Length(min = 1)
     @BindView(R.id.contactNameEditText)
     EditText accountNameEditText;
 
@@ -76,6 +77,7 @@ public class NewAccountActivity extends Activity implements Validator.Validation
 
     @Override
     public void onValidationSucceeded() {
+        Log.v(NewAccountActivity.class.getSimpleName(), "Name validation succeeded");
         saveButton.setEnabled(true);
     }
 
@@ -87,10 +89,12 @@ public class NewAccountActivity extends Activity implements Validator.Validation
     @Override
     public void handleException(Throwable throwable) {
         //TODO implement
+        Log.e(NewAccountActivity.class.getSimpleName(), "Exception occured ", throwable);
     }
 
     @Override
     public void handleSuccess() {
+        Log.v(NewAccountActivity.class.getSimpleName(), "Registered");
         finish();
     }
 }
