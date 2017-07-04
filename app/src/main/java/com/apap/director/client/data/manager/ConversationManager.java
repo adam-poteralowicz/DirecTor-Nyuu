@@ -28,6 +28,16 @@ public class ConversationManager {
 
     }
 
+    public ConversationEntity createConversation() {
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+        ConversationEntity conversation = realm.createObject(ConversationEntity.class, generateConversationId(realm));
+        realm.copyToRealmOrUpdate(conversation);
+        realm.commitTransaction();
+
+        return conversation;
+    }
+
     public List<ConversationEntity> listAllConversations() {
         RealmResults<ConversationEntity> conversations = realm.where(ConversationEntity.class).findAll();
         return new ArrayList<>(conversations);

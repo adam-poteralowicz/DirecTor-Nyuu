@@ -11,7 +11,7 @@ import com.apap.director.client.presentation.ui.base.contract.view.BaseView;
 public interface HomeContract {
 
     interface View extends BaseView {
-
+        void logOut(AccountEntity account);
     }
 
     interface Presenter extends BasePresenter {

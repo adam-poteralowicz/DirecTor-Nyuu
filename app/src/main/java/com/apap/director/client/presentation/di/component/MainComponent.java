@@ -3,28 +3,25 @@ package com.apap.director.client.presentation.di.component;
 import android.content.Context;
 
 import com.apap.director.client.data.manager.AccountManager;
+import com.apap.director.client.data.net.rest.service.KeyService;
 import com.apap.director.client.data.net.rest.service.RestAccountService;
+import com.apap.director.client.data.net.service.MessageAction;
 import com.apap.director.client.data.store.IdentityKeyStoreImpl;
 import com.apap.director.client.data.store.PreKeyStoreImpl;
+import com.apap.director.client.data.store.SessionStoreImpl;
+import com.apap.director.client.data.store.SignedPreKeyStoreImpl;
 import com.apap.director.client.domain.repository.AccountRepository;
 import com.apap.director.client.presentation.di.module.ContextModule;
 import com.apap.director.client.presentation.di.module.ManagerModule;
+import com.apap.director.client.presentation.di.module.NetModule;
 import com.apap.director.client.presentation.di.module.RealmModule;
 import com.apap.director.client.presentation.di.module.RepositoryModule;
+import com.apap.director.client.presentation.di.module.SignalModule;
+import com.apap.director.client.presentation.di.module.WebSocketModule;
 import com.apap.director.client.presentation.ui.contact.AddContactActivity;
-import com.apap.director.client.presentation.ui.home.HomeActivity;
-import com.apap.director.client.presentation.ui.contact.NewContactActivity;
-import com.apap.director.client.presentation.ui.message.NewMsgActivity;
-import com.apap.director.client.presentation.ui.contact.SingleContactActivity;
 import com.apap.director.client.presentation.ui.contact.ContactsFragment;
 import com.apap.director.client.presentation.ui.inbox.InboxFragment;
-import com.apap.director.client.presentation.di.module.WebSocketModule;
-import com.apap.director.client.data.net.service.MessageAction;
-import com.apap.director.client.presentation.di.module.NetModule;
-import com.apap.director.client.data.net.rest.service.KeyService;
-import com.apap.director.client.data.store.SessionStoreImpl;
-import com.apap.director.client.data.store.SignedPreKeyStoreImpl;
-import com.apap.director.client.presentation.di.module.SignalModule;
+import com.apap.director.client.presentation.ui.message.NewMsgActivity;
 
 import javax.inject.Singleton;
 
@@ -45,8 +42,6 @@ public interface MainComponent {
     void inject(AddContactActivity addContactActivity);
 
     void inject(ContactsFragment contactsFragment);
-
-    void inject(SingleContactActivity singleContactActivity);
 
     void inject(InboxFragment inboxFragment);
 
