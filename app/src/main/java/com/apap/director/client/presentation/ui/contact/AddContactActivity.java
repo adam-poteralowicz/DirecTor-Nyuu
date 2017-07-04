@@ -3,12 +3,12 @@ package com.apap.director.client.presentation.ui.contact;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.IntentFilter.MalformedMimeTypeException;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
@@ -23,13 +23,15 @@ import com.apap.director.client.R;
 import com.apap.director.client.data.manager.AccountManager;
 import com.apap.director.client.data.manager.ContactManager;
 import com.apap.director.client.data.manager.ConversationManager;
-import com.apap.director.client.presentation.ui.home.HomeActivity;
 import com.apap.director.client.data.util.NFCUtils;
+import com.apap.director.client.presentation.ui.contact.contract.AddContactContract;
+import com.apap.director.client.presentation.ui.contact.di.component.DaggerAddContactComponent;
+import com.apap.director.client.presentation.ui.contact.di.module.AddContactContractModule;
+import com.apap.director.client.presentation.ui.contact.presenter.AddContactPresenter;
+import com.apap.director.client.presentation.ui.home.HomeActivity;
 
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.InvalidKeyException;
-
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -37,10 +39,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.Realm;
 
-public class AddContactActivity extends AppCompatActivity {
+public class AddContactActivity extends AppCompatActivity implements AddContactContract.View {
 
     private static final String MIME_TYPE = "text/plain";
 
+    @Inject
+    AddContactPresenter addContactPresenter;
     @Inject
     Realm realm;
     @Inject
@@ -54,7 +58,6 @@ public class AddContactActivity extends AppCompatActivity {
     TextView myKeyView;
 
     private NfcAdapter nfcAdapter;
-    private Intent intent;
     private PendingIntent pendingIntent;
     private IntentFilter[] readIntentFilters;
     private byte[] myPublicKey;
@@ -63,7 +66,7 @@ public class AddContactActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_contact_view);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        ((App) getApplication()).getComponent().inject(this);
+        setUpInjection();
         ButterKnife.bind(this);
 
         try {
@@ -73,9 +76,9 @@ public class AddContactActivity extends AppCompatActivity {
         } catch (InvalidKeyException e) {
             Log.getStackTraceString(e);
         }
-
         getSupportActionBar().show();
-        initNFC();
+
+        addContactPresenter.initNFC(NfcAdapter.getDefaultAdapter(this));
     }
 
     @Override
@@ -92,7 +95,7 @@ public class AddContactActivity extends AppCompatActivity {
             if (pm.hasSystemFeature(PackageManager.FEATURE_NFC) && NfcAdapter.getDefaultAdapter(this) != null) {
                 if (nfcAdapter.isEnabled()) {
                     Toast.makeText(this, "NFC enabled", Toast.LENGTH_LONG).show();
-                    useNFC();
+                    addContactPresenter.useNFC(NfcAdapter.getDefaultAdapter(this), new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED));
                 } else {
                     Toast.makeText(this, "Please activate NFC", Toast.LENGTH_LONG).show();
                 }
@@ -108,12 +111,8 @@ public class AddContactActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent newIntent) {
         super.onNewIntent(newIntent);
-        intent = newIntent;
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(newIntent.getAction())) {
-            _readMessage();
-        }
-        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(newIntent.getAction())) {
-            _readMessage();
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(newIntent.getAction()) || NfcAdapter.ACTION_TAG_DISCOVERED.equals(newIntent.getAction())) {
+            addContactPresenter.readMessage(NFCUtils.getStringsFromNfcIntent(newIntent), getSupportActionBar());
         }
     }
 
@@ -141,31 +140,37 @@ public class AddContactActivity extends AppCompatActivity {
         startActivity(selectedIntent);
     }
 
-    public void initNFC() {
-        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        if (nfcAdapter.isEnabled()) {
-            pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass())
-                    .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-        }
+    @Override
+    public void handleException(Throwable throwable) {
+        Log.getStackTraceString(throwable);
     }
 
-    public void useNFC() {
-        if (nfcAdapter == null) {
-            Toast.makeText(this, "This device does not support NFC", Toast.LENGTH_LONG).show();
-            return;
-        }
+    @Override
+    public void showToast(String text) {
+        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+    }
 
-        if (nfcAdapter.isEnabled()) {
-            pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass())
-                    .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-            IntentFilter ndefDetected = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
-            try {
-                ndefDetected.addDataType(MIME_TYPE);
-            } catch (MalformedMimeTypeException e) {
-                Log.getStackTraceString(e);
-            }
-            readIntentFilters = new IntentFilter[]{ndefDetected};
-        }
+    @Override
+    public void showActionBar(ActionBar actionBar) {
+        actionBar.show();
+    }
+
+    @Override
+    public void showNewContact(String publicKey) {
+        Intent newContactIntent = new Intent(this, NewContactActivity.class);
+        newContactIntent.putExtra("key", publicKey);
+        startActivity(newContactIntent);
+    }
+
+    @Override
+    public void callPendingActivity() {
+        pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass())
+            .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+    }
+
+    @Override
+    public void getReadIntentFilters(IntentFilter ndefDetected) {
+        readIntentFilters = new IntentFilter[]{ndefDetected};
     }
 
     private void exchangePublicKeys() throws InvalidKeyException {
@@ -183,16 +188,11 @@ public class AddContactActivity extends AppCompatActivity {
         nfcAdapter.enableForegroundDispatch(this, pendingIntent, writeIntentFilters, null);
     }
 
-    public void _readMessage() {
-        List<String> msgs = NFCUtils.getStringsFromNfcIntent(intent);
-        if (msgs != null) {
-            Toast.makeText(this, "ContactEntity public key : " + msgs.get(0), Toast.LENGTH_LONG).show();
-            String contactPublicKey = msgs.get(0);
-            getSupportActionBar().show();
-
-            Intent newContactIntent = new Intent(this, NewContactActivity.class);
-            newContactIntent.putExtra("key", contactPublicKey);
-            startActivity(newContactIntent);
-        }
+    private void setUpInjection() {
+        DaggerAddContactComponent.builder()
+                .mainComponent(((App) getApplication()).getComponent())
+                .addContactContractModule(new AddContactContractModule(this))
+                .build()
+                .inject(this);
     }
 }
