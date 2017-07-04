@@ -3,6 +3,8 @@ package com.apap.director.client.data.repository;
 import android.util.Base64;
 
 import com.apap.director.client.data.db.entity.AccountEntity;
+import com.apap.director.client.data.db.entity.ContactEntity;
+import com.apap.director.client.data.db.entity.SessionEntity;
 import com.apap.director.client.data.db.service.AccountStore;
 import com.apap.director.client.data.net.rest.service.RestAccountService;
 import com.apap.director.client.domain.repository.AccountRepository;
@@ -10,6 +12,7 @@ import com.apap.director.client.domain.repository.AccountRepository;
 import org.whispersystems.libsignal.IdentityKey;
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.state.IdentityKeyStore;
+import org.whispersystems.libsignal.state.SignedPreKeyRecord;
 import org.whispersystems.libsignal.util.ByteUtil;
 import org.whispersystems.libsignal.util.KeyHelper;
 
@@ -18,6 +21,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.realm.RealmList;
 import okhttp3.ResponseBody;
 
 /**
@@ -26,8 +30,8 @@ import okhttp3.ResponseBody;
 
 public class AccountRepositoryImpl implements AccountRepository {
 
-    private final static int KEY_LENGTH = 32;
-    private final static int TYPE_LENGTH = 1;
+    private static final int KEY_LENGTH = 32;
+    private static final int TYPE_LENGTH = 1;
 
     private AccountStore accountStore;
     private RestAccountService restAccountService;
@@ -44,10 +48,6 @@ public class AccountRepositoryImpl implements AccountRepository {
         return Observable.just(accountStore.getAccountList());
     }
 
-    @Override
-    public Observable<String> getCode(String userId) {
-        return restAccountService.requestCode(userId);
-    }
 
     @Override
     public Observable<ResponseBody> signUp(String userId) {
@@ -69,6 +69,10 @@ public class AccountRepositoryImpl implements AccountRepository {
         accountEntity.setRegistrationId(KeyHelper.generateRegistrationId(false));
         accountEntity.setKeyBase64(convertToBase64(keyPair.getPublicKey()));
 
+        accountEntity.setContacts(new RealmList<ContactEntity>());
+        accountEntity.setSessions(new RealmList<SessionEntity>());
+//        accountEntity.setSignedKey(KeyHelper.gener);
+
         return accountEntity;
     }
 
@@ -76,4 +80,11 @@ public class AccountRepositoryImpl implements AccountRepository {
         byte[][] typeAndKey = ByteUtil.split(key.serialize(), TYPE_LENGTH, KEY_LENGTH);
         return Base64.encodeToString(typeAndKey[1], Base64.URL_SAFE | Base64.NO_WRAP);
     }
+
+//    private SignedPreKeyRecord generateSignedPreKey(IdentityKeyPair keyPair) {
+//        try {
+//            return KeyHelper.generateSignedPreKey(keyPair)
+//        }
+//        catch ()
+//    }
 }

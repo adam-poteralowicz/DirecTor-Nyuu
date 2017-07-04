@@ -1,21 +1,21 @@
-package com.apap.director.client.data.db.entity;
+package com.apap.director.client.domain.model;
 
-import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Created by Alicja Michniewicz
+ */
+
 @Getter
 @Setter
 @NoArgsConstructor
-public class SessionEntity extends RealmObject {
+public class OneTimeKeyModel {
 
-    @PrimaryKey
     private long id;
-    private int deviceId;
+    private int oneTimeKeyId;
     private byte[] serializedKey;
-    private String name;
-
 
 }

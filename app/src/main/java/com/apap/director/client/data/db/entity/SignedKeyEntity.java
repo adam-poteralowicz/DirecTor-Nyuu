@@ -15,5 +15,4 @@ public class SignedKeyEntity extends RealmObject {
     private long id;
     private int signedKeyId;
     private byte[] serializedKey;
-    private AccountEntity account;
 }

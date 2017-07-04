@@ -14,9 +14,7 @@ import okhttp3.ResponseBody;
 public interface AccountRepository {
 
     Observable<List<AccountEntity>> getAccountList();
-
-    Observable<String> getCode(String userId);
-
+    
     Observable<ResponseBody> signUp(String userId);
 
     Observable<AccountEntity> createAccount(String name);
