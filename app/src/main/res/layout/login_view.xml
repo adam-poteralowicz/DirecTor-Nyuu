@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:id="@+id/loginActivity_layout">
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="180dp"
         android:id="@+id/accountsView"
@@ -16,7 +16,8 @@
         android:layout_marginBottom="80dp"/>
 
     <include layout="@layout/master_password_verification_dialog"
-        android:id="@+id/loginActivity_dialog" />
+        android:id="@+id/loginActivity_dialog"
+        android:visibility="gone"/>
 
     <Button
         android:layout_width="wrap_content"

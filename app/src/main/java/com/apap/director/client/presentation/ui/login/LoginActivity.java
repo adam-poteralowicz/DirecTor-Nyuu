@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,7 +14,6 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.apap.director.client.App;
@@ -23,6 +24,7 @@ import com.apap.director.client.data.net.rest.service.RestAccountService;
 import com.apap.director.client.data.net.service.ClientService;
 import com.apap.director.client.presentation.ui.common.view.NetActivity;
 import com.apap.director.client.presentation.ui.home.HomeActivity;
+import com.apap.director.client.presentation.ui.login.adapter.AccountAdapter;
 import com.apap.director.client.presentation.ui.login.contract.LoginContract;
 import com.apap.director.client.presentation.ui.login.di.component.DaggerLoginContractComponent;
 import com.apap.director.client.presentation.ui.login.di.module.LoginContractModule;
@@ -62,7 +64,7 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     LoginPresenter loginPresenter;
 
     @BindView(R.id.accountsView)
-    ListView accountsListView;
+    RecyclerView accountsRecyclerView;
     @BindView(R.id.loginActivity_dialog)
     View masterPasswordDialog;
     @BindView(R.id.masterPasswordVerification_button)
@@ -72,6 +74,7 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
 
     private ArrayList<AccountEntity> accountList;
     private ArrayAdapter<AccountEntity> arrayAdapter;
+    private AccountAdapter accountAdapter;
     private String accountName;
 
     @Override
@@ -82,17 +85,13 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
         ButterKnife.bind(this);
 
         setUpInjection();
-        setUpArrayAdapter();
+        setUpRecyclerView();
     }
 
-    private void setUpArrayAdapter() {
-        //TODO: change to RecyclerView
-        accountList = new ArrayList<>();
-        arrayAdapter = new ArrayAdapter<>(
-                getApplicationContext(),
-                android.R.layout.simple_list_item_single_choice,
-                accountList);
-        accountsListView.setAdapter(arrayAdapter);
+    private void setUpRecyclerView() {
+        accountAdapter = new AccountAdapter(this);
+        accountsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        accountsRecyclerView.setAdapter(accountAdapter);
     }
 
     private void setUpInjection() {
