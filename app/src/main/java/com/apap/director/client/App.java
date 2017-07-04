@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
 import com.apap.director.client.presentation.di.component.DaggerMainComponent;
 import com.apap.director.client.presentation.di.component.MainComponent;
@@ -13,8 +15,10 @@ import com.apap.director.client.presentation.di.module.NetModule;
 import com.apap.director.client.presentation.di.module.RealmModule;
 import com.apap.director.client.presentation.di.module.RepositoryModule;
 import com.apap.director.client.presentation.di.module.SignalModule;
+import com.apap.director.client.presentation.ui.error.ErrorActivity;
 import com.apap.director.client.presentation.ui.login.LoginActivity;
 
+import butterknife.BindView;
 import info.guardianproject.netcipher.client.StrongOkHttpClientBuilder;
 import info.guardianproject.netcipher.proxy.OrbotHelper;
 import io.realm.Realm;
@@ -23,6 +27,9 @@ import okhttp3.OkHttpClient;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 public class App extends Application implements StrongOkHttpClientBuilder.Callback<OkHttpClient> {
+
+    @BindView(R.id.splashActivity_layout)
+    View rootView;
 
     private static Context mContext;
     private MainComponent mainComponent;
@@ -57,11 +64,10 @@ public class App extends Application implements StrongOkHttpClientBuilder.Callba
         startActivity(loginActivity);
     }
 
-    //TODO: Send user to Error Activity, tell him Orbot's broken, meow :(
     @Override
     public void onConnectionException(Exception e) {
         Log.e(App.class.getSimpleName(), "OkHttpClient exception", e);
-
+        startActivity(new Intent(this, ErrorActivity.class).putExtra("error", "OkHttpClient exception: " + e.getMessage()));
     }
 
     @Override
@@ -109,8 +115,7 @@ public class App extends Application implements StrongOkHttpClientBuilder.Callba
     private void sanityCheckOrbot() {
         if(!OrbotHelper.isOrbotInstalled(this)) {
             Log.v(App.class.getSimpleName(), "Orbot not installed");
-
-            //TODO show snackbar or sth
+            Toast.makeText(this, "Orbot not installed", Toast.LENGTH_LONG).show();
         }
     }
 

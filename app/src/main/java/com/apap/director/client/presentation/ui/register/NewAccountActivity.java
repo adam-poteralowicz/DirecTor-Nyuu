@@ -88,8 +88,7 @@ public class NewAccountActivity extends Activity implements Validator.Validation
 
     @Override
     public void handleException(Throwable throwable) {
-        //TODO implement
-        Log.e(NewAccountActivity.class.getSimpleName(), "Exception occured ", throwable);
+        Log.getStackTraceString(throwable);
     }
 
     @Override

@@ -17,6 +17,7 @@ import com.apap.director.client.data.db.entity.MessageEntity;
 import com.apap.director.client.data.manager.ConversationManager;
 import com.apap.director.client.data.manager.MessageManager;
 import com.apap.director.client.data.net.service.ClientService;
+import com.apap.director.client.domain.repository.MessageRepository;
 import com.apap.director.client.presentation.ui.home.adapter.MessageAdapter;
 import com.apap.director.client.presentation.ui.listener.ArrayAdapterChangeListener;
 import com.apap.director.client.presentation.ui.message.contract.NewMsgContract;
@@ -60,6 +61,7 @@ public class NewMsgActivity extends Activity implements NewMsgContract.View {
     private String TAG = this.getClass().getSimpleName();
     private ArrayAdapterChangeListener<MessageEntity, RealmResults<MessageEntity>> changeListener;
     private RealmResults<MessageEntity> allMessages;
+    private MessageRepository messageRepository;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,7 +121,7 @@ public class NewMsgActivity extends Activity implements NewMsgContract.View {
     private void setUpInjection() {
         DaggerNewMsgComponent.builder()
                 .mainComponent(((App) getApplication()).getComponent())
-                .newMsgContractModule(new NewMsgContractModule(this))
+                .newMsgContractModule(new NewMsgContractModule(this, messageRepository))
                 .build()
                 .inject(this);
     }

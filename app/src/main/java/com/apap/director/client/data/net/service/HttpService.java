@@ -1,11 +1,7 @@
 package com.apap.director.client.data.net.service;
 
-import android.content.Context;
-import android.util.Log;
-
 import com.apap.director.client.presentation.ui.common.view.NetActivity;
 
-import info.guardianproject.netcipher.client.StrongConnectionBuilder;
 import info.guardianproject.netcipher.client.StrongOkHttpClientBuilder;
 import okhttp3.OkHttpClient;
 
