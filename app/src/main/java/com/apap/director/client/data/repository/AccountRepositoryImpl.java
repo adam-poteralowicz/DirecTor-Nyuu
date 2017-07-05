@@ -45,6 +45,11 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
+    public Observable<AccountEntity> getActiveAccount() {
+        return Observable.just(accountStore.getActiveAccount());
+    }
+
+    @Override
     public Observable<String> getCode(String userId) {
         return restAccountService.requestCode(userId);
     }

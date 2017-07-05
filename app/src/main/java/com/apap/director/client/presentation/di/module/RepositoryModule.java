@@ -1,7 +1,13 @@
 package com.apap.director.client.presentation.di.module;
 
 import com.apap.director.client.data.repository.AccountRepositoryImpl;
+import com.apap.director.client.data.repository.ContactRepositoryImpl;
+import com.apap.director.client.data.repository.ConversationRepositoryImpl;
+import com.apap.director.client.data.repository.MessageRepositoryImpl;
 import com.apap.director.client.domain.repository.AccountRepository;
+import com.apap.director.client.domain.repository.ContactRepository;
+import com.apap.director.client.domain.repository.ConversationRepository;
+import com.apap.director.client.domain.repository.MessageRepository;
 
 import javax.inject.Singleton;
 
@@ -19,6 +25,24 @@ public class RepositoryModule {
     @Singleton
     AccountRepository provideAccountRepository(AccountRepositoryImpl accountRepository) {
         return accountRepository;
+    }
+
+    @Provides
+    @Singleton
+    MessageRepository provideMessageRepository(MessageRepositoryImpl messageRepository) {
+        return messageRepository;
+    }
+
+    @Provides
+    @Singleton
+    ContactRepository provideContactRepository(ContactRepositoryImpl contactRepository) {
+        return contactRepository;
+    }
+
+    @Provides
+    @Singleton
+    ConversationRepository provideConversationRepository(ConversationRepositoryImpl conversationRepository) {
+        return conversationRepository;
     }
 
 }

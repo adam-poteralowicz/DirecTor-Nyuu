@@ -21,4 +21,8 @@ public class AccountStore {
         return realm.where(AccountEntity.class).findAll();
     }
 
+    public AccountEntity getActiveAccount() {
+        return realm.where(AccountEntity.class).equalTo("active", true).findFirst();
+    }
+
 }

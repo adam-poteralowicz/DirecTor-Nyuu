@@ -1,4 +1,4 @@
-package com.apap.director.client.presentation.ui.message.di;
+package com.apap.director.client.presentation.ui.message.di.module;
 
 import com.apap.director.client.domain.repository.MessageRepository;
 import com.apap.director.client.presentation.di.scope.Activity;
@@ -16,10 +16,12 @@ public class NewMsgContractModule {
 
     private NewMsgContract.View view;
     private MessageRepository messageRepository;
+    private Long id;
 
-    public NewMsgContractModule(NewMsgContract.View view, MessageRepository messageRepository) {
+    public NewMsgContractModule(NewMsgContract.View view, MessageRepository messageRepository, Long id) {
         this.view = view;
         this.messageRepository = messageRepository;
+        this.id = id;
     }
 
     @Activity
@@ -30,5 +32,11 @@ public class NewMsgContractModule {
 
     @Activity
     @Provides
-    public MessageRepository provideMessageRepository() { return messageRepository; }
+    public MessageRepository provideMessageRepository() {
+        return messageRepository;
+    }
+
+    @Activity
+    @Provides
+    public Long provideLong() { return id; }
 }

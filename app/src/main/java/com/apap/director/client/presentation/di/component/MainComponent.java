@@ -19,8 +19,6 @@ import com.apap.director.client.presentation.di.module.RealmModule;
 import com.apap.director.client.presentation.di.module.RepositoryModule;
 import com.apap.director.client.presentation.di.module.SignalModule;
 import com.apap.director.client.presentation.di.module.WebSocketModule;
-import com.apap.director.client.presentation.ui.contact.ContactsFragment;
-import com.apap.director.client.presentation.ui.inbox.InboxFragment;
 
 import javax.inject.Singleton;
 
@@ -37,10 +35,6 @@ import io.realm.Realm;
         NetModule.class,
         ContextModule.class})
 public interface MainComponent {
-
-    void inject(ContactsFragment contactsFragment);
-
-    void inject(InboxFragment inboxFragment);
 
     MessageAction getMessageAction();
 

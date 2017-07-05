@@ -3,6 +3,7 @@ package com.apap.director.client.presentation.ui.contact;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,12 +13,16 @@ import android.widget.ListView;
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.data.db.entity.AccountEntity;
-import com.apap.director.client.data.manager.AccountManager;
 import com.apap.director.client.data.db.entity.ContactEntity;
+import com.apap.director.client.data.manager.AccountManager;
+import com.apap.director.client.presentation.ui.contact.contract.ContactsContract;
+import com.apap.director.client.presentation.ui.contact.di.component.DaggerContactsComponent;
+import com.apap.director.client.presentation.ui.contact.di.module.ContactsContractModule;
+import com.apap.director.client.presentation.ui.contact.presenter.ContactsPresenter;
 import com.apap.director.client.presentation.ui.listener.ArrayAdapterChangeListener;
 
-
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -28,8 +33,10 @@ import butterknife.OnItemClick;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-public class ContactsFragment extends Fragment {
+public class ContactsFragment extends Fragment implements ContactsContract.View {
 
+    @Inject
+    ContactsPresenter contactsPresenter;
     @Inject
     AccountManager accountManager;
 
@@ -40,6 +47,7 @@ public class ContactsFragment extends Fragment {
     private Realm realm;
     private ArrayAdapterChangeListener<ContactEntity, RealmResults<ContactEntity>> changeListener;
     private RealmResults<ContactEntity> allContacts;
+    private AccountEntity active;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -52,22 +60,14 @@ public class ContactsFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
 
-        ((App) getActivity().getApplication()).getComponent().inject(this);
         super.onActivityCreated(savedInstanceState);
+        setUpInjection();
         realm = Realm.getDefaultInstance();
 
-        AccountEntity active = realm.where(AccountEntity.class).equalTo("active", true).findFirst();
+        contactsPresenter.getActiveAccount();
+        contactsPresenter.getContactList();
 
-        allContacts = realm.where(ContactEntity.class).equalTo("account.id", active.getId()).findAll();
-
-        contactList = new ArrayList<>(allContacts);
-        ArrayAdapter<ContactEntity> arrayAdapter = new ArrayAdapter<>(
-                App.getContext(),
-                android.R.layout.simple_list_item_1,
-                contactList);
-        contactsListView.setAdapter(arrayAdapter);
-
-        changeListener = new ArrayAdapterChangeListener<>(arrayAdapter, "contacts fragment listner");
+        changeListener = new ArrayAdapterChangeListener<>(setUpAdapter(), "contacts fragment listner");
         allContacts.addChangeListener(changeListener);
     }
 
@@ -90,6 +90,21 @@ public class ContactsFragment extends Fragment {
         realm.close();
     }
 
+    @Override
+    public void retrieveActiveAccount(AccountEntity account) {
+        active = account;
+    }
+
+    @Override
+    public void refreshContactList(List<ContactEntity> data) {
+        allContacts = (RealmResults<ContactEntity>) data;
+    }
+
+    @Override
+    public void handleException(Throwable throwable) {
+        Log.getStackTraceString(throwable);
+    }
+
     @OnItemClick(R.id.contactsView)
     public void showContactDetails(int position) {
         Intent intent = new Intent(App.getContext(), SingleContactActivity.class)
@@ -102,5 +117,24 @@ public class ContactsFragment extends Fragment {
     public void onClick() {
         Intent selectedIntent = new Intent(getActivity(), AddContactActivity.class);
         startActivity(selectedIntent);
+    }
+
+    private void setUpInjection() {
+        DaggerContactsComponent.builder()
+                .mainComponent(((App) getActivity().getApplication()).getComponent())
+                .contactsContractModule(new ContactsContractModule(this, contactsPresenter))
+                .build()
+                .inject(this);
+    }
+
+    private ArrayAdapter<ContactEntity> setUpAdapter() {
+        contactList = new ArrayList<>(allContacts);
+        ArrayAdapter<ContactEntity> arrayAdapter = new ArrayAdapter<>(
+                App.getContext(),
+                android.R.layout.simple_list_item_1,
+                contactList);
+        contactsListView.setAdapter(arrayAdapter);
+
+        return arrayAdapter;
     }
 }
