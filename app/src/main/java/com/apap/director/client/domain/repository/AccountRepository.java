@@ -16,6 +16,4 @@ public interface AccountRepository {
     Observable<List<AccountEntity>> getAccountList();
     
     Observable<ResponseBody> signUp(String userId);
-
-    Observable<AccountEntity> createAccount(String name);
 }

@@ -119,10 +119,6 @@ public class SessionStoreImpl implements SessionStore {
 
     @Override
     public void deleteAllSessions(String name) {
-        Realm realm = Realm.getDefaultInstance();
-        realm.beginTransaction();
-            realm.where(SessionEntity.class).equalTo("name", name).findAll().deleteAllFromRealm();
-        realm.commitTransaction();
-        realm.close();
+        realm.where(SessionEntity.class).equalTo("name", name).findAll().deleteAllFromRealm();
     }
 }

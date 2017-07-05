@@ -6,7 +6,10 @@ import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.domain.interactor.base.Callback;
 import com.apap.director.client.domain.interactor.register.CreateAccountInteractor;
 import com.apap.director.client.domain.interactor.register.RegisterAccountInteractor;
+import com.apap.director.client.domain.model.AccountModel;
 import com.apap.director.client.presentation.ui.register.contract.RegisterContract;
+
+import org.whispersystems.libsignal.util.KeyHelper;
 
 import javax.inject.Inject;
 
@@ -15,37 +18,17 @@ import okhttp3.ResponseBody;
 public class RegisterPresenter implements RegisterContract.Presenter {
 
     private RegisterContract.View view;
-    private CreateAccountInteractor createAccountInteractor;
     private RegisterAccountInteractor registerAccountInteractor;
 
     @Inject
-    public RegisterPresenter(RegisterContract.View view, CreateAccountInteractor createAccountInteractor, RegisterAccountInteractor registerAccountInteractor) {
+    public RegisterPresenter(RegisterContract.View view, RegisterAccountInteractor registerAccountInteractor) {
         this.view = view;
-        this.createAccountInteractor = createAccountInteractor;
         this.registerAccountInteractor = registerAccountInteractor;
     }
 
     @Override
     public void dispose() {
-        createAccountInteractor.dispose();
         registerAccountInteractor.dispose();
-    }
-
-    @Override
-    public void signUp(String name) {
-        Log.v(RegisterPresenter.class.getSimpleName(), "Signing up as " + name);
-        createAccountInteractor.execute(name, new Callback<AccountEntity>() {
-            @Override
-            public void onAccept(AccountEntity data) {
-                Log.v(RegisterPresenter.class.getSimpleName(), "Account created");
-                registerAccount(data);
-            }
-
-            @Override
-            public void onError(Throwable throwable) {
-                view.handleException(throwable);
-            }
-        });
     }
 
     private void registerAccount(AccountEntity account) {
@@ -63,5 +46,22 @@ public class RegisterPresenter implements RegisterContract.Presenter {
                 view.handleException(throwable);
             }
         });
+    }
+
+    @Override
+    public void signUp(String name) {
+
+    }
+
+    private void createAccount(String name) {
+        Log.v(RegisterPresenter.class.getSimpleName(), "Creating account named " + name);
+
+        AccountModel accountModel = new AccountModel();
+        accountModel.setName(name);
+        accountModel.preconfigureAccount();
+    }
+
+    private void createSignedKey(AccountModel account) {
+        KeyHelper.generateSignedPreKey(account.getKeyPair(), 
     }
 }
