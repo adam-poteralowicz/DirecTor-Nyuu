@@ -1,4 +1,4 @@
-package com.apap.director.client.presentation.ui.inbox.di;
+package com.apap.director.client.presentation.ui.inbox.di.component;
 
 import com.apap.director.client.presentation.di.component.MainComponent;
 import com.apap.director.client.presentation.di.scope.Activity;
