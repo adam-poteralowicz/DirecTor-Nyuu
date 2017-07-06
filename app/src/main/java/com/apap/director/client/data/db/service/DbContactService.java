@@ -17,7 +17,7 @@ public class DbContactService {
     private Realm realm;
 
     @Inject
-    public DbContactService(Realm realm) {
+    DbContactService(Realm realm) {
         this.realm = realm;
     }
 

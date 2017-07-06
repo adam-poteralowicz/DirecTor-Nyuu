@@ -56,6 +56,11 @@ public class ClientService {
     private static PreKeyStoreImpl preKeyStore;
     private static SignedPreKeyStoreImpl signedPreKeyStore;
     private static KeyService keyService;
+    private static ECPublicKey oneTimeKeyEC;
+    private static ECPublicKey signedKeyEC;
+    private static OneTimeKeyTO oneTimeKeyTO;
+    private static SignedKeyTO signedKeyTO;
+    private static byte[] decodedSignature;
     private static String TAG = "ClientService";
     private static String MESSAGE = "MESSAGE";
 
@@ -117,9 +122,8 @@ public class ClientService {
     }
 
     public static void sendEncryptedMessage(final String to, final String from, final String text) {
-        Realm realm = Realm.getDefaultInstance();
 
-        try {
+        try (Realm realm = Realm.getDefaultInstance()) {
             String address = "/app/message/" + to;
             Log.v(TAG, "Sending framed message! " + address);
 
@@ -127,58 +131,23 @@ public class ClientService {
 
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(to, contactKey.getDeviceId());
 
+            IdentityKey contactIdentity = new IdentityKey(contactKey.getSerialized(), 0);
+
             // Instantiate a SessionBuilder for a remote recipientId + deviceId tuple.
             SessionBuilder sessionBuilder = new SessionBuilder(sessionStore, preKeyStore, signedPreKeyStore,
                     identityKeyStore, signalProtocolAddress);
 
-            // Build a session with a PreKey retrieved from the server.
-            AsyncTask<Void, Void, OneTimeKeyTO> getKeyTask = new AsyncTask<Void, Void, OneTimeKeyTO>() {
-                @Override
-                protected OneTimeKeyTO doInBackground(Void... params) {
-                    try {
-                        return getOneTimeKey(to);
-                    } catch (IOException | InvalidKeyException e) {
-                        Log.getStackTraceString(e);
-                        return null;
-                    }
-                }
-            };
 
-            OneTimeKeyTO oneTimeKeyTO = getKeyTask.execute().get();
-            byte[] decoded = Base64.decode(oneTimeKeyTO.getKeyBase64(), Base64.NO_WRAP | Base64.URL_SAFE);
-
-            ECPublicKey oneTimeKeyEC = Curve.decodePoint(decoded, 0);
-
-
-            AsyncTask<Void, Void, SignedKeyTO> getSignedKeyTask = new AsyncTask<Void, Void, SignedKeyTO>() {
-                @Override
-                protected SignedKeyTO doInBackground(Void... params) {
-                try {
-                    return getSignedKey(to);
-                } catch (IOException | InvalidKeyException e) {
-                    Log.getStackTraceString(e);
-
-                    return null;
-                }
-                }
-            };
-
-            SignedKeyTO signedKeyTO = getSignedKeyTask.execute().get();
-            byte[] decodedKey = Base64.decode(signedKeyTO.getKeyBase64(), Base64.NO_WRAP | Base64.URL_SAFE);
-            byte[] decodedSignature = Base64.decode(signedKeyTO.getSignatureBase64(), Base64.NO_WRAP | Base64.URL_SAFE);
-
-
-            ECPublicKey signedKeyEC = Curve.decodePoint(decodedKey, 0);
-            IdentityKey contactIdentity = new IdentityKey(contactKey.getSerialized(), 0);
+            // Build a session from a PreKey retrieved from the server.
             SessionRecord mySession = sessionStore.loadSession(signalProtocolAddress);
+            retrieveKeys(to);
 
             if (mySession == null) {
                 sessionStore.storeSession(signalProtocolAddress, new SessionRecord());
 
-                PreKeyBundle preKeyBundle = new PreKeyBundle(0, 0, oneTimeKeyTO.getOneTimeKeyId(), oneTimeKeyEC, signedKeyTO.getSignedKeyId(), signedKeyEC, decodedSignature, contactIdentity);
+                PreKeyBundle preKeyBundle = preparePreKey(contactIdentity);
                 sessionBuilder.process(preKeyBundle);
                 realm.close();
-
             }
 
             SessionCipher sessionCipher = new SessionCipher(sessionStore, preKeyStore, signedPreKeyStore, identityKeyStore, signalProtocolAddress);
@@ -206,12 +175,8 @@ public class ClientService {
 
             realm.close();
 
-        } catch (UntrustedIdentityException | InvalidKeyException | IOException | InterruptedException | ExecutionException e) {
+        } catch (UntrustedIdentityException | InvalidKeyException | IOException e) {
             Log.getStackTraceString(e);
-        }
-        finally {
-            realm.close();
-
         }
     }
 
@@ -250,5 +215,66 @@ public class ClientService {
 
     public static void disconnect() {
         client.disconnect();
+    }
+
+    private static void retrieveKeys(String to) {
+        retrieveOneTimeKey(to);
+        retrieveSignedKey(to);
+    }
+
+    private static void retrieveOneTimeKey(final String to) {
+
+            AsyncTask<Void, Void, OneTimeKeyTO> getKeyTask = new AsyncTask<Void, Void, OneTimeKeyTO>() {
+                @Override
+                protected OneTimeKeyTO doInBackground(Void... params) {
+                    try {
+                        return getOneTimeKey(to);
+                    } catch (IOException | InvalidKeyException e) {
+                        Log.getStackTraceString(e);
+                        return null;
+                    }
+                }
+            };
+
+        try {
+
+            oneTimeKeyTO = getKeyTask.execute().get();
+            byte[] decoded = Base64.decode(oneTimeKeyTO.getKeyBase64(), Base64.NO_WRAP | Base64.URL_SAFE);
+
+            oneTimeKeyEC = Curve.decodePoint(decoded, 0);
+
+        } catch (InterruptedException | ExecutionException | InvalidKeyException e) {
+            Log.getStackTraceString(e);
+        }
+    }
+
+    private static void retrieveSignedKey(final String to) {
+
+        AsyncTask<Void, Void, SignedKeyTO> getSignedKeyTask = new AsyncTask<Void, Void, SignedKeyTO>() {
+            @Override
+            protected SignedKeyTO doInBackground(Void... params) {
+                try {
+                    return getSignedKey(to);
+                } catch (IOException | InvalidKeyException e) {
+                    Log.getStackTraceString(e);
+                    return null;
+                }
+            }
+        };
+
+        try {
+            signedKeyTO = getSignedKeyTask.execute().get();
+            byte[] decodedKey = Base64.decode(signedKeyTO.getKeyBase64(), Base64.NO_WRAP | Base64.URL_SAFE);
+            decodedSignature = Base64.decode(signedKeyTO.getSignatureBase64(), Base64.NO_WRAP | Base64.URL_SAFE);
+
+            signedKeyEC = Curve.decodePoint(decodedKey, 0);
+
+        } catch (InterruptedException | ExecutionException | InvalidKeyException e) {
+            Log.getStackTraceString(e);
+        }
+    }
+
+    private static PreKeyBundle preparePreKey(IdentityKey contactIdentity) {
+        return new PreKeyBundle(0, 0, oneTimeKeyTO.getOneTimeKeyId(), oneTimeKeyEC, signedKeyTO.getSignedKeyId(), signedKeyEC, decodedSignature, contactIdentity);
     }
 }

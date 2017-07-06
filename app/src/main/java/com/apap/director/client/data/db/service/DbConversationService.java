@@ -1,6 +1,5 @@
 package com.apap.director.client.data.db.service;
 
-import com.apap.director.client.data.db.entity.ContactEntity;
 import com.apap.director.client.data.db.entity.ConversationEntity;
 import com.apap.director.client.data.manager.ContactManager;
 
@@ -21,16 +20,11 @@ public class DbConversationService {
     private Realm realm;
 
     @Inject
-    public DbConversationService(Realm realm) {
+    DbConversationService(Realm realm) {
         this.realm = realm;
     }
 
     public List<ConversationEntity> getConversationList() {
         return realm.where(ConversationEntity.class).findAll();
     }
-
-    public void setContact(ContactEntity contact) {
-        
-    }
-
 }

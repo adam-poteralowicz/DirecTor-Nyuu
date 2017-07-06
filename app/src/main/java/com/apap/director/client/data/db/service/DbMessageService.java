@@ -17,9 +17,7 @@ public class DbMessageService {
     private Realm realm;
 
     @Inject
-    public DbMessageService(Realm realm) { this.realm = realm; }
-
-
+    DbMessageService(Realm realm) { this.realm = realm; }
 
     public List<MessageEntity> getMessagesByContact(Long contactId) {
         return realm.where(MessageEntity.class).equalTo("conversation.id", contactId).findAll();
