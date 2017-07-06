@@ -12,7 +12,8 @@ public class OneTimeKeyMapper extends BaseMapper<OneTimeKeyModel, OneTimeKeyEnti
 
     @Override
     public OneTimeKeyEntity mapToEntity(OneTimeKeyModel model) {
-        if(model == null) return null;
+        if(model == null)
+            return null;
 
         OneTimeKeyEntity entity = new OneTimeKeyEntity();
 
@@ -25,7 +26,8 @@ public class OneTimeKeyMapper extends BaseMapper<OneTimeKeyModel, OneTimeKeyEnti
 
     @Override
     public OneTimeKeyModel mapToModel(OneTimeKeyEntity entity) {
-        if(entity == null) return null;
+        if(entity == null)
+            return null;
 
         OneTimeKeyModel model = new OneTimeKeyModel();
 
