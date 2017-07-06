@@ -14,6 +14,7 @@ import com.apap.director.client.data.store.SignedPreKeyStoreImpl;
 import com.apap.director.client.domain.repository.AccountRepository;
 import com.apap.director.client.presentation.di.module.ContextModule;
 import com.apap.director.client.presentation.di.module.ManagerModule;
+import com.apap.director.client.presentation.di.module.MapperModule;
 import com.apap.director.client.presentation.di.module.NetModule;
 import com.apap.director.client.presentation.di.module.RealmModule;
 import com.apap.director.client.presentation.di.module.RepositoryModule;
@@ -35,7 +36,8 @@ import io.realm.Realm;
         WebSocketModule.class,
         RepositoryModule.class,
         NetModule.class,
-        ContextModule.class})
+        ContextModule.class,
+        MapperModule.class})
 public interface MainComponent {
 
     void inject(ContactsFragment contactsFragment);
