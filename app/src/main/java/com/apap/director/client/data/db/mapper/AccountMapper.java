@@ -1,15 +1,10 @@
 package com.apap.director.client.data.db.mapper;
 
 import com.apap.director.client.data.db.entity.AccountEntity;
-import com.apap.director.client.data.db.entity.ContactEntity;
-import com.apap.director.client.data.db.entity.SessionEntity;
 import com.apap.director.client.data.db.mapper.base.BaseMapper;
 import com.apap.director.client.domain.model.AccountModel;
 
 import javax.inject.Inject;
-
-import dagger.Module;
-import io.realm.RealmList;
 
 /**
  * Created by Alicja Michniewicz
@@ -28,7 +23,8 @@ public class AccountMapper extends BaseMapper<AccountModel, AccountEntity> {
 
     @Override
     public AccountEntity mapToEntity(AccountModel model) {
-        if(model == null) return null;
+        if(model == null)
+            return null;
 
         AccountEntity entity = new AccountEntity();
 
@@ -48,7 +44,8 @@ public class AccountMapper extends BaseMapper<AccountModel, AccountEntity> {
 
     @Override
     public AccountModel mapToModel(AccountEntity entity) {
-        if(entity == null) return null;
+        if(entity == null)
+            return null;
 
         AccountModel model = new AccountModel();
 
