@@ -14,13 +14,9 @@ public class ConversationEntity extends RealmObject {
 
     @PrimaryKey
     private long id;
-    private ContactEntity contact;
+    private AccountEntity owner;
+    private ContactEntity interlocutor;
     private RealmList<MessageEntity> messages;
     private RealmList<SessionEntity> sessions;
-    private AccountEntity account;
 
-    @Override
-    public String toString() {
-        return getContact().toString();
-    }
 }

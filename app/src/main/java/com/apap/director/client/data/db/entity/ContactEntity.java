@@ -14,12 +14,10 @@ public class ContactEntity extends RealmObject {
 
     @PrimaryKey
     private long id;
-
     private String name;
-    private ConversationEntity conversation;
     private RealmList<ContactKeyEntity> contactKeys;
+    private AccountEntity owner;
     private String image;
-    private AccountEntity account;
 
     @Override
     public String toString() {

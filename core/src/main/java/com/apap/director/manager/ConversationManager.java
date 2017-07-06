@@ -40,7 +40,7 @@ public class ConversationManager {
     }
 
     public Conversation getConversationByContactName(String contactName) {
-        Conversation conversation = realm.where(Conversation.class).equalTo("contact.name", contactName).findFirst();
+        Conversation conversation = realm.where(Conversation.class).equalTo("contacts.name", contactName).findFirst();
         if (conversation != null) {
             return conversation;
         } else return null;
@@ -48,7 +48,7 @@ public class ConversationManager {
 
     public Conversation getConversationByContactId(Long contactId) {
         Realm realm = Realm.getDefaultInstance();
-        Conversation conversation = realm.where(Conversation.class).equalTo("contact.id", contactId).findFirst();
+        Conversation conversation = realm.where(Conversation.class).equalTo("contacts.id", contactId).findFirst();
         realm.close();
         return conversation;
     }
@@ -91,7 +91,7 @@ public class ConversationManager {
     }
 
     public boolean deleteConversationByContactName(String contactName) {
-        Conversation conversationToDelete = realm.where(Conversation.class).equalTo("contact.name", contactName).findFirst();
+        Conversation conversationToDelete = realm.where(Conversation.class).equalTo("contacts.name", contactName).findFirst();
         if (conversationToDelete != null) {
             realm.beginTransaction();
             conversationToDelete.deleteFromRealm();
@@ -101,7 +101,7 @@ public class ConversationManager {
     }
 
     public boolean deleteConversationByContactId(Long contactId) {
-        Conversation conversationToDelete = realm.where(Conversation.class).equalTo("contact.id", contactId).findFirst();
+        Conversation conversationToDelete = realm.where(Conversation.class).equalTo("contacts.id", contactId).findFirst();
         if (conversationToDelete != null) {
             realm.beginTransaction();
             conversationToDelete.deleteFromRealm();
@@ -134,7 +134,7 @@ public class ConversationManager {
     }
 
     public boolean updateConversationSessionsByContactName(String name, Session session) {
-        Conversation conversation = realm.where(Conversation.class).equalTo("contact.name", name).findFirst();
+        Conversation conversation = realm.where(Conversation.class).equalTo("contacts.name", name).findFirst();
         if (conversation == null)
             return false;
 
@@ -147,7 +147,7 @@ public class ConversationManager {
     }
 
     public boolean updateConversationSessionsByContactId(Long contactId, Session session) {
-        Conversation conversation = realm.where(Conversation.class).equalTo("contact.id", contactId).findFirst();
+        Conversation conversation = realm.where(Conversation.class).equalTo("contacts.id", contactId).findFirst();
         if (conversation == null)
             return false;
 

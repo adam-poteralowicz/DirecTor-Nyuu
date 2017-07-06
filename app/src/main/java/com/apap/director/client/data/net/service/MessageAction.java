@@ -84,7 +84,7 @@ public class MessageAction implements Action1<StompMessage> {
 
             Log.v(TAG, "ContactEntity name " + contact.getName());
 
-            ConversationEntity conversation = localRealm.where(ConversationEntity.class).equalTo("contact.id", contact.getId()).findFirst();
+            ConversationEntity conversation = localRealm.where(ConversationEntity.class).equalTo("contacts.id", contact.getId()).findFirst();
 
             SignalProtocolAddress address = new SignalProtocolAddress(frame.getFrom(), 0);
             SessionCipher cipher = new SessionCipher(sessionStore, preKeyStore, signedPreKeyStore, identityKeyStore, address);

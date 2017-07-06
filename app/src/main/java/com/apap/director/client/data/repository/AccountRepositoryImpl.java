@@ -3,13 +3,18 @@ package com.apap.director.client.data.repository;
 import android.util.Base64;
 
 import com.apap.director.client.data.db.entity.AccountEntity;
+import com.apap.director.client.data.db.entity.ContactEntity;
+import com.apap.director.client.data.db.entity.SessionEntity;
+import com.apap.director.client.data.db.mapper.AccountMapper;
 import com.apap.director.client.data.db.service.AccountStore;
 import com.apap.director.client.data.net.rest.service.RestAccountService;
+import com.apap.director.client.domain.model.AccountModel;
 import com.apap.director.client.domain.repository.AccountRepository;
 
 import org.whispersystems.libsignal.IdentityKey;
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.state.IdentityKeyStore;
+import org.whispersystems.libsignal.state.SignedPreKeyRecord;
 import org.whispersystems.libsignal.util.ByteUtil;
 import org.whispersystems.libsignal.util.KeyHelper;
 
@@ -18,6 +23,9 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
+import io.realm.RealmList;
 import okhttp3.ResponseBody;
 
 /**
@@ -26,17 +34,15 @@ import okhttp3.ResponseBody;
 
 public class AccountRepositoryImpl implements AccountRepository {
 
-    private final static int KEY_LENGTH = 32;
-    private final static int TYPE_LENGTH = 1;
-
     private AccountStore accountStore;
     private RestAccountService restAccountService;
-    private IdentityKeyStore identityKeyStore;
+    private AccountMapper accountMapper;
 
     @Inject
-    public AccountRepositoryImpl(AccountStore accountStore, RestAccountService restAccountService) {
+    public AccountRepositoryImpl(AccountStore accountStore, RestAccountService restAccountService, AccountMapper accountMapper) {
         this.accountStore = accountStore;
         this.restAccountService = restAccountService;
+        this.accountMapper = accountMapper;
     }
 
     @Override
@@ -50,35 +56,30 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public Observable<String> getCode(String userId) {
-        return restAccountService.requestCode(userId);
+    public Observable<String> getCode(AccountModel account) {
+        return null;
     }
 
     @Override
-    public Observable<ResponseBody> signUp(String userId) {
-        return restAccountService.signUp(userId);
+    public Observable<ResponseBody> signUp(AccountModel account) {
+        return restAccountService.signUp(account.getKeyBase64());
     }
 
     @Override
-    public Observable<AccountEntity> createAccount(String name) {
-        AccountEntity accountEntity = new AccountEntity();
-        accountEntity.setName(name);
-
-        return Observable.just(preconfigureAccount(accountEntity));
+    public Observable<Integer> findLastSignedKeyId(AccountModel account) {
+        return Observable.just(accountStore.findLastSignedKeyId(account.getKeyBase64()));
     }
 
-    private AccountEntity preconfigureAccount(AccountEntity accountEntity) {
-        IdentityKeyPair keyPair = KeyHelper.generateIdentityKeyPair();
-
-        accountEntity.setKeyPair(keyPair.serialize());
-        accountEntity.setRegistrationId(KeyHelper.generateRegistrationId(false));
-        accountEntity.setKeyBase64(convertToBase64(keyPair.getPublicKey()));
-
-        return accountEntity;
+    @Override
+    public Observable<Integer> findLastOneTimeKeyId(AccountModel account) {
+        return Observable.just(accountStore.findLastOneTimeKeyId(account.getKeyBase64()));
     }
 
-    private String convertToBase64(IdentityKey key) {
-        byte[][] typeAndKey = ByteUtil.split(key.serialize(), TYPE_LENGTH, KEY_LENGTH);
-        return Base64.encodeToString(typeAndKey[1], Base64.URL_SAFE | Base64.NO_WRAP);
+    @Override
+    public Observable<AccountModel> saveAccount(AccountModel account) {
+        AccountEntity entity = accountMapper.mapToEntity(account);
+        accountStore.saveAccount(entity);
+        return Observable.just(account);
     }
+
 }

@@ -14,13 +14,10 @@ public class MessageEntity extends RealmObject {
 
     @PrimaryKey
     private long id;
-    private String sender;
-    private String recipient;
+    private ConversationEntity conversation;
     private String content;
     private Date date;
     private Boolean mine;
-    private AccountEntity account;
-    private ConversationEntity conversation;
 
     public Boolean isMine() {
         return mine;

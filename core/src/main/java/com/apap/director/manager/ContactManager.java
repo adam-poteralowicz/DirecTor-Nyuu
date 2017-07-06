@@ -154,17 +154,4 @@ public class ContactManager {
         return id;
     }
 
-    public String generateOneTimeKey() {
-        SecureRandom sr = new SecureRandom();
-        String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-        String otk = "";
-        StringBuilder stringBuilder = new StringBuilder(otk);
-        int x;
-        
-        for (int i = 0; i < 32; i++) {
-            x = sr.nextInt(alphabet.length() - 1);
-            stringBuilder.append(Character.toString(alphabet.charAt(x)));
-        }
-        return stringBuilder.toString();
-    }
 }

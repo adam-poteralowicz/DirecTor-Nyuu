@@ -15,6 +15,5 @@ public class OneTimeKeyEntity extends RealmObject {
     private long id;
     private int oneTimeKeyId;
     private byte[] serializedKey;
-    private AccountEntity account;
 
 }

@@ -13,18 +13,13 @@ import lombok.Setter;
 public class AccountEntity extends RealmObject {
 
     @PrimaryKey
-    private long id;
+    private String keyBase64;
     private String name;
     private byte[] keyPair;
     private int registrationId;
     private String masterPassword;
-
-    private String keyBase64;
-
-    private RealmList<ContactEntity> contacts;
     private RealmList<OneTimeKeyEntity> oneTimeKeys;
     private SignedKeyEntity signedKey;
-    private RealmList<SessionEntity> sessions;
     private boolean registered;
     private boolean active;
     private String cookie;

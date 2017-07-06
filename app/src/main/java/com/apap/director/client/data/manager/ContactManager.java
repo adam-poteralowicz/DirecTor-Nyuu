@@ -128,46 +128,23 @@ public class ContactManager {
     }
 
     private long generateContactId(Realm realm) {
-        long id;
-        try {
-            if (realm.where(ContactEntity.class).max("id") == null) {
-                id = 0;
-            } else {
-                id = realm.where(ContactEntity.class).max("id").longValue() + 1;
-            }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            id = 0;
-            Log.getStackTraceString(e);
+        Number lastestId = realm.where(ContactEntity.class).max("id").longValue();
+
+        if (lastestId == null) {
+            return 0;
+        } else {
+            return lastestId.longValue() + 1;
         }
-        return id;
     }
 
-    private long generateContactKeyId(Realm realm) {
-        long id;
-        try {
-            if (realm.where(ContactKeyEntity.class).max("id") == null) {
-                id = 0;
-            } else {
-                id = realm.where(ContactKeyEntity.class).max("id").longValue() + 1;
-            }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            id = 0;
-            Log.getStackTraceString(e);
+    private long generateContactKeyId() {
+        Number lastestId = realm.where(ContactKeyEntity.class).max("id").longValue();
+
+        if (lastestId == null) {
+            return 0;
+        } else {
+            return lastestId.longValue() + 1;
         }
-        return id;
     }
 
-    public String generateOneTimeKey() {
-        SecureRandom sr = new SecureRandom();
-        String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-        String otk = "";
-        StringBuilder stringBuilder = new StringBuilder(otk);
-        int x;
-
-        for (int i = 0; i < 32; i++) {
-            x = sr.nextInt(alphabet.length() - 1);
-            stringBuilder.append(Character.toString(alphabet.charAt(x)));
-        }
-        return stringBuilder.toString();
-    }
 }
