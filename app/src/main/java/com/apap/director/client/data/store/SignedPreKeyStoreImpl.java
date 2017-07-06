@@ -19,6 +19,7 @@ import io.realm.Realm;
 
 public class SignedPreKeyStoreImpl implements SignedPreKeyStore {
 
+    private static final String ID_COLUMN = "signedKeyId";
     private Realm realm;
 
     @Inject
@@ -28,77 +29,76 @@ public class SignedPreKeyStoreImpl implements SignedPreKeyStore {
 
     @Override
     public SignedPreKeyRecord loadSignedPreKey(int signedPreKeyId) throws InvalidKeyIdException {
-        Realm realm = Realm.getDefaultInstance();
+        SignedKeyEntity signedKey = findKeyById(signedPreKeyId);
 
-        try {
-
-            SignedKeyEntity signedKey = realm.where(SignedKeyEntity.class)
-                    .equalTo("signedKeyId", signedPreKeyId)
-                    .findFirst();
-
-            if (signedKey == null)
-                throw new InvalidKeyIdException("No such key " + signedPreKeyId);
-
-            return new SignedPreKeyRecord(signedKey.getSerializedKey());
-        } catch (IOException e) {
-            Log.getStackTraceString(e);
-
-            throw new InvalidKeyIdException("IO exception: " + e.getMessage());
-        }
-        finally {
-            realm.close();
+        if (signedKey == null) {
+            throw new InvalidKeyIdException("No such key " + signedPreKeyId);
         }
 
+        return deserializeRecord(signedKey);
     }
 
     @Override
     public List<SignedPreKeyRecord> loadSignedPreKeys() {
-        try {
-            List<SignedKeyEntity> list = realm.where(SignedKeyEntity.class).findAll();
-            List<SignedPreKeyRecord> records = new ArrayList<>(list.size());
+        List<SignedKeyEntity> list = realm.where(SignedKeyEntity.class).findAll();
+        List<SignedPreKeyRecord> records = new ArrayList<>(list.size());
 
-            for (SignedKeyEntity preKey : list) {
-                records.add(new SignedPreKeyRecord(preKey.getSerializedKey()));
-            }
-
-            return records;
-        } catch (IOException e) {
-            Log.getStackTraceString(e);
-            return null;
+        for (SignedKeyEntity preKey : list) {
+            records.add(deserializeRecord(preKey));
         }
 
+        return records;
     }
 
     @Override
     public void storeSignedPreKey(int signedPreKeyId, SignedPreKeyRecord record) {
-        Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
-            SignedKeyEntity signedKey = new SignedKeyEntity();
-            signedKey.setSerializedKey(record.serialize());
-            signedKey.setSignedKeyId(signedPreKeyId);
-
-            long id;
-            if (realm.where(SignedKeyEntity.class).findFirst() == null) {
-                id = 0;
-            } else {
-                id = realm.where(SignedKeyEntity.class).max("id").longValue() + 1;
-            }
-            signedKey.setId(id);
-            realm.copyToRealmOrUpdate(signedKey);
+        realm.copyToRealmOrUpdate(createSignedKeyEntity(record, signedPreKeyId));
         realm.commitTransaction();
-        realm.close();
-
     }
 
     @Override
     public boolean containsSignedPreKey(int signedPreKeyId) {
-        return realm.where(SignedKeyEntity.class).equalTo("signedKeyId", signedPreKeyId).findFirst() != null;
+        return realm.where(SignedKeyEntity.class).equalTo(ID_COLUMN, signedPreKeyId).findFirst() != null;
     }
 
     @Override
     public void removeSignedPreKey(int signedPreKeyId) {
-        realm.where(SignedKeyEntity.class).equalTo("signedKeyId", signedPreKeyId).findFirst().deleteFromRealm();
+        realm.where(SignedKeyEntity.class).equalTo(ID_COLUMN, signedPreKeyId).findFirst().deleteFromRealm();
     }
 
+    private SignedKeyEntity findKeyById(long id) {
+        return realm.where(SignedKeyEntity.class)
+                .equalTo(ID_COLUMN, id)
+                .findFirst();
+    }
 
+    private long generateSignedKeyId() {
+        Number lastId = realm.where(SignedKeyEntity.class).max(ID_COLUMN).longValue();
+
+        if (lastId == null) {
+            return 0;
+        } else {
+            return lastId.longValue() + 1;
+        }
+    }
+
+    private SignedPreKeyRecord deserializeRecord(SignedKeyEntity key) {
+        try {
+            return new SignedPreKeyRecord(key.getSerializedKey());
+        } catch (IOException e) {
+            Log.e(SignedPreKeyStoreImpl.class.getSimpleName(), "Serialization for signed key failed", e);
+            return null;
+        }
+    }
+
+    public SignedKeyEntity createSignedKeyEntity(SignedPreKeyRecord record, int signedPreKeyId) {
+        SignedKeyEntity signedKey = new SignedKeyEntity();
+
+        signedKey.setSerializedKey(record.serialize());
+        signedKey.setSignedKeyId(signedPreKeyId);
+        signedKey.setId(generateSignedKeyId());
+
+        return signedKey;
+    }
 }

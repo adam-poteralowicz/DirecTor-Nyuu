@@ -6,6 +6,7 @@ import com.apap.director.client.data.net.to.SignedKeyTO;
 
 import java.util.List;
 
+import io.reactivex.Observable;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -19,16 +20,16 @@ public interface KeyService {
 
     @POST(value = "/key/one_time")
     @Headers("Content-Type: application/json")
-    Call<ResponseBody> postOneTimeKeys(@Body List<OneTimeKeyTO> keys, @Header("Cookie") String cookiez);
+    Observable<ResponseBody> postOneTimeKeys(@Body List<OneTimeKeyTO> keys, @Header("Cookie") String cookie);
 
     @POST(value = "/key/signed")
     @Headers("Content-Type: application/json")
-    Call<ResponseBody> postSignedKeys(@Body SignedKeyTO keyTO, @Header("Cookie") String cookiez);
+    Observable<ResponseBody> postSignedKeys(@Body SignedKeyTO keyTO, @Header("Cookie") String cookie);
 
     @GET(value = "/key/one_time/{ownerId}")
-    Call<OneTimeKeyTO> getOneTimeKey(@Path("ownerId") String ownerId);
+    Observable<OneTimeKeyTO> getOneTimeKey(@Path("ownerId") String ownerId);
 
     @GET(value = "/key/signed/{ownerId}")
-    Call<SignedKeyTO> getSignedKey(@Path("ownerId") String ownerId);
+    Observable<SignedKeyTO> getSignedKey(@Path("ownerId") String ownerId);
 
 }

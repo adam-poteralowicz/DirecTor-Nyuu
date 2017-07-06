@@ -20,6 +20,4 @@ public interface AccountRepository {
     Observable<String> getCode(String userId);
 
     Observable<ResponseBody> signUp(String userId);
-
-    Observable<AccountEntity> createAccount(String name);
 }

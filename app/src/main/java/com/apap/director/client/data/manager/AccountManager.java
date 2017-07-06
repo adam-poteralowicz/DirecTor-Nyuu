@@ -429,21 +429,5 @@ public class AccountManager {
         return id;
     }
 
-    private long generateOtkId() {
-        Realm realm = Realm.getDefaultInstance();
-        long id;
-        try {
-            if (realm.where(OneTimeKeyEntity.class).max("id") == null) {
-                id = 0;
-            } else {
-                id = realm.where(OneTimeKeyEntity.class).max("id").longValue() + 1;
-            }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            id = 0;
-            Log.getStackTraceString(e);
-        }
-        realm.close();
-        return id;
-    }
 
 }

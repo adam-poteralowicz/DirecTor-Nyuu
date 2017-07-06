@@ -1,16 +1,22 @@
 package com.apap.director.client.domain.model;
 
-import com.apap.director.client.data.db.entity.OneTimeKeyEntity;
-import com.apap.director.client.data.db.entity.SessionEntity;
-import com.apap.director.client.data.db.entity.SignedKeyEntity;
+import android.util.Base64;
+
+import com.apap.director.client.domain.util.Base64Util;
+
+import org.whispersystems.libsignal.IdentityKey;
+import org.whispersystems.libsignal.IdentityKeyPair;
+import org.whispersystems.libsignal.InvalidKeyException;
+import org.whispersystems.libsignal.state.SignedPreKeyRecord;
+import org.whispersystems.libsignal.util.ByteUtil;
+import org.whispersystems.libsignal.util.KeyHelper;
 
 import java.util.List;
 
-import io.realm.RealmList;
-import io.realm.annotations.PrimaryKey;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 
 /**
  * Created by Alicja Michniewicz
@@ -31,4 +37,14 @@ public class AccountModel {
     private boolean registered;
     private boolean active;
     private String cookie;
+
+    public void preconfigureAccount() {
+        IdentityKeyPair identityKeyPair = KeyHelper.generateIdentityKeyPair();
+
+        keyPair = identityKeyPair.serialize();
+        keyBase64 = Base64Util.convertToBase64(identityKeyPair.getPublicKey());
+
+        registrationId = KeyHelper.generateRegistrationId(false);
+    }
+
 }

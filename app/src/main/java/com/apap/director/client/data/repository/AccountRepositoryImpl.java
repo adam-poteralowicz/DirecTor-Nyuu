@@ -30,8 +30,7 @@ import okhttp3.ResponseBody;
 
 public class AccountRepositoryImpl implements AccountRepository {
 
-    private static final int KEY_LENGTH = 32;
-    private static final int TYPE_LENGTH = 1;
+
 
     private AccountStore accountStore;
     private RestAccountService restAccountService;
@@ -63,30 +62,4 @@ public class AccountRepositoryImpl implements AccountRepository {
         return restAccountService.signUp(userId);
     }
 
-    @Override
-    public Observable<AccountEntity> createAccount(String name) {
-        AccountEntity accountEntity = new AccountEntity();
-        accountEntity.setName(name);
-
-        return Observable.just(preconfigureAccount(accountEntity));
-    }
-
-    private AccountEntity preconfigureAccount(AccountEntity accountEntity) {
-        IdentityKeyPair keyPair = KeyHelper.generateIdentityKeyPair();
-
-        accountEntity.setKeyPair(keyPair.serialize());
-        accountEntity.setRegistrationId(KeyHelper.generateRegistrationId(false));
-        accountEntity.setKeyBase64(convertToBase64(keyPair.getPublicKey()));
-
-        accountEntity.setContacts(new RealmList<ContactEntity>());
-        accountEntity.setSessions(new RealmList<SessionEntity>());
-//        accountEntity.setSignedKey(KeyHelper.gener);
-
-        return accountEntity;
-    }
-
-    private String convertToBase64(IdentityKey key) {
-        byte[][] typeAndKey = ByteUtil.split(key.serialize(), TYPE_LENGTH, KEY_LENGTH);
-        return Base64.encodeToString(typeAndKey[1], Base64.URL_SAFE | Base64.NO_WRAP);
-    }
 }
