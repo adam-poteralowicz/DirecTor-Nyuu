@@ -137,7 +137,7 @@ public class ContactManager {
         }
     }
 
-    private long generateContactKeyId(Realm realm) {
+    private long generateContactKeyId() {
         Number lastestId = realm.where(ContactKeyEntity.class).max("id").longValue();
 
         if (lastestId == null) {

@@ -7,6 +7,7 @@ import com.apap.director.client.data.db.entity.ContactEntity;
 import com.apap.director.client.data.db.entity.SessionEntity;
 import com.apap.director.client.data.db.service.AccountStore;
 import com.apap.director.client.data.net.rest.service.RestAccountService;
+import com.apap.director.client.domain.model.AccountModel;
 import com.apap.director.client.domain.repository.AccountRepository;
 
 import org.whispersystems.libsignal.IdentityKey;
@@ -21,6 +22,8 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
 import io.realm.RealmList;
 import okhttp3.ResponseBody;
 
@@ -30,11 +33,8 @@ import okhttp3.ResponseBody;
 
 public class AccountRepositoryImpl implements AccountRepository {
 
-
-
     private AccountStore accountStore;
     private RestAccountService restAccountService;
-    private IdentityKeyStore identityKeyStore;
 
     @Inject
     public AccountRepositoryImpl(AccountStore accountStore, RestAccountService restAccountService) {
@@ -53,13 +53,23 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public Observable<String> getCode(String userId) {
-        return restAccountService.requestCode(userId);
+    public Observable<String> getCode(AccountModel account) {
+        return null;
     }
 
     @Override
-    public Observable<ResponseBody> signUp(String userId) {
-        return restAccountService.signUp(userId);
+    public Observable<ResponseBody> signUp(AccountModel account) {
+        return restAccountService.signUp(account.getKeyBase64());
+    }
+
+    @Override
+    public Observable<Integer> findLastSignedKeyId(AccountModel account) {
+        return Observable.just(new Integer(accountStore.findLastSignedKeyId(account.getKeyBase64())));
+    }
+
+    @Override
+    public Observable<Integer> findLastOneTimeKeyId(AccountModel account) {
+        return Observable.just(accountStore.findLastOneTimeKeyId(account.getKeyBase64()));
     }
 
 }

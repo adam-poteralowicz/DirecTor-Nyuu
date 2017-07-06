@@ -12,7 +12,6 @@ import lombok.Setter;
 public class OneTimeKeyEntity extends RealmObject {
 
     @PrimaryKey
-    private long id;
     private int oneTimeKeyId;
     private byte[] serializedKey;
 

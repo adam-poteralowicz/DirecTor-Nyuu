@@ -2,6 +2,7 @@ package com.apap.director.client.domain.interactor.register;
 
 import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.domain.interactor.base.BaseInteractor;
+import com.apap.director.client.domain.model.AccountModel;
 import com.apap.director.client.domain.repository.AccountRepository;
 
 import javax.inject.Inject;
@@ -13,7 +14,7 @@ import okhttp3.ResponseBody;
  * Created by Alicja Michniewicz
  */
 
-public class RegisterAccountInteractor extends BaseInteractor<ResponseBody,String> {
+public class RegisterAccountInteractor extends BaseInteractor<ResponseBody,AccountModel> {
 
     private AccountRepository accountRepository;
 
@@ -23,7 +24,7 @@ public class RegisterAccountInteractor extends BaseInteractor<ResponseBody,Strin
     }
 
     @Override
-    public Observable<ResponseBody> buildObservable(String id) {
-        return accountRepository.signUp(id);
+    public Observable<ResponseBody> buildObservable(AccountModel user) {
+        return accountRepository.signUp(user);
     }
 }

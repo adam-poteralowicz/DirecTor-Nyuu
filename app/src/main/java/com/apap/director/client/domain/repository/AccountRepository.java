@@ -1,6 +1,7 @@
 package com.apap.director.client.domain.repository;
 
 import com.apap.director.client.data.db.entity.AccountEntity;
+import com.apap.director.client.domain.model.AccountModel;
 
 import java.util.List;
 
@@ -17,7 +18,11 @@ public interface AccountRepository {
 
     Observable<AccountEntity> getActiveAccount();
 
-    Observable<String> getCode(String userId);
+    Observable<String> getCode(AccountModel account);
 
-    Observable<ResponseBody> signUp(String userId);
+    Observable<ResponseBody> signUp(AccountModel account);
+
+    Observable<Integer> findLastSignedKeyId(AccountModel account);
+
+    Observable<Integer> findLastOneTimeKeyId(AccountModel account);
 }

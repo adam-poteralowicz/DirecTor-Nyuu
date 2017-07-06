@@ -2,6 +2,7 @@ package com.apap.director.client.domain.model;
 
 import android.util.Base64;
 
+import com.apap.director.client.domain.mapper.OneTimeKeyMapper;
 import com.apap.director.client.domain.util.Base64Util;
 
 import org.whispersystems.libsignal.IdentityKey;
@@ -11,6 +12,7 @@ import org.whispersystems.libsignal.state.SignedPreKeyRecord;
 import org.whispersystems.libsignal.util.ByteUtil;
 import org.whispersystems.libsignal.util.KeyHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
@@ -38,13 +40,14 @@ public class AccountModel {
     private boolean active;
     private String cookie;
 
-    public void preconfigureAccount() {
-        IdentityKeyPair identityKeyPair = KeyHelper.generateIdentityKeyPair();
 
-        keyPair = identityKeyPair.serialize();
-        keyBase64 = Base64Util.convertToBase64(identityKeyPair.getPublicKey());
 
-        registrationId = KeyHelper.generateRegistrationId(false);
+    public void generateOneTimeKeys(int startLocalId, int startPreKeyId, int count) {
+        this.oneTimeKeys = new ArrayList<OneTimeKeyModel>();
+
+        OneTimeKeyMapper mapper = new OneTimeKeyMapper();
+
+        this.oneTimeKeys = mapper.mapRecordListToModelList(KeyHelper.generatePreKeys(startPreKeyId, count), startLocalId);
     }
 
 }

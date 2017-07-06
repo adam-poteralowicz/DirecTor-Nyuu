@@ -13,5 +13,5 @@ import io.reactivex.Observable;
 
 public interface SignedKeyRepository {
 
-    Observable<SignedKeyModel> findLastestSignedKey(AccountModel owner);
+    Observable<Long> findNextId();
 }

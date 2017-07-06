@@ -1,5 +1,9 @@
 package com.apap.director.client.domain.model;
 
+import org.whispersystems.libsignal.IdentityKeyPair;
+import org.whispersystems.libsignal.InvalidKeyException;
+import org.whispersystems.libsignal.util.KeyHelper;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +16,10 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class SignedKeyModel {
+
+    public SignedKeyModel(IdentityKeyPair keyPair, int id) throws InvalidKeyException {
+        KeyHelper.generateSignedPreKey(keyPair, id);
+    }
 
     private long id;
     private int signedKeyId;
