@@ -94,6 +94,4 @@ public class DbSignedKeyService implements SignedPreKeyStore {
         realm.where(SignedKeyEntity.class).equalTo("signedKeyId", signedPreKeyId).findFirst().deleteFromRealm();
     }
 
-    p
-
 }

@@ -82,6 +82,7 @@ public class ClientService {
         Log.v("HAI", "Connecting to websocket with cookie " + cookie + "...");
         StompHeader cookieHeader = new StompHeader("Cookie", cookie);
         client.connect();
+
         client.topic("/user/exchange/amq.direct/messages", Collections.singletonList(cookieHeader)).subscribe(messageAction, new ErrorAction());
         // client.lifecycle().subscribe(listener);
     }
