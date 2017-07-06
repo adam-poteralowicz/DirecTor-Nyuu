@@ -3,6 +3,7 @@ package com.apap.director.client.presentation.ui.inbox;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +15,15 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.data.db.entity.ConversationEntity;
 import com.apap.director.client.data.manager.ConversationManager;
+import com.apap.director.client.domain.repository.ConversationRepository;
+import com.apap.director.client.presentation.ui.inbox.contract.InboxContract;
+import com.apap.director.client.presentation.ui.inbox.di.DaggerInboxComponent;
+import com.apap.director.client.presentation.ui.inbox.di.module.InboxContractModule;
+import com.apap.director.client.presentation.ui.inbox.presenter.InboxPresenter;
 import com.apap.director.client.presentation.ui.message.NewMsgActivity;
 
-
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -29,8 +35,10 @@ import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
-public class InboxFragment extends Fragment {
+public class InboxFragment extends Fragment implements InboxContract.View {
 
+    @Inject
+    InboxPresenter inboxPresenter;
     @Inject
     ConversationManager conversationManager;
 
@@ -40,6 +48,9 @@ public class InboxFragment extends Fragment {
     private ArrayList<ConversationEntity> conversationList;
     private ArrayAdapter<ConversationEntity> arrayAdapter;
     private Realm realm;
+    private RealmResults<ConversationEntity> conversationResults;
+    private RealmResults<ConversationEntity> conversations;
+    private ConversationRepository conversationRepository;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -51,29 +62,14 @@ public class InboxFragment extends Fragment {
 
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
-        ((App) getActivity().getApplication()).getComponent().inject(this);
         super.onActivityCreated(savedInstanceState);
+        setUpInjection();
         realm = Realm.getDefaultInstance();
 
-        conversationList = new ArrayList<>();
-        RealmResults<ConversationEntity> conversationResults = realm.where(ConversationEntity.class).findAll();
-        if (!conversationResults.isEmpty())
-            conversationList.addAll(realm.copyFromRealm(conversationResults));
-        arrayAdapter = new ArrayAdapter<>(
-                getActivity(),
-                android.R.layout.simple_list_item_1,
-                conversationList);
-
-        msgListView.setAdapter(arrayAdapter);
-
-        final RealmResults<ConversationEntity> conversations = realm.where(ConversationEntity.class).findAll();
-        conversations.addChangeListener(new RealmChangeListener<RealmResults<ConversationEntity>>() {
-            @Override
-            public void onChange(RealmResults<ConversationEntity> results) {
-                conversations.size();
-            }
-        });
-
+        inboxPresenter.getConversations(null);
+        addNewConversations();
+        setUpAdapter();
+        inboxPresenter.getConversations(conversations);
     }
 
     @Override
@@ -86,6 +82,27 @@ public class InboxFragment extends Fragment {
     public void onStop() {
         super.onStop();
         realm.close();
+    }
+
+    @Override
+    public void refreshConversationList(List<ConversationEntity> data) {
+        conversationResults = (RealmResults<ConversationEntity>) data;
+    }
+
+    @Override
+    public void addChangeListener(List<ConversationEntity> data) {
+        conversations = (RealmResults<ConversationEntity>) data;
+        conversations.addChangeListener(new RealmChangeListener<RealmResults<ConversationEntity>>() {
+            @Override
+            public void onChange(RealmResults<ConversationEntity> results) {
+                conversations.size();
+            }
+        });
+    }
+
+    @Override
+    public void handleException(Throwable throwable) {
+        Log.getStackTraceString(throwable);
     }
 
     @OnItemClick(R.id.msgList)
@@ -103,5 +120,27 @@ public class InboxFragment extends Fragment {
         conversationList.remove(position);
         arrayAdapter.notifyDataSetChanged();
         return true;
+    }
+
+    private void setUpInjection() {
+        DaggerInboxComponent.builder()
+                .mainComponent(((App) getActivity().getApplication()).getComponent())
+                .inboxContractModule(new InboxContractModule((InboxContract.View) getView(), conversationRepository))
+                .build()
+                .inject(this);
+    }
+
+    private void setUpAdapter() {
+        arrayAdapter = new ArrayAdapter<>(
+                getActivity(),
+                android.R.layout.simple_list_item_1,
+                conversationList);
+        msgListView.setAdapter(arrayAdapter);
+    }
+
+    private void addNewConversations() {
+        conversationList = new ArrayList<>();
+        if (!conversationResults.isEmpty())
+            conversationList.addAll(realm.copyFromRealm(conversationResults));
     }
 }

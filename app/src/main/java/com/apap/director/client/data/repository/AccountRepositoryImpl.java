@@ -48,6 +48,15 @@ public class AccountRepositoryImpl implements AccountRepository {
         return Observable.just(accountStore.getAccountList());
     }
 
+    @Override
+    public Observable<AccountEntity> getActiveAccount() {
+        return Observable.just(accountStore.getActiveAccount());
+    }
+
+    @Override
+    public Observable<String> getCode(String userId) {
+        return restAccountService.requestCode(userId);
+    }
 
     @Override
     public Observable<ResponseBody> signUp(String userId) {
@@ -80,11 +89,4 @@ public class AccountRepositoryImpl implements AccountRepository {
         byte[][] typeAndKey = ByteUtil.split(key.serialize(), TYPE_LENGTH, KEY_LENGTH);
         return Base64.encodeToString(typeAndKey[1], Base64.URL_SAFE | Base64.NO_WRAP);
     }
-
-//    private SignedPreKeyRecord generateSignedPreKey(IdentityKeyPair keyPair) {
-//        try {
-//            return KeyHelper.generateSignedPreKey(keyPair)
-//        }
-//        catch ()
-//    }
 }

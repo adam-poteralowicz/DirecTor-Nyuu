@@ -24,7 +24,6 @@ public class SettingsFragment extends Fragment {
 
     @BindView(R.id.settingsView_editText)
     EditText editText;
-
     @BindView(R.id.settingsView_confirmButton)
     Button confirmButton;
 

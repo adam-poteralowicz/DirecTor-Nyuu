@@ -17,6 +17,6 @@ public interface NewMsgContract {
     }
 
     interface Presenter extends BasePresenter {
-        void getMessageList();
+        void getMessagesByContact(Long contactIdFromIntent);
     }
 }

@@ -17,14 +17,16 @@ import io.reactivex.Observable;
 public class GetMessageListInteractor extends BaseInteractor<List<MessageEntity>, Void> {
 
     private MessageRepository messageRepository;
+    public Long contactId;
 
     @Inject
-    GetMessageListInteractor(MessageRepository messageRepository) {
+    GetMessageListInteractor(MessageRepository messageRepository, Long contactId) {
         this.messageRepository = messageRepository;
+        this.contactId = contactId;
     }
 
     @Override
     public Observable<List<MessageEntity>> buildObservable(Void aVoid) {
-        return messageRepository.getMessageList();
+        return messageRepository.getMessagesByContact(this.contactId);
     }
 }

@@ -33,4 +33,5 @@ public abstract class BaseInteractor<D, P> {
     public void dispose() {
         disposable.dispose();
     }
+
 }

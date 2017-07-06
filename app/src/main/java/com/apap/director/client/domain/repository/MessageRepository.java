@@ -12,5 +12,5 @@ import io.reactivex.Observable;
 
 public interface MessageRepository {
 
-    Observable<List<MessageEntity>> getMessageList();
+    Observable<List<MessageEntity>> getMessagesByContact(Long contactId);
 }

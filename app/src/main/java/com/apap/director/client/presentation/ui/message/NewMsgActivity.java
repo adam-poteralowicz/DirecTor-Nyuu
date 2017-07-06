@@ -21,8 +21,8 @@ import com.apap.director.client.domain.repository.MessageRepository;
 import com.apap.director.client.presentation.ui.home.adapter.MessageAdapter;
 import com.apap.director.client.presentation.ui.listener.ArrayAdapterChangeListener;
 import com.apap.director.client.presentation.ui.message.contract.NewMsgContract;
-import com.apap.director.client.presentation.ui.message.di.DaggerNewMsgComponent;
-import com.apap.director.client.presentation.ui.message.di.NewMsgContractModule;
+import com.apap.director.client.presentation.ui.message.di.component.DaggerNewMsgComponent;
+import com.apap.director.client.presentation.ui.message.di.module.NewMsgContractModule;
 import com.apap.director.client.presentation.ui.message.presenter.NewMsgPresenter;
 
 import java.util.ArrayList;
@@ -69,13 +69,13 @@ public class NewMsgActivity extends Activity implements NewMsgContract.View {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         ClientService.sendMessage("NewMsgActivity");
+        decorateMsgScreen();
         setUpInjection();
         ButterKnife.bind(this);
         autorefreshMessages();
-        decorateMsgScreen();
 
         arrayAdapter = setUpAdapter();
-        newMsgPresenter.getMessageList();
+        newMsgPresenter.getMessagesByContact(contactIdFromIntent);
         allMessages.addChangeListener(new ArrayAdapterChangeListener<>(arrayAdapter, "message activity listener"));
     }
 
@@ -121,7 +121,7 @@ public class NewMsgActivity extends Activity implements NewMsgContract.View {
     private void setUpInjection() {
         DaggerNewMsgComponent.builder()
                 .mainComponent(((App) getApplication()).getComponent())
-                .newMsgContractModule(new NewMsgContractModule(this, messageRepository))
+                .newMsgContractModule(new NewMsgContractModule(this, messageRepository, contactIdFromIntent))
                 .build()
                 .inject(this);
     }
