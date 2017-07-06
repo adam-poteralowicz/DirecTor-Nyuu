@@ -21,8 +21,8 @@ public class AccountStore {
     private final String SIGNED_KEY_ID_COLUMN = "signedKeyId";
     private final String PRE_KEY_COLUMN = "oneTimeKeys";
     private final String PRE_KEY_ID_COLUMN = "oneTimeKeyId";
-    private Realm realm;
 
+    private Realm realm;
 
     @Inject
     public AccountStore(Realm realm) {
@@ -55,5 +55,11 @@ public class AccountStore {
         } else {
             return lastId.intValue() + 1;
         }
+    }
+
+    public void saveAccount(AccountEntity accountEntity) {
+        realm.beginTransaction();
+        realm.copyToRealm(accountEntity);
+        realm.commitTransaction();
     }
 }

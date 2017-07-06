@@ -25,4 +25,6 @@ public interface AccountRepository {
     Observable<Integer> findLastSignedKeyId(AccountModel account);
 
     Observable<Integer> findLastOneTimeKeyId(AccountModel account);
+
+    Observable<AccountModel> saveAccount(AccountModel account);
 }

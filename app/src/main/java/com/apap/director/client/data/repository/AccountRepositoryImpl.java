@@ -5,6 +5,7 @@ import android.util.Base64;
 import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.db.entity.ContactEntity;
 import com.apap.director.client.data.db.entity.SessionEntity;
+import com.apap.director.client.data.db.mapper.AccountMapper;
 import com.apap.director.client.data.db.service.AccountStore;
 import com.apap.director.client.data.net.rest.service.RestAccountService;
 import com.apap.director.client.domain.model.AccountModel;
@@ -35,11 +36,13 @@ public class AccountRepositoryImpl implements AccountRepository {
 
     private AccountStore accountStore;
     private RestAccountService restAccountService;
+    private AccountMapper accountMapper;
 
     @Inject
-    public AccountRepositoryImpl(AccountStore accountStore, RestAccountService restAccountService) {
+    public AccountRepositoryImpl(AccountStore accountStore, RestAccountService restAccountService, AccountMapper accountMapper) {
         this.accountStore = accountStore;
         this.restAccountService = restAccountService;
+        this.accountMapper = accountMapper;
     }
 
     @Override
@@ -64,12 +67,19 @@ public class AccountRepositoryImpl implements AccountRepository {
 
     @Override
     public Observable<Integer> findLastSignedKeyId(AccountModel account) {
-        return Observable.just(new Integer(accountStore.findLastSignedKeyId(account.getKeyBase64())));
+        return Observable.just(accountStore.findLastSignedKeyId(account.getKeyBase64()));
     }
 
     @Override
     public Observable<Integer> findLastOneTimeKeyId(AccountModel account) {
         return Observable.just(accountStore.findLastOneTimeKeyId(account.getKeyBase64()));
+    }
+
+    @Override
+    public Observable<AccountModel> saveAccount(AccountModel account) {
+        AccountEntity entity = accountMapper.mapToEntity(account);
+        accountStore.saveAccount(entity);
+        return Observable.just(account);
     }
 
 }
