@@ -70,7 +70,6 @@ public class IdentityKeyStoreImpl implements IdentityKeyStore {
                     .findFirst();
 
             contact.getContactKeys().add(contactKey);
-            contactKey.setContact(contact);
 
         realm.commitTransaction();
         realm.close();
