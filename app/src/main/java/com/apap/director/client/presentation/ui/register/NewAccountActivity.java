@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -13,6 +14,7 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.data.exception.DuplicateException;
 import com.apap.director.client.presentation.ui.register.contract.RegisterContract;
+import com.apap.director.client.presentation.ui.register.di.component.DaggerRegisterContractComponent;
 import com.apap.director.client.presentation.ui.register.di.module.RegisterContractModule;
 import com.apap.director.client.presentation.ui.register.presenter.RegisterPresenter;
 import com.mobsandgeeks.saripaar.ValidationError;
@@ -83,6 +85,7 @@ public class NewAccountActivity extends Activity implements Validator.Validation
     public void onValidationSucceeded() {
         Log.v(NewAccountActivity.class.getSimpleName(), "Name validation succeeded");
         saveButton.setEnabled(true);
+        saveButton.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
     }
 
     @Override

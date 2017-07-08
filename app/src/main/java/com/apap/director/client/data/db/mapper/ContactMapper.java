@@ -23,7 +23,8 @@ public class ContactMapper extends BaseMapper<ContactModel, ContactEntity> {
 
     @Override
     public ContactEntity mapToEntity(ContactModel model) {
-        if(model == null) return null;
+        if(model == null)
+            return null;
 
         ContactEntity contactEntity = new ContactEntity();
         contactEntity.setName(model.getName());
@@ -37,7 +38,8 @@ public class ContactMapper extends BaseMapper<ContactModel, ContactEntity> {
 
     @Override
     public ContactModel mapToModel(ContactEntity entity) {
-        if(entity == null) return null;
+        if(entity == null)
+            return null;
 
         ContactModel contactModel = new ContactModel();
         contactModel.setName(entity.getName());

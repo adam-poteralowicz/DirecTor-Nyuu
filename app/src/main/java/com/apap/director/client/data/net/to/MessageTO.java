@@ -15,5 +15,4 @@ public class MessageTO {
     public String from;
     public String message;
     public int type;
-
 }

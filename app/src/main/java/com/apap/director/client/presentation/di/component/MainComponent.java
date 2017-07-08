@@ -2,6 +2,7 @@ package com.apap.director.client.presentation.di.component;
 
 import android.content.Context;
 
+import com.apap.director.client.data.db.mapper.OneTimeKeyMapper;
 import com.apap.director.client.data.manager.AccountManager;
 import com.apap.director.client.data.manager.MessageManager;
 import com.apap.director.client.data.net.rest.service.KeyService;
@@ -16,6 +17,7 @@ import com.apap.director.client.domain.repository.SignedKeyRepository;
 import com.apap.director.client.presentation.di.module.ContextModule;
 import com.apap.director.client.presentation.di.module.InteractorModule;
 import com.apap.director.client.presentation.di.module.ManagerModule;
+import com.apap.director.client.presentation.di.module.MapperModule;
 import com.apap.director.client.presentation.di.module.NetModule;
 import com.apap.director.client.presentation.di.module.RealmModule;
 import com.apap.director.client.presentation.di.module.RepositoryModule;
@@ -36,6 +38,7 @@ import io.realm.Realm;
         RepositoryModule.class,
         NetModule.class,
         InteractorModule.class,
+        MapperModule.class,
         ContextModule.class})
 public interface MainComponent {
 
@@ -64,4 +67,6 @@ public interface MainComponent {
     Context context();
 
     MessageManager messageManager();
+
+    OneTimeKeyMapper oneTimeKeyMapper();
 }
