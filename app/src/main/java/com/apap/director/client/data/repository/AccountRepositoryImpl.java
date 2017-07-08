@@ -56,8 +56,8 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public Observable<String> getCode(AccountModel account) {
-        return null;
+    public Observable<AccountEntity> getAccount(String name) {
+        return Observable.just(accountStore.findAccountByName(name));
     }
 
     @Override

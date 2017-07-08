@@ -1,7 +1,9 @@
 package com.apap.director.client.presentation.ui.register;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -9,8 +11,8 @@ import android.widget.EditText;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
+import com.apap.director.client.data.exception.DuplicateException;
 import com.apap.director.client.presentation.ui.register.contract.RegisterContract;
-import com.apap.director.client.presentation.ui.register.di.component.DaggerRegisterContractComponent;
 import com.apap.director.client.presentation.ui.register.di.module.RegisterContractModule;
 import com.apap.director.client.presentation.ui.register.presenter.RegisterPresenter;
 import com.mobsandgeeks.saripaar.ValidationError;
@@ -26,6 +28,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class NewAccountActivity extends Activity implements Validator.ValidationListener, RegisterContract.View {
+
+    private final String RESULT_EXTRA = "result";
 
     @Length(min = 1)
     @BindView(R.id.contactNameEditText)
@@ -88,12 +92,23 @@ public class NewAccountActivity extends Activity implements Validator.Validation
 
     @Override
     public void handleException(Throwable throwable) {
+        if(throwable instanceof DuplicateException) {
+            Snackbar.make(getCurrentFocus(), throwable.getMessage(), Snackbar.LENGTH_LONG)
+                    .show();
+        }
+
         Log.getStackTraceString(throwable);
     }
 
     @Override
     public void handleSuccess() {
         Log.v(NewAccountActivity.class.getSimpleName(), "Registered");
+
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra(RESULT_EXTRA, true);
+        setResult(Activity.RESULT_OK,returnIntent);
+
         finish();
     }
+
 }

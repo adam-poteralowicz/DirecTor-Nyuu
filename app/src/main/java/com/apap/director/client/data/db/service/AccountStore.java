@@ -17,6 +17,7 @@ public class AccountStore {
 
     private final String ACTIVE_COLUMN = "active";
     private final String ID_COLUMN = "keyBase64";
+    private final String NAME_COLUMN = "name";
     private final String SIGNED_KEY_COLUMN = "signedKey";
     private final String SIGNED_KEY_ID_COLUMN = "signedKeyId";
     private final String PRE_KEY_COLUMN = "oneTimeKeys";
@@ -55,6 +56,10 @@ public class AccountStore {
         } else {
             return lastId.intValue() + 1;
         }
+    }
+
+    public AccountEntity findAccountByName(String name) {
+        return realm.where(AccountEntity.class).equalTo(NAME_COLUMN, name).findFirst();
     }
 
     public void saveAccount(AccountEntity accountEntity) {

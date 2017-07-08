@@ -12,7 +12,9 @@ import com.apap.director.client.data.store.PreKeyStoreImpl;
 import com.apap.director.client.data.store.SessionStoreImpl;
 import com.apap.director.client.data.store.SignedPreKeyStoreImpl;
 import com.apap.director.client.domain.repository.AccountRepository;
+import com.apap.director.client.domain.repository.SignedKeyRepository;
 import com.apap.director.client.presentation.di.module.ContextModule;
+import com.apap.director.client.presentation.di.module.InteractorModule;
 import com.apap.director.client.presentation.di.module.ManagerModule;
 import com.apap.director.client.presentation.di.module.NetModule;
 import com.apap.director.client.presentation.di.module.RealmModule;
@@ -33,6 +35,7 @@ import io.realm.Realm;
         WebSocketModule.class,
         RepositoryModule.class,
         NetModule.class,
+        InteractorModule.class,
         ContextModule.class})
 public interface MainComponent {
 
@@ -55,6 +58,8 @@ public interface MainComponent {
     Realm realm();
 
     AccountRepository accountRepository();
+
+    SignedKeyRepository signedKeyRepository();
 
     Context context();
 
