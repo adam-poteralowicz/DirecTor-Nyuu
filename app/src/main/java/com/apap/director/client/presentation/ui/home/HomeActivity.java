@@ -47,7 +47,7 @@ public class HomeActivity extends FragmentActivity implements HomeContract.View 
         setUpInjection();
         ButterKnife.bind(this);
 
-        direcTorPagerAdapter = new DirecTorPagerAdapter(getSupportFragmentManager(), 3);
+        direcTorPagerAdapter = new DirecTorPagerAdapter(getSupportFragmentManager(), 2);
         viewPager.setAdapter(direcTorPagerAdapter);
         realm = Realm.getDefaultInstance();
     }
