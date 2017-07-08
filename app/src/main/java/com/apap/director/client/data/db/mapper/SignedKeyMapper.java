@@ -12,7 +12,8 @@ public class SignedKeyMapper extends BaseMapper<SignedKeyModel, SignedKeyEntity>
 
     @Override
     public SignedKeyEntity mapToEntity(SignedKeyModel model) {
-        if(model == null) return null;
+        if(model == null)
+            return null;
 
         SignedKeyEntity entity = new SignedKeyEntity();
         entity.setId(model.getId());
@@ -24,7 +25,8 @@ public class SignedKeyMapper extends BaseMapper<SignedKeyModel, SignedKeyEntity>
 
     @Override
     public SignedKeyModel mapToModel(SignedKeyEntity entity) {
-        if(entity == null) return null;
+        if(entity == null)
+            return null;
 
         SignedKeyModel model = new SignedKeyModel();
         model.setId(entity.getId());

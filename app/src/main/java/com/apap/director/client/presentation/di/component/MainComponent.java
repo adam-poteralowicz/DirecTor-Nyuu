@@ -17,6 +17,7 @@ import com.apap.director.client.domain.repository.SignedKeyRepository;
 import com.apap.director.client.presentation.di.module.ContextModule;
 import com.apap.director.client.presentation.di.module.InteractorModule;
 import com.apap.director.client.presentation.di.module.ManagerModule;
+import com.apap.director.client.presentation.di.module.MapperModule;
 import com.apap.director.client.presentation.di.module.NetModule;
 import com.apap.director.client.presentation.di.module.RealmModule;
 import com.apap.director.client.presentation.di.module.RepositoryModule;
@@ -37,6 +38,7 @@ import io.realm.Realm;
         RepositoryModule.class,
         NetModule.class,
         InteractorModule.class,
+        MapperModule.class,
         ContextModule.class})
 public interface MainComponent {
 

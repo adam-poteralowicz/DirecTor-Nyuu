@@ -23,7 +23,8 @@ public class AccountMapper extends BaseMapper<AccountModel, AccountEntity> {
 
     @Override
     public AccountEntity mapToEntity(AccountModel model) {
-        if(model == null) return null;
+        if(model == null)
+            return null;
 
         AccountEntity entity = new AccountEntity();
 
@@ -42,7 +43,8 @@ public class AccountMapper extends BaseMapper<AccountModel, AccountEntity> {
 
     @Override
     public AccountModel mapToModel(AccountEntity entity) {
-        if(entity == null) return null;
+        if(entity == null)
+            return null;
 
         AccountModel model = new AccountModel();
 

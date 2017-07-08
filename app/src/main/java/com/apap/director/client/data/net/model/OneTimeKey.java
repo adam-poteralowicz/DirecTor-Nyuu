@@ -1,8 +1,7 @@
-package com.apap.director.client.data.net.to;
+package com.apap.director.client.data.net.model;
 
 import android.util.Base64;
 import android.util.Log;
-
 
 import com.apap.director.client.data.db.entity.OneTimeKeyEntity;
 
@@ -10,30 +9,24 @@ import org.whispersystems.libsignal.state.PreKeyRecord;
 
 import java.io.IOException;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
+/**
+ * Created by Adam Poterałowicz
+ */
+
+@Getter
 @Setter
-public class OneTimeKeyTO {
+@NoArgsConstructor
+public class OneTimeKey {
 
     private long keyId;
     private String keyBase64;
     private int oneTimeKeyId;
 
-    public long getKeyId() {
-        return keyId;
-    }
-
-    public String getKeyBase64() {
-        return keyBase64;
-    }
-
-    public int getOneTimeKeyId() {
-        return oneTimeKeyId;
-    }
-
-    public OneTimeKeyTO(OneTimeKeyEntity oneTimeKey) {
+    public OneTimeKey(OneTimeKeyEntity oneTimeKey) {
         try {
             this.keyId = oneTimeKey.getId();
             PreKeyRecord record = new PreKeyRecord(oneTimeKey.getSerializedKey());

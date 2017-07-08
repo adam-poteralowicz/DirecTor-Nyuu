@@ -34,7 +34,7 @@ public class AccountModel {
 
 
     public void generateOneTimeKeys(int startLocalId, int startPreKeyId, int count) {
-        this.oneTimeKeys = new ArrayList<OneTimeKeyModel>();
+        this.oneTimeKeys = new ArrayList<>();
 
         OneTimeKeyMapper mapper = new OneTimeKeyMapper();
 

@@ -1,8 +1,7 @@
-package com.apap.director.client.data.net.to;
+package com.apap.director.client.data.net.model;
 
 import android.util.Base64;
 import android.util.Log;
-
 
 import com.apap.director.client.data.db.entity.SignedKeyEntity;
 
@@ -14,20 +13,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
-@Setter
+/**
+ * Created by Adam Poterałowicz
+ */
+
 @Getter
-public class SignedKeyTO {
+@Setter
+@NoArgsConstructor
+public class SignedKey {
 
     private String keyBase64;
     private String signatureBase64;
     private int signedKeyId;
 
-    public String getKeyBase64() {
-        return keyBase64;
-    }
-
-    public SignedKeyTO(SignedKeyEntity signedKey) {
+    public SignedKey(SignedKeyEntity signedKey) {
         try {
             SignedPreKeyRecord record = new SignedPreKeyRecord(signedKey.getSerializedKey());
             this.keyBase64 = Base64.encodeToString(record.getKeyPair().getPublicKey().serialize(), Base64.NO_WRAP | Base64.URL_SAFE);
