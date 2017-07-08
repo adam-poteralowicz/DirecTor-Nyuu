@@ -21,7 +21,9 @@
 
         <activity android:name=".presentation.ui.home.HomeActivity"/>
         <activity android:name=".activity.InboxActivity"/>
-        <activity android:name=".presentation.ui.message.NewMsgActivity"/>
+        <activity android:name=".presentation.ui.message.NewMsgActivity"
+            android:windowSoftInputMode="adjustPan">
+        </activity>
         <activity android:name=".presentation.ui.contact.AddContactActivity"/>
         <activity android:name=".presentation.ui.register.NewAccountActivity"/>
         <activity android:name=".presentation.ui.contact.NewContactActivity"/>
