@@ -59,7 +59,7 @@
 ////        };
 ////    }
 //
-//    public void connect(String cookie){
+//    public void setUpClient(String cookie){
 //        this.cookie = cookie;
 //        Log.v("HAI/StompService", "Cookie : "+cookie);
 //        HashMap<String, String> connectionHeaders = new HashMap<>();
@@ -69,7 +69,7 @@
 //
 //        Log.v("HAI", "Connecting to websocket with cookie "+ cookie+"...");
 //        StompHeader cookieHeader = new StompHeader("Cookie", cookie);
-//        client.connect();
+//        client.setUpClient();
 //       // client.topic("/user/exchange/amq.direct/messages", Arrays.asList(cookieHeader)).subscribe(messageAction, new ErrorAction());
 //       // client.lifecycle().subscribe(listener);
 //    }
@@ -82,14 +82,14 @@
 //    public void sendMessage(String text){
 //        Log.v("HAI/StompService", "Sending default message!");
 //        Log.v("HAI/StompService", "Cookie " + cookie);
-//        client.connect(true);
+//        client.setUpClient(true);
 ////        client.disconnect();
 ////        try {
 ////            wait(200);
 ////        } catch (InterruptedException e) {
 ////            e.printStackTrace();
 ////        }
-////        client.connect();
+////        client.setUpClient();
 //        client.send("/app/hello",text);
 //    }
 //
