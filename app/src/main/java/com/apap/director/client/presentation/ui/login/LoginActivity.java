@@ -74,7 +74,6 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
 
     private ArrayList<AccountEntity> accountList;
     private ArrayAdapter<AccountEntity> arrayAdapter;
-    private AccountAdapter accountAdapter;
     private String accountName;
 
     @Override
@@ -89,7 +88,7 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     }
 
     private void setUpRecyclerView() {
-        accountAdapter = new AccountAdapter(this);
+        AccountAdapter accountAdapter = new AccountAdapter(this);
         accountsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         accountsRecyclerView.setAdapter(accountAdapter);
     }

@@ -1,6 +1,7 @@
 package com.apap.director.client.data.net.to;
 
 import android.util.Base64;
+import android.util.Log;
 
 
 import com.apap.director.client.data.db.entity.SignedKeyEntity;
@@ -36,7 +37,7 @@ public class SignedKeyTO {
             this.signatureBase64 = Base64.encodeToString(record.getSignature(), Base64.NO_WRAP | Base64.URL_SAFE);
             this.signedKeyId = signedKey.getSignedKeyId();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.getStackTraceString(e);
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.apap.director.client.data.net.to;
 
 import android.util.Base64;
+import android.util.Log;
 
 
 import com.apap.director.client.data.db.entity.OneTimeKeyEntity;
@@ -40,7 +41,7 @@ public class OneTimeKeyTO {
             this.keyBase64 = Base64.encodeToString(record.getKeyPair().getPublicKey().serialize(), Base64.NO_WRAP | Base64.URL_SAFE);
             this.oneTimeKeyId = oneTimeKey.getOneTimeKeyId();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.getStackTraceString(e);
         }
     }
 }

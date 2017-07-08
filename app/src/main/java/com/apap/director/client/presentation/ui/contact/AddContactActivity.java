@@ -33,6 +33,8 @@ import com.apap.director.client.presentation.ui.home.HomeActivity;
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.InvalidKeyException;
 
+import java.security.SecureRandom;
+
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -94,14 +96,18 @@ public class AddContactActivity extends AppCompatActivity implements AddContactC
             PackageManager pm = getPackageManager();
             if (pm.hasSystemFeature(PackageManager.FEATURE_NFC) && NfcAdapter.getDefaultAdapter(this) != null) {
                 if (nfcAdapter.isEnabled()) {
-                    Toast.makeText(this, "NFC enabled", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.nfc_enabled, Toast.LENGTH_LONG).show();
                     addContactPresenter.useNFC(NfcAdapter.getDefaultAdapter(this), new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED));
                 } else {
-                    Toast.makeText(this, "Please activate NFC", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.please_activate_nfc, Toast.LENGTH_LONG).show();
                 }
             } else {
-                Toast.makeText(this, "NFC feature not supported", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.nfc_not_supported, Toast.LENGTH_LONG).show();
             }
+            return true;
+        } else if (item.getItemId() == R.id.atn_add_contact) {
+            SecureRandom sr = new SecureRandom();
+            setUpNewIntent("publicKey" + sr.nextInt() + sr.nextInt());
             return true;
         } else {
             return super.onOptionsItemSelected(item);
@@ -157,9 +163,7 @@ public class AddContactActivity extends AppCompatActivity implements AddContactC
 
     @Override
     public void showNewContact(String publicKey) {
-        Intent newContactIntent = new Intent(this, NewContactActivity.class);
-        newContactIntent.putExtra("key", publicKey);
-        startActivity(newContactIntent);
+        setUpNewIntent(publicKey);
     }
 
     @Override
@@ -194,5 +198,11 @@ public class AddContactActivity extends AppCompatActivity implements AddContactC
                 .addContactContractModule(new AddContactContractModule(this))
                 .build()
                 .inject(this);
+    }
+
+    private void setUpNewIntent(String key) {
+        Intent newContactIntent = new Intent(this, NewContactActivity.class);
+        newContactIntent.putExtra("key", key);
+        startActivity(newContactIntent);
     }
 }
