@@ -2,7 +2,6 @@ package com.apap.director.client.presentation.ui.login;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -30,7 +29,6 @@ import com.apap.director.client.presentation.ui.login.contract.LoginContract;
 import com.apap.director.client.presentation.ui.login.di.component.DaggerLoginContractComponent;
 import com.apap.director.client.presentation.ui.login.di.module.LoginContractModule;
 import com.apap.director.client.presentation.ui.login.presenter.LoginPresenter;
-import com.apap.director.client.presentation.ui.password.PasswordActivity;
 import com.apap.director.client.presentation.ui.register.NewAccountActivity;
 
 import java.io.IOException;
@@ -45,7 +43,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnItemClick;
 import butterknife.OnItemLongClick;
-import info.guardianproject.netcipher.NetCipher;
 import io.realm.Realm;
 
 import static android.view.View.GONE;
@@ -55,6 +52,8 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
 
     private static final String TAG = App.getContext().getClass().getSimpleName();
     private static final int LAYOUT_ID = R.layout.login_view;
+    private static final String SHARED_PREFERENCES_FILENAME = "prefs";
+    private static final String KEY = "masterPassword";
 
     @Inject
     AccountManager accountManager;
@@ -79,7 +78,6 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     private ArrayList<AccountEntity> accountList;
     private ArrayAdapter<AccountEntity> arrayAdapter;
     private String accountName;
-    private SharedPreferences.Editor prefs;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -90,6 +88,7 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
 
         setUpInjection();
         setUpRecyclerView();
+//        NetCipher.useTor();
     }
 
     private void setUpRecyclerView() {
@@ -109,24 +108,18 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.tor_items, menu);
+        inflater.inflate(R.menu.login_items, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.tor_conn_on:
-                NetCipher.useTor();
-                return true;
-            case R.id.tor_conn_off:
-                NetCipher.clearProxy();
-                return true;
-            case R.id.swapId:
-                Log.v(TAG, "Swap Id pressed");
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        int i = item.getItemId();
+        if (i == R.id.swapId) {
+            Log.v(TAG, "Swap Id pressed");
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
         }
     }
 
@@ -197,11 +190,8 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
             realm.commitTransaction();
 
             ClientService.connect(cookie);
-            if (getSharedPreferences("prefs", MODE_PRIVATE).contains("masterPassword")) {
-                startActivity(new Intent(LoginActivity.this, HomeActivity.class));
-            } else {
-                startActivity(new Intent(LoginActivity.this, PasswordActivity.class));
-            }
+
+            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
 
         } catch (InterruptedException | ExecutionException e) {
             Log.getStackTraceString(e);
@@ -238,7 +228,7 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     }
 
     public boolean verifyMasterPassword(String password) {
-        return realm.where(AccountEntity.class).equalTo("masterPassword", password) != null;
+        return password.equals(getSharedPreferences(SHARED_PREFERENCES_FILENAME, MODE_PRIVATE).getString(KEY, ""));
     }
 
     public void deleteAccount(String accountName) {
