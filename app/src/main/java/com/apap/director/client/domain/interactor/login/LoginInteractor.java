@@ -38,7 +38,7 @@ public class LoginInteractor extends BaseInteractor<ResponseBody, AccountModel> 
         return getCodeInteractor.execute(accountModel)
                 .flatMap(code -> signCodeInteractor.execute(code))
                 .flatMap(signedCode -> {
-                    LoginDetails loginDetails = new LoginDetails(accountModel.getKeyBase64(), Base64Util.convertToBase64(signedCode.getBytes()))
+                    LoginDetails loginDetails = new LoginDetails(accountModel.getKeyBase64(), Base64Util.convertToBase64(signedCode.getBytes()));
                     return loginRepository.login(loginDetails);
                 });
     }
