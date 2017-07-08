@@ -43,7 +43,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnItemClick;
 import butterknife.OnItemLongClick;
-import info.guardianproject.netcipher.NetCipher;
 import io.realm.Realm;
 
 import static android.view.View.GONE;
@@ -89,6 +88,7 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
 
         setUpInjection();
         setUpRecyclerView();
+//        NetCipher.useTor();
     }
 
     private void setUpRecyclerView() {
@@ -108,24 +108,18 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.tor_items, menu);
+        inflater.inflate(R.menu.login_items, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.tor_conn_on:
-                NetCipher.useTor();
-                return true;
-            case R.id.tor_conn_off:
-                NetCipher.clearProxy();
-                return true;
-            case R.id.swapId:
-                Log.v(TAG, "Swap Id pressed");
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        int i = item.getItemId();
+        if (i == R.id.swapId) {
+            Log.v(TAG, "Swap Id pressed");
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
         }
     }
 

@@ -162,18 +162,12 @@ public class ClientService {
             String json = mapper.writeValueAsString(frame);
 
             client.send("/app/message/test/" + to, json)
-                    .subscribe(new Action1<Void>() {
-                        @Override
-                        public void call(Void aVoid) {
-                            Log.v(MESSAGE, "Call onNext " + text);
+                    .subscribe(aVoid -> {
+                        Log.v(MESSAGE, "Call onNext " + text);
 
-                        }
-                    }, new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
-                            Log.v(MESSAGE, "Error " + text);
+                    }, throwable -> {
+                        Log.v(MESSAGE, "Error " + text);
 
-                        }
                     });
 
             realm.close();
@@ -201,18 +195,12 @@ public class ClientService {
     public static void sendMessage(final String text) {
         Log.v("HAI/StompService", "Sending default message!");
         client.send("/app/hello", text)
-                .subscribe(new Action1<Void>() {
-                    @Override
-                    public void call(Void aVoid) {
-                        Log.v(MESSAGE, "Call onNext " + text);
+                .subscribe(aVoid -> {
+                    Log.v(MESSAGE, "Call onNext " + text);
 
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        Log.v(MESSAGE, "Error " + text);
+                }, throwable -> {
+                    Log.v(MESSAGE, "Error " + text);
 
-                    }
                 });
     }
 
