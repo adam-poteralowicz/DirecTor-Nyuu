@@ -34,7 +34,7 @@ public class AddContactPresenter implements BasePresenter, AddContactContract.Pr
     @Override
     public void readMessage(List<String> messages, ActionBar actionBar) {
         if (messages != null) {
-            view.showToast("ContactEntity public key : " + messages.get(0));
+            view.showSnackbar("ContactEntity public key : " + messages.get(0));
             view.showActionBar(actionBar);
             view.showNewContact(messages.get(0));
         }
@@ -50,7 +50,7 @@ public class AddContactPresenter implements BasePresenter, AddContactContract.Pr
     @Override
     public void useNFC(NfcAdapter nfcAdapter, IntentFilter ndefDetected) {
         if (nfcAdapter == null) {
-            view.showToast("This device does not support NFC");
+            view.showSnackbar("This device does not support NFC");
         } else if (nfcAdapter.isEnabled()) {
             view.callPendingActivity();
 

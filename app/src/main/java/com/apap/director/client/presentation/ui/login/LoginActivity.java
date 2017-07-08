@@ -2,8 +2,10 @@ package com.apap.director.client.presentation.ui.login;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,7 +16,6 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
@@ -29,6 +30,7 @@ import com.apap.director.client.presentation.ui.login.contract.LoginContract;
 import com.apap.director.client.presentation.ui.login.di.component.DaggerLoginContractComponent;
 import com.apap.director.client.presentation.ui.login.di.module.LoginContractModule;
 import com.apap.director.client.presentation.ui.login.presenter.LoginPresenter;
+import com.apap.director.client.presentation.ui.password.PasswordActivity;
 import com.apap.director.client.presentation.ui.register.NewAccountActivity;
 
 import java.io.IOException;
@@ -71,10 +73,13 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     Button verificationButton;
     @BindView(R.id.masterPasswordVerification_editText)
     EditText masterPasswordEditText;
+    @BindView(R.id.loginActivity_layout)
+    View rootLayout;
 
     private ArrayList<AccountEntity> accountList;
     private ArrayAdapter<AccountEntity> arrayAdapter;
     private String accountName;
+    private SharedPreferences.Editor prefs;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -147,7 +152,7 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     public void onClick(View view) {
         try {
             if (accountManager.getActiveAccount() == null) {
-                Toast.makeText(this, "Choose an account", Toast.LENGTH_LONG).show();
+                Snackbar.make(rootLayout, "Choose an account", Snackbar.LENGTH_LONG).show();
                 return;
             } else Log.d("active account", accountManager.getActiveAccountName());
 
@@ -192,7 +197,11 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
             realm.commitTransaction();
 
             ClientService.connect(cookie);
-            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+            if (getSharedPreferences("prefs", MODE_PRIVATE).contains("masterPassword")) {
+                startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+            } else {
+                startActivity(new Intent(LoginActivity.this, PasswordActivity.class));
+            }
 
         } catch (InterruptedException | ExecutionException e) {
             Log.getStackTraceString(e);
@@ -211,14 +220,14 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
             deleteAccount(accountName);
             masterPasswordDialog.setVisibility(GONE);
         } else {
-            Toast.makeText(this, "Wrong master password", Toast.LENGTH_LONG).show();
+            Snackbar.make(rootLayout, "Wrong master password", Snackbar.LENGTH_LONG).show();
         }
     }
 
     @OnItemClick(R.id.accountsView)
     public void chooseAccount(int position) {
         boolean success = accountManager.chooseAccount(accountList.get(position).getName());
-        Toast.makeText(this, accountManager.getActiveAccountName() + " " + success, Toast.LENGTH_LONG).show();
+        Snackbar.make(rootLayout, accountManager.getActiveAccountName() + " " + success, Snackbar.LENGTH_LONG).show();
     }
 
     @OnItemLongClick(R.id.accountsView)

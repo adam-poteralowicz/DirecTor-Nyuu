@@ -10,7 +10,7 @@ import com.apap.director.client.presentation.ui.base.contract.view.BaseView;
 public interface NewContactContract {
 
     interface View extends BaseView {
-        void showToast(String text);
+        void showSnackbar(String text);
         void addConversation(String contactName);
     }
 

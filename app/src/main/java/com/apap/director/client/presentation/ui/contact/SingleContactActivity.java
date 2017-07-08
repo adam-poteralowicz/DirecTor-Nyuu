@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -14,7 +15,6 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
@@ -59,6 +59,8 @@ public class SingleContactActivity extends Activity implements SingleContactCont
     ListView optionsListView;
     @BindView(R.id.imageView)
     ImageView imageView;
+    @BindView(R.id.singleContactActivity_rootView)
+    View rootView;
 
     private String TAG = App.getContext().getClass().getSimpleName();
     List<String> myOptionsList = null;
@@ -91,7 +93,7 @@ public class SingleContactActivity extends Activity implements SingleContactCont
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Toast.makeText(App.getContext(), myOptionsList.get(position), Toast.LENGTH_LONG).show();
+                Snackbar.make(rootView, myOptionsList.get(position), Snackbar.LENGTH_LONG).show();
 
                 switch (position) {
                     case 0:
@@ -164,7 +166,7 @@ public class SingleContactActivity extends Activity implements SingleContactCont
     @Override
     public void setConversationContact(ConversationEntity conversation, ContactEntity contact) {
         realm.beginTransaction();
-        conversation.setContact(contact);
+        conversation.setInterlocutor(contact);
         realm.copyToRealmOrUpdate(conversation);
         realm.commitTransaction();
     }
@@ -172,7 +174,7 @@ public class SingleContactActivity extends Activity implements SingleContactCont
     @Override
     public void setConversationAccount(ConversationEntity conversation, AccountEntity account) {
         realm.beginTransaction();
-        conversation.setAccount(account);
+        conversation.setOwner(account);
         realm.copyToRealmOrUpdate(conversation);
         realm.commitTransaction();
     }

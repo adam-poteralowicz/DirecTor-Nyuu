@@ -34,6 +34,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".presentation.ui.error.ErrorActivity"/>
+        <activity android:name=".presentation.ui.password.PasswordActivity"/>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

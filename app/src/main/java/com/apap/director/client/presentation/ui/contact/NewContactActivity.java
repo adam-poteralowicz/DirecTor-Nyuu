@@ -4,10 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
@@ -28,7 +29,6 @@ public class NewContactActivity extends Activity implements NewContactContract.V
 
     @Inject
     NewContactPresenter newContactPresenter;
-
     @Inject
     ConversationManager conversationManager;
 
@@ -36,6 +36,8 @@ public class NewContactActivity extends Activity implements NewContactContract.V
     EditText contactNameEditText;
     @BindView(R.id.theirPublicKey)
     TextView textView;
+    @BindView(R.id.newContactActivity_rootView)
+    View rootView;
 
     private String contactPublicKey;
     private DbContactService dbContactService;
@@ -59,15 +61,15 @@ public class NewContactActivity extends Activity implements NewContactContract.V
         newContactPresenter.addContact(contactName, contactPublicKey);
         newContactPresenter.addConversation(contactName);
 
-        Toast.makeText(this, contactPublicKey, Toast.LENGTH_LONG).show();
+        Snackbar.make(rootView, contactPublicKey, Snackbar.LENGTH_LONG).show();
 
         Intent intent = new Intent(this, AddContactActivity.class);
         startActivity(intent);
     }
 
     @Override
-    public void showToast(String text) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+    public void showSnackbar(String text) {
+        Snackbar.make(rootView, text, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override

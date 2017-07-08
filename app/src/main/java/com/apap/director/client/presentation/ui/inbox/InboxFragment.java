@@ -2,6 +2,7 @@ package com.apap.director.client.presentation.ui.inbox;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
@@ -107,16 +107,16 @@ public class InboxFragment extends Fragment implements InboxContract.View {
 
     @OnItemClick(R.id.msgList)
     public void startSendMessageActivity(int position) {
-        Toast.makeText(getActivity(), conversationList.get(position).getContact().getName(), Toast.LENGTH_LONG).show();
+        Snackbar.make(getView(), conversationList.get(position).getInterlocutor().getName(), Snackbar.LENGTH_LONG).show();
         Intent intent = new Intent(getActivity(), NewMsgActivity.class)
-                .putExtra("contactId", conversationList.get(position).getContact().getId())
-                .putExtra("msgTitle", conversationList.get(position).getContact().getName());
+                .putExtra("contactId", conversationList.get(position).getInterlocutor().getId())
+                .putExtra("msgTitle", conversationList.get(position).getInterlocutor().getName());
         startActivity(intent);
     }
 
     @OnItemLongClick(R.id.msgList)
     public boolean deleteConversation(int position) {
-        conversationManager.deleteConversationByContactId(conversationList.get(position).getContact().getId());
+        conversationManager.deleteConversationByContactId(conversationList.get(position).getInterlocutor().getId());
         conversationList.remove(position);
         arrayAdapter.notifyDataSetChanged();
         return true;
