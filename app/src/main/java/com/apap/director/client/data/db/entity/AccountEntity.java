@@ -17,7 +17,6 @@ public class AccountEntity extends RealmObject {
     private String name;
     private byte[] keyPair;
     private int registrationId;
-    private String masterPassword;
     private RealmList<OneTimeKeyEntity> oneTimeKeys;
     private SignedKeyEntity signedKey;
     private boolean registered;

@@ -1,15 +1,10 @@
 package com.apap.director.client.data.db.mapper;
 
 import com.apap.director.client.data.db.entity.AccountEntity;
-import com.apap.director.client.data.db.entity.ContactEntity;
-import com.apap.director.client.data.db.entity.SessionEntity;
 import com.apap.director.client.data.db.mapper.base.BaseMapper;
 import com.apap.director.client.domain.model.AccountModel;
 
 import javax.inject.Inject;
-
-import dagger.Module;
-import io.realm.RealmList;
 
 /**
  * Created by Alicja Michniewicz
@@ -35,7 +30,6 @@ public class AccountMapper extends BaseMapper<AccountModel, AccountEntity> {
         entity.setName(model.getName());
         entity.setKeyPair(model.getKeyPair());
         entity.setRegistrationId(model.getRegistrationId());
-        entity.setMasterPassword(model.getMasterPassword());
         entity.setKeyBase64(model.getKeyBase64());
         entity.setActive(model.isActive());
         entity.setCookie(model.getCookie());
@@ -55,7 +49,6 @@ public class AccountMapper extends BaseMapper<AccountModel, AccountEntity> {
         model.setName(entity.getName());
         model.setKeyPair(entity.getKeyPair());
         model.setRegistrationId(entity.getRegistrationId());
-        model.setMasterPassword(entity.getMasterPassword());
         model.setKeyBase64(entity.getKeyBase64());
         model.setActive(entity.isActive());
         model.setCookie(entity.getCookie());
