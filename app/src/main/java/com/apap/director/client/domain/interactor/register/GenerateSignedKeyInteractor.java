@@ -10,6 +10,8 @@ import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.state.SignedPreKeyRecord;
 import org.whispersystems.libsignal.util.KeyHelper;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.BiFunction;
@@ -23,6 +25,11 @@ public class GenerateSignedKeyInteractor extends BaseInteractor<SignedKeyModel,A
     private AccountRepository accountRepository;
     private SignedKeyRepository signedKeyRepository;
 
+    @Inject
+    public GenerateSignedKeyInteractor(AccountRepository accountRepository, SignedKeyRepository signedKeyRepository) {
+        this.accountRepository = accountRepository;
+        this.signedKeyRepository = signedKeyRepository;
+    }
 
     @Override
     public Observable<SignedKeyModel> buildObservable(final AccountModel accountModel) {

@@ -1,9 +1,12 @@
 package com.apap.director.client.domain.interactor.register;
 
+import com.apap.director.client.data.db.entity.AccountEntity;
+import com.apap.director.client.data.exception.DuplicateException;
 import com.apap.director.client.domain.interactor.base.BaseInteractor;
 import com.apap.director.client.domain.model.AccountModel;
 import com.apap.director.client.domain.model.OneTimeKeyModel;
 import com.apap.director.client.domain.model.SignedKeyModel;
+import com.apap.director.client.domain.repository.AccountRepository;
 import com.apap.director.client.domain.util.Base64Util;
 
 import org.whispersystems.libsignal.IdentityKeyPair;
@@ -23,6 +26,9 @@ import io.reactivex.functions.BiFunction;
 
 public class CreateAccountInteractor extends BaseInteractor<AccountModel, String> {
 
+    private final String NAME_COLUMN = "name";
+
+    private AccountRepository accountRepository;
     private GenerateSignedKeyInteractor generateSignedKeyInteractor;
     private GenerateOneTimeKeysInteractor generateOneTimeKeysInteractor;
 
@@ -33,8 +39,20 @@ public class CreateAccountInteractor extends BaseInteractor<AccountModel, String
     }
 
     @Override
-    public Observable<AccountModel> buildObservable(String name) {
+    protected Observable<AccountModel> buildObservable(String name) {
+        if(isDuplicate(name)) {
+            return createError(name);
+        }
+        else {
+            return createAccount(name);
+        }
+    }
 
+    private Observable<AccountModel> createError(String name) {
+        return Observable.error(new DuplicateException(AccountEntity.class.getSimpleName(), NAME_COLUMN, name));
+    }
+
+    private Observable<AccountModel> createAccount(String name) {
         final AccountModel account = preconfigureAccount(name);
 
         return Observable.zip(generateSignedKeyInteractor.execute(account),
@@ -50,7 +68,7 @@ public class CreateAccountInteractor extends BaseInteractor<AccountModel, String
                 });
     }
 
-    public AccountModel preconfigureAccount(String name) {
+    private AccountModel preconfigureAccount(String name) {
         AccountModel accountModel = new AccountModel();
         IdentityKeyPair identityKeyPair = KeyHelper.generateIdentityKeyPair();
 
@@ -61,5 +79,9 @@ public class CreateAccountInteractor extends BaseInteractor<AccountModel, String
         accountModel.setName(name);
 
         return accountModel;
+    }
+
+    private boolean isDuplicate(String name) {
+        return accountRepository.getAccount(name) != null;
     }
 }

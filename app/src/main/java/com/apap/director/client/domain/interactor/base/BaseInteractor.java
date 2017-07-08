@@ -9,7 +9,7 @@ import lombok.NonNull;
 
 public abstract class BaseInteractor<D, P> {
 
-    public abstract Observable<D>  buildObservable(P p);
+    protected abstract Observable<D>  buildObservable(P p);
 
     public Observable<D> execute(P p) {
         return buildObservable(p)

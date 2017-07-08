@@ -12,9 +12,12 @@ import com.apap.director.client.presentation.ui.register.contract.RegisterContra
 
 import javax.inject.Inject;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import okhttp3.ResponseBody;
 import rx.subscriptions.CompositeSubscription;
 
@@ -32,6 +35,8 @@ public class RegisterPresenter implements RegisterContract.Presenter {
         this.registerAccountInteractor = registerAccountInteractor;
         this.createAccountInteractor = createAccountInteractor;
         this.saveAccountInteractor = saveAccountInteractor;
+
+        subscriptions = new CompositeDisposable();
     }
 
     @Override
@@ -40,25 +45,16 @@ public class RegisterPresenter implements RegisterContract.Presenter {
         subscriptions.clear();
     }
 
-    private void registerAccount(AccountModel account) {
-        Log.v(RegisterPresenter.class.getSimpleName(), "Sign up request");
-
-        subscriptions.add(registerAccountInteractor.execute(account).subscribe(new Consumer<ResponseBody>() {
-            @Override
-            public void accept(@NonNull ResponseBody responseBody) throws Exception {
-                view.handleSuccess();
-            }
-        }, new Consumer<Throwable>() {
-            @Override
-            public void accept(@NonNull Throwable throwable) throws Exception {
-                view.handleException(throwable);
-            }
-        }));
-    }
-
     @Override
     public void signUp(String name) {
-
+        subscriptions.add(createAccountInteractor.execute(name)
+                .flatMap(this::buildChain)
+                .subscribe(accountModel -> view.handleSuccess(),
+                        throwable -> view.handleException(throwable)));
     }
 
+    private Observable<AccountModel> buildChain(AccountModel accountModel) {
+        return registerAccountInteractor.execute(accountModel)
+                .flatMap(responseBody -> saveAccountInteractor.execute(accountModel));
+    }
 }

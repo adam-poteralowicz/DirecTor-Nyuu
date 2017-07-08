@@ -19,6 +19,6 @@ public interface RestAccountService {
 
     @POST(value = "/login")
     @Headers("Content-Type: application/json")
-    Call<ResponseBody> login(@Body LoginDetails details);
+    Observable<ResponseBody> login(@Body LoginDetails details);
 
 }

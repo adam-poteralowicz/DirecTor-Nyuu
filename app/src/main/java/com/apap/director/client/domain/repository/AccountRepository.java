@@ -18,7 +18,7 @@ public interface AccountRepository {
 
     Observable<AccountEntity> getActiveAccount();
 
-    Observable<String> getCode(AccountModel account);
+    Observable<AccountEntity> getAccount(String name);
 
     Observable<ResponseBody> signUp(AccountModel account);
 

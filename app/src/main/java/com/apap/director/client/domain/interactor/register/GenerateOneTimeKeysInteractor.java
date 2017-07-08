@@ -38,7 +38,7 @@ public class GenerateOneTimeKeysInteractor extends BaseInteractor<List<OneTimeKe
     @Override
     public Observable<List<OneTimeKeyModel>> buildObservable(AccountModel account) {
         return Observable.zip(oneTimeKeyRepository.findNextId(),
-                accountRepository.findLastSignedKeyId(account),
+                accountRepository.findLastOneTimeKeyId(account),
                 new BiFunction<Long, Integer, List<OneTimeKeyModel>>() {
                     @Override
                     public List<OneTimeKeyModel> apply(@NonNull Long dbId, @NonNull Integer last) throws Exception {
