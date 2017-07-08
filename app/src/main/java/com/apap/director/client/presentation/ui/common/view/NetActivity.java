@@ -3,7 +3,6 @@ package com.apap.director.client.presentation.ui.common.view;
 import android.app.Activity;
 import android.support.design.widget.Snackbar;
 import android.view.View;
-import android.widget.Toast;
 
 import com.apap.director.client.R;
 
@@ -22,7 +21,7 @@ public class NetActivity extends Activity implements StrongOkHttpClientBuilder.C
 
     @Override
     public void onConnected(OkHttpClient client) {
-        Toast.makeText(this, "Successfully connected", Toast.LENGTH_LONG).show();
+        Snackbar.make(rootView, "Successfully connected", Snackbar.LENGTH_LONG).show();
     }
 
     @Override

@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
@@ -15,8 +16,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
@@ -58,6 +59,8 @@ public class AddContactActivity extends AppCompatActivity implements AddContactC
 
     @BindView(R.id.myPublicKey)
     TextView myKeyView;
+    @BindView(R.id.addContactActivity_rootView)
+    View rootView;
 
     private NfcAdapter nfcAdapter;
     private PendingIntent pendingIntent;
@@ -96,13 +99,13 @@ public class AddContactActivity extends AppCompatActivity implements AddContactC
             PackageManager pm = getPackageManager();
             if (pm.hasSystemFeature(PackageManager.FEATURE_NFC) && NfcAdapter.getDefaultAdapter(this) != null) {
                 if (nfcAdapter.isEnabled()) {
-                    Toast.makeText(this, R.string.nfc_enabled, Toast.LENGTH_LONG).show();
+                    Snackbar.make(rootView, R.string.nfc_enabled, Snackbar.LENGTH_LONG).show();
                     addContactPresenter.useNFC(NfcAdapter.getDefaultAdapter(this), new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED));
                 } else {
-                    Toast.makeText(this, R.string.please_activate_nfc, Toast.LENGTH_LONG).show();
+                    Snackbar.make(rootView, R.string.please_activate_nfc, Snackbar.LENGTH_LONG).show();
                 }
             } else {
-                Toast.makeText(this, R.string.nfc_not_supported, Toast.LENGTH_LONG).show();
+                Snackbar.make(rootView, R.string.nfc_not_supported, Snackbar.LENGTH_LONG).show();
             }
             return true;
         } else if (item.getItemId() == R.id.atn_add_contact) {
@@ -152,8 +155,8 @@ public class AddContactActivity extends AppCompatActivity implements AddContactC
     }
 
     @Override
-    public void showToast(String text) {
-        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+    public void showSnackbar(String text) {
+        Snackbar.make(rootView, text, Snackbar.LENGTH_LONG).show();
     }
 
     @Override

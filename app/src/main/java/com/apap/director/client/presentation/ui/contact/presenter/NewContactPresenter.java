@@ -30,7 +30,7 @@ public class NewContactPresenter implements BasePresenter, NewContactContract.Pr
     @Override
     public void addContact(String name, String publicKey) {
         if (name.length() == 0) {
-            view.showToast("Type a valid name");
+            view.showSnackbar("Type a valid name");
         } else {
             contactManager.addContact(name, publicKey);
         }

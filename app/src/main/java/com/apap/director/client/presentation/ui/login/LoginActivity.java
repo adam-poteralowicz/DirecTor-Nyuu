@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -71,6 +72,8 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     Button verificationButton;
     @BindView(R.id.masterPasswordVerification_editText)
     EditText masterPasswordEditText;
+    @BindView(R.id.loginActivity_layout)
+    View rootView;
 
     private ArrayList<AccountEntity> accountList;
     private ArrayAdapter<AccountEntity> arrayAdapter;
@@ -147,7 +150,7 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     public void onClick(View view) {
         try {
             if (accountManager.getActiveAccount() == null) {
-                Toast.makeText(this, "Choose an account", Toast.LENGTH_LONG).show();
+                Snackbar.make(rootView, "Choose an account", Snackbar.LENGTH_LONG).show();
                 return;
             } else Log.d("active account", accountManager.getActiveAccountName());
 
@@ -211,14 +214,14 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
             deleteAccount(accountName);
             masterPasswordDialog.setVisibility(GONE);
         } else {
-            Toast.makeText(this, "Wrong master password", Toast.LENGTH_LONG).show();
+            Snackbar.make(rootView, "Wrong master password", Snackbar.LENGTH_LONG).show();
         }
     }
 
     @OnItemClick(R.id.accountsView)
     public void chooseAccount(int position) {
         boolean success = accountManager.chooseAccount(accountList.get(position).getName());
-        Toast.makeText(this, accountManager.getActiveAccountName() + " " + success, Toast.LENGTH_LONG).show();
+        Snackbar.make(rootView, accountManager.getActiveAccountName() + " " + success, Snackbar.LENGTH_LONG).show();
     }
 
     @OnItemLongClick(R.id.accountsView)

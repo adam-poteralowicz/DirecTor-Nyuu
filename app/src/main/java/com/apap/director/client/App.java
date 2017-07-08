@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import com.apap.director.client.presentation.di.component.DaggerMainComponent;
 import com.apap.director.client.presentation.di.component.MainComponent;
@@ -115,7 +114,7 @@ public class App extends Application implements StrongOkHttpClientBuilder.Callba
     private void sanityCheckOrbot() {
         if(!OrbotHelper.isOrbotInstalled(this)) {
             Log.v(App.class.getSimpleName(), "Orbot not installed");
-            Toast.makeText(this, "Orbot not installed", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(this, ErrorActivity.class).putExtra("error", "Orbot not installed"));
         }
     }
 

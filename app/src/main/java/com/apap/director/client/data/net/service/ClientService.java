@@ -3,6 +3,7 @@ package com.apap.director.client.data.net.service;
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
+import android.view.View;
 
 import com.apap.director.client.data.db.entity.ContactKeyEntity;
 import com.apap.director.client.data.net.rest.Paths;
@@ -50,6 +51,7 @@ import ua.naiksoftware.stomp.client.StompClient;
 public class ClientService {
 
     public static StompClient client;
+    private static View view;
     private static MessageAction messageAction;
     private static SessionStoreImpl sessionStore;
     private static IdentityKeyStoreImpl identityKeyStore;
@@ -64,8 +66,8 @@ public class ClientService {
     private static String TAG = "ClientService";
     private static String MESSAGE = "MESSAGE";
 
-    private ClientService() {
-        // not called
+    private ClientService(View view) {
+        this.view = view;
     }
 
     public static void init(MessageAction messageAction, SessionStoreImpl sessionStore, IdentityKeyStoreImpl identityKeyStore, PreKeyStoreImpl preKeyStore, SignedPreKeyStoreImpl signedPreKeyStore, KeyService keyService) {
@@ -88,7 +90,7 @@ public class ClientService {
         StompHeader cookieHeader = new StompHeader("Cookie", cookie);
         client.connect();
 
-        client.topic("/user/exchange/amq.direct/messages", Collections.singletonList(cookieHeader)).subscribe(messageAction, new ErrorAction());
+        client.topic("/user/exchange/amq.direct/messages", Collections.singletonList(cookieHeader)).subscribe(messageAction, new ErrorAction(view));
         // client.lifecycle().subscribe(listener);
     }
 

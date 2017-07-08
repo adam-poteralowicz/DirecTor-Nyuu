@@ -16,7 +16,8 @@ import java.util.List;
 public interface AddContactContract {
 
     interface View extends BaseView {
-        void showToast(String text);
+
+        void showSnackbar(String text);
         void showActionBar(ActionBar actionBar);
         void showNewContact(String publicKey);
         void callPendingActivity();
