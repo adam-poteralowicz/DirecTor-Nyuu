@@ -2,6 +2,7 @@ package com.apap.director.client.presentation.di.component;
 
 import android.content.Context;
 
+import com.apap.director.client.data.db.mapper.OneTimeKeyMapper;
 import com.apap.director.client.data.manager.AccountManager;
 import com.apap.director.client.data.manager.MessageManager;
 import com.apap.director.client.data.net.rest.service.KeyService;
@@ -64,4 +65,6 @@ public interface MainComponent {
     Context context();
 
     MessageManager messageManager();
+
+    OneTimeKeyMapper oneTimeKeyMapper();
 }

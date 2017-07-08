@@ -27,12 +27,11 @@ public class NewMsgPresenter implements BasePresenter, NewMsgContract.Presenter 
 
     @Override
     public void dispose() {
-        getMessageListInteractor.dispose();
+
     }
 
     @Override
     public void getMessagesByContact(Long contactIdFromIntent) {
-        getMessageListInteractor.contactId = contactIdFromIntent;
         getMessageListInteractor.execute(null, new Callback<List<MessageEntity>>() {
 
             @Override
