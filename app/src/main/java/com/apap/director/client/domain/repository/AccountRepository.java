@@ -14,11 +14,11 @@ import okhttp3.ResponseBody;
 
 public interface AccountRepository {
 
-    Observable<List<AccountEntity>> getAccountList();
+    Observable<List<AccountModel>> getAccountList();
 
-    Observable<AccountEntity> getActiveAccount();
+    Observable<AccountModel> getActiveAccount();
 
-    Observable<AccountEntity> getAccount(String name);
+    Observable<AccountModel> getAccount(String name);
 
     Observable<ResponseBody> signUp(AccountModel account);
 

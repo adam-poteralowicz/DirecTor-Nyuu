@@ -12,6 +12,8 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.realm.Realm;
+import io.realm.RealmList;
+import io.realm.RealmResults;
 
 public class AccountStore {
 
@@ -30,8 +32,12 @@ public class AccountStore {
         this.realm = realm;
     }
 
-    public List<AccountEntity> getAccountList() {
-        return realm.where(AccountEntity.class).findAll();
+    public RealmList<AccountEntity> getAccountList() {
+        RealmList <AccountEntity> list = new RealmList<>();
+        RealmResults<AccountEntity> results = realm.where(AccountEntity.class).findAll();
+        list.addAll(results.subList(0, results.size()));
+
+        return list;
     }
 
     public AccountEntity getActiveAccount() {
