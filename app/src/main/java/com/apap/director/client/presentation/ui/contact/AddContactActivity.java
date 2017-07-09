@@ -22,7 +22,6 @@ import android.widget.TextView;
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.data.manager.AccountManager;
-import com.apap.director.client.data.manager.ContactManager;
 import com.apap.director.client.data.manager.ConversationManager;
 import com.apap.director.client.data.util.NFCUtils;
 import com.apap.director.client.presentation.ui.contact.contract.AddContactContract;
@@ -50,8 +49,6 @@ public class AddContactActivity extends AppCompatActivity implements AddContactC
     AddContactPresenter addContactPresenter;
     @Inject
     Realm realm;
-    @Inject
-    ContactManager contactManager;
     @Inject
     AccountManager accountManager;
     @Inject

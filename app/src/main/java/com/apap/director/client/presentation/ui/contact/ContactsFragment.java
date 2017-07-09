@@ -14,7 +14,6 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.db.entity.ContactEntity;
-import com.apap.director.client.data.manager.AccountManager;
 import com.apap.director.client.presentation.ui.contact.contract.ContactsContract;
 import com.apap.director.client.presentation.ui.contact.di.component.DaggerContactsComponent;
 import com.apap.director.client.presentation.ui.contact.di.module.ContactsContractModule;
@@ -37,8 +36,6 @@ public class ContactsFragment extends Fragment implements ContactsContract.View 
 
     @Inject
     ContactsPresenter contactsPresenter;
-    @Inject
-    AccountManager accountManager;
 
     @BindView(R.id.contactsView)
     ListView contactsListView;

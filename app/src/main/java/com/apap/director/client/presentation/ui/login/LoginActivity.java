@@ -12,17 +12,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.data.db.entity.AccountEntity;
-import com.apap.director.client.data.manager.AccountManager;
-import com.apap.director.client.data.net.rest.service.RestAccountService;
+import com.apap.director.client.data.db.mapper.AccountMapper;
 import com.apap.director.client.data.net.service.ClientService;
-import com.apap.director.client.domain.model.AccountModel;
 import com.apap.director.client.presentation.ui.common.view.NetActivity;
 import com.apap.director.client.presentation.ui.home.HomeActivity;
 import com.apap.director.client.presentation.ui.login.adapter.AccountAdapter;
@@ -32,7 +29,6 @@ import com.apap.director.client.presentation.ui.login.di.module.LoginContractMod
 import com.apap.director.client.presentation.ui.login.presenter.LoginPresenter;
 import com.apap.director.client.presentation.ui.register.NewAccountActivity;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -57,10 +53,6 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     private static final String KEY = "masterPassword";
 
     @Inject
-    AccountManager accountManager;
-    @Inject
-    RestAccountService restAccountService;
-    @Inject
     Realm realm;
     @Inject
     LoginPresenter loginPresenter;
@@ -77,8 +69,9 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     View rootLayout;
 
     private ArrayList<AccountEntity> accountList;
-    private ArrayAdapter<AccountEntity> arrayAdapter;
     private String accountName;
+    private AccountAdapter accountAdapter;
+    private AccountMapper accountMapper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -93,7 +86,7 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     }
 
     private void setUpRecyclerView() {
-        AccountAdapter accountAdapter = new AccountAdapter(this);
+        accountAdapter = new AccountAdapter(this);
         accountsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         accountsRecyclerView.setAdapter(accountAdapter);
     }
@@ -127,7 +120,7 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
-            accountManager.signUp(accountManager.createAccount(data.getStringExtra("accountName")));
+            loginPresenter.signUp(loginPresenter.createAccount(data.getStringExtra("accountName")));
         }
     }
 
@@ -145,10 +138,10 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     @OnClick(R.id.postLoginButton)
     public void onClick(View view) {
         try {
-            if (accountManager.getActiveAccount() == null) {
+            if (loginPresenter.getActiveAccount() == null) {
                 Snackbar.make(rootLayout, "Choose an account", Snackbar.LENGTH_LONG).show();
                 return;
-            } else Log.d("active account", accountManager.getActiveAccountName());
+            } else Log.d("active account", loginPresenter.getActiveAccount().getName());
 
             String cookie = null;
 
@@ -156,7 +149,7 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
                 AsyncTask<Void, Void, String> asyncTask = new AsyncTask<Void, Void, String>() {
                     @Override
                     protected String doInBackground(Void... params) {
-                        return accountManager.logIn();
+                        return loginPresenter.logIn(accountMapper.mapToModel(loginPresenter.getActiveAccount()));
                     }
                 };
                 cookie = asyncTask.execute().get();
@@ -168,27 +161,17 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
             AsyncTask<Void, Void, Void> keysTask = new AsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... params) {
-                    try {
-                        Log.v(TAG, "Trying to post keys");
-                        accountManager.postSignedKey();
-                        accountManager.postOneTimeKeys();
+                    Log.v(TAG, "Trying to post keys");
+                    loginPresenter.postSignedKey(accountMapper.mapToModel(loginPresenter.getActiveAccount()));
+                    loginPresenter.postOneTimeKeys(accountMapper.mapToModel(loginPresenter.getActiveAccount()));
 
-                    } catch (IOException e) {
-                        Log.getStackTraceString(e);
-                    }
                     return null;
                 }
             };
 
             keysTask.execute().get();
 
-            Log.v(TAG, "Chosen account: " + accountManager.getActiveAccount() + " cookie" + accountManager.getActiveAccount().getCookie());
-
-            realm.beginTransaction();
-            AccountEntity account = realm.where(AccountEntity.class).equalTo("active", true).findFirst();
-            String cookie2 = account.getCookie();
-            Log.v(TAG, "cookie2 " + cookie2);
-            realm.commitTransaction();
+            Log.v(TAG, "Chosen account: " + loginPresenter.getActiveAccount() + " cookie" + loginPresenter.getActiveAccount().getCookie());
 
             ClientService.connect(cookie);
 
@@ -217,8 +200,7 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
 
     @OnItemClick(R.id.accountsView)
     public void chooseAccount(int position) {
-        boolean success = accountManager.chooseAccount(accountList.get(position).getName());
-        Snackbar.make(rootLayout, accountManager.getActiveAccountName() + " " + success, Snackbar.LENGTH_LONG).show();
+        loginPresenter.chooseAccount(accountList.get(position).getName());
     }
 
     @OnItemLongClick(R.id.accountsView)
@@ -233,18 +215,18 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     }
 
     public void deleteAccount(String accountName) {
-        boolean deleted = accountManager.deleteAccount(accountName);
-        if (!deleted)
-            Log.v(TAG, accountName + " account failed to delete");
-        else
-            Log.v(TAG, accountName + " account deleted");
+        loginPresenter.deleteAccount(accountName);
     }
 
     @Override
-    public void refreshAccountList(List<AccountModel> newList) {
-        arrayAdapter.clear();
-        arrayAdapter.addAll(newList);
-        arrayAdapter.notifyDataSetChanged();
+    public void refreshAccountList(List<AccountEntity> newList) {
+        accountAdapter.clear();
+        accountAdapter.update(newList);
+    }
+
+    @Override
+    public void handleSuccess(String message) {
+        Log.v(TAG, message);
     }
 
     @Override

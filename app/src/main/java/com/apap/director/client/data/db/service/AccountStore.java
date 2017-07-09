@@ -4,7 +4,6 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.apap.director.client.data.db.entity.AccountEntity;
-import com.apap.director.client.data.db.mapper.AccountMapper;
 
 import org.whispersystems.libsignal.state.SignedPreKeyRecord;
 
@@ -17,9 +16,6 @@ import io.realm.RealmList;
 import io.realm.RealmResults;
 
 public class AccountStore {
-
-    @Inject
-    AccountMapper accountMapper;
 
     private final String ACTIVE_COLUMN = "active";
     private final String ID_COLUMN = "keyBase64";
@@ -80,6 +76,19 @@ public class AccountStore {
 
     public void updateAccount(AccountEntity accountEntity) {
         realm.beginTransaction();
+        realm.copyToRealmOrUpdate(accountEntity);
+        realm.commitTransaction();
+    }
+
+    public void deleteAccount(AccountEntity accountEntity) {
+        realm.beginTransaction();
+        accountEntity.deleteFromRealm();
+        realm.commitTransaction();
+    }
+
+    public void setAccountActive(AccountEntity accountEntity) {
+        realm.beginTransaction();
+        accountEntity.setActive(true);
         realm.copyToRealmOrUpdate(accountEntity);
         realm.commitTransaction();
     }
