@@ -30,32 +30,19 @@ public class CreateMessageInteractor extends BaseInteractor<MessageModel, Messag
 
     private static final int SINGLE_ELEMENT_COUNT = 1;
 
-    private CreateContactInteractor createContactInteractor;
     private GetContactInteractor getContactInteractor;
     private CreateConversationInteractor createConversationInteractor;
     private GetConversationInteractor getConversationInteractor;
     private MessageRepository messageRepository;
 
     @Inject
-    public CreateMessageInteractor(CreateContactInteractor createContactInteractor, GetContactInteractor getContactInteractor, CreateConversationInteractor createConversationInteractor, GetConversationInteractor getConversationInteractor, MessageRepository messageRepository) {
-        this.createContactInteractor = createContactInteractor;
-        this.getContactInteractor = getContactInteractor;
-        this.createConversationInteractor = createConversationInteractor;
-        this.getConversationInteractor = getConversationInteractor;
-        this.messageRepository = messageRepository;
-    }
+
 
     @Override
     protected Observable<MessageModel> buildObservable(MessageTO messageTO) {
-        return getOrCreateRecipient(messageTO)
+        return getContactInteractor.execute(messageTO.getFrom())
                 .flatMap(this::getOrCreateConversation)
                 .flatMap(conversation -> createMessage(conversation, messageTO));
-    }
-
-    private Observable<ContactModel> getOrCreateRecipient(MessageTO messageTO) {
-        return getContactInteractor.execute(messageTO.getFrom())
-                .concatWith(createContactInteractor.execute(new Pair<>(messageTO.getFrom(), messageTO.getFrom())))
-                .take(SINGLE_ELEMENT_COUNT);
     }
 
     private Observable<ConversationModel> getOrCreateConversation(ContactModel contactModel) {

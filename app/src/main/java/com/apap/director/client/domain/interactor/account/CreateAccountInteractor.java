@@ -1,8 +1,10 @@
-package com.apap.director.client.domain.interactor.register;
+package com.apap.director.client.domain.interactor.account;
 
 import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.exception.DuplicateException;
 import com.apap.director.client.domain.interactor.base.BaseInteractor;
+import com.apap.director.client.domain.interactor.register.GenerateOneTimeKeysInteractor;
+import com.apap.director.client.domain.interactor.register.GenerateSignedKeyInteractor;
 import com.apap.director.client.domain.model.AccountModel;
 import com.apap.director.client.domain.model.OneTimeKeyModel;
 import com.apap.director.client.domain.model.SignedKeyModel;

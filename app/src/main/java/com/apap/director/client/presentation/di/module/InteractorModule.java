@@ -6,7 +6,7 @@ import com.apap.director.client.domain.interactor.login.GetAccountListInteractor
 import com.apap.director.client.domain.interactor.login.GetCodeInteractor;
 import com.apap.director.client.domain.interactor.login.LoginInteractor;
 import com.apap.director.client.domain.interactor.message.GetMessageListInteractor;
-import com.apap.director.client.domain.interactor.register.CreateAccountInteractor;
+import com.apap.director.client.domain.interactor.account.CreateAccountInteractor;
 import com.apap.director.client.domain.interactor.register.GenerateOneTimeKeysInteractor;
 import com.apap.director.client.domain.interactor.register.GenerateSignedKeyInteractor;
 import com.apap.director.client.domain.interactor.register.RegisterAccountInteractor;

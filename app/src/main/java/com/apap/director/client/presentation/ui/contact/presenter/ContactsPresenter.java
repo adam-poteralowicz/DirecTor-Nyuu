@@ -3,7 +3,7 @@ package com.apap.director.client.presentation.ui.contact.presenter;
 import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.db.entity.ContactEntity;
 import com.apap.director.client.domain.interactor.base.Callback;
-import com.apap.director.client.domain.interactor.contact.GetActiveAccountInteractor;
+import com.apap.director.client.domain.interactor.account.GetActiveAccountInteractor;
 import com.apap.director.client.domain.interactor.contact.GetContactListInteractor;
 import com.apap.director.client.presentation.ui.base.contract.presenter.BasePresenter;
 import com.apap.director.client.presentation.ui.contact.contract.ContactsContract;
