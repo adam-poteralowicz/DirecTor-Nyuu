@@ -1,31 +1,17 @@
 package com.apap.director.client.data.repository;
 
-import android.util.Base64;
-
 import com.apap.director.client.data.db.entity.AccountEntity;
-import com.apap.director.client.data.db.entity.ContactEntity;
-import com.apap.director.client.data.db.entity.SessionEntity;
 import com.apap.director.client.data.db.mapper.AccountMapper;
 import com.apap.director.client.data.db.service.AccountStore;
 import com.apap.director.client.data.net.rest.service.RestAccountService;
 import com.apap.director.client.domain.model.AccountModel;
 import com.apap.director.client.domain.repository.AccountRepository;
 
-import org.whispersystems.libsignal.IdentityKey;
-import org.whispersystems.libsignal.IdentityKeyPair;
-import org.whispersystems.libsignal.state.IdentityKeyStore;
-import org.whispersystems.libsignal.state.SignedPreKeyRecord;
-import org.whispersystems.libsignal.util.ByteUtil;
-import org.whispersystems.libsignal.util.KeyHelper;
-
 import java.util.List;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Consumer;
-import io.realm.RealmList;
 import okhttp3.ResponseBody;
 
 /**
@@ -80,6 +66,13 @@ public class AccountRepositoryImpl implements AccountRepository {
         AccountEntity entity = accountMapper.mapToEntity(account);
         accountStore.saveAccount(entity);
         return Observable.just(account);
+    }
+
+    @Override
+    public Observable<AccountModel> chooseAccount(AccountModel account) {
+        AccountEntity entity = accountMapper.mapToEntity(account);
+        accountStore.updateAccount(entity);
+        return Observable.just(accountMapper.mapToModel(entity));
     }
 
 }
