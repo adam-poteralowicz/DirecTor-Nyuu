@@ -38,4 +38,9 @@ public class MessageRepositoryImpl implements MessageRepository {
         dbMessageService.saveMessage(entity);
         return Observable.just(message);
     }
+
+    @Override
+    public Observable<Long> findNextId() {
+        return Observable.just(dbMessageService.findNextId());
+    }
 }

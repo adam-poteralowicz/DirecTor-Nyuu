@@ -7,11 +7,18 @@ import com.apap.director.client.domain.interactor.base.BaseInteractor;
 import com.apap.director.client.domain.interactor.contact.CreateContactInteractor;
 import com.apap.director.client.domain.interactor.contact.GetContactInteractor;
 import com.apap.director.client.domain.interactor.inbox.CreateConversationInteractor;
+import com.apap.director.client.domain.interactor.inbox.GetConversationInteractor;
 import com.apap.director.client.domain.model.AccountModel;
 import com.apap.director.client.domain.model.ContactModel;
 import com.apap.director.client.domain.model.ConversationModel;
 import com.apap.director.client.domain.model.MessageModel;
 import com.apap.director.client.domain.repository.AccountRepository;
+import com.apap.director.client.domain.repository.ContactRepository;
+import com.apap.director.client.domain.repository.MessageRepository;
+
+import java.util.Date;
+
+import javax.inject.Inject;
 
 import io.reactivex.Observable;
 
@@ -21,35 +28,39 @@ import io.reactivex.Observable;
 
 public class CreateMessageInteractor extends BaseInteractor<MessageModel, MessageTO> {
 
-    private final static int ELEMENT_COUNT = 1;
+    private static final int SINGLE_ELEMENT_COUNT = 1;
 
-    private CreateContactInteractor createContactInteractor;
     private GetContactInteractor getContactInteractor;
     private CreateConversationInteractor createConversationInteractor;
-    private GetConversationIn
-    private AccountRepository accountRepository;
+    private GetConversationInteractor getConversationInteractor;
+    private MessageRepository messageRepository;
+
+    @Inject
+
 
     @Override
     protected Observable<MessageModel> buildObservable(MessageTO messageTO) {
-        return getOrCreateRecipent()
-    }
-
-    private Observable<ContactModel> getOrCreateRecipent(AccountModel account, MessageTO messageTO) {
         return getContactInteractor.execute(messageTO.getFrom())
-                .concatWith(createContactInteractor.execute(new Pair<>(messageTO.getFrom(), messageTO.getFrom())))
-                .take(ELEMENT_COUNT);
+                .flatMap(this::getOrCreateConversation)
+                .flatMap(conversation -> createMessage(conversation, messageTO));
     }
 
     private Observable<ConversationModel> getOrCreateConversation(ContactModel contactModel) {
-        return getCon
+        return getConversationInteractor.execute(contactModel)
+                .concatWith(createConversationInteractor.execute(contactModel))
+                .take(SINGLE_ELEMENT_COUNT);
     }
 
-    private Observable<ContactModel> chooseContactObservable(ContactModel contactModel, MessageTO) {
-            if(contactModel == null) {
-                return createContactInteractor.execute(new Pair<>(messageTO.getFrom(), messageTO.getFrom()));
-            }
-            else {
-                return Observable.just(contactModel);
-            }}
-        }
+    private Observable<MessageModel> createMessage(ConversationModel conversationModel, MessageTO messageTO) {
+        return messageRepository.findNextId()
+                .map(id -> {
+                    MessageModel messageModel = new MessageModel();
+                    messageModel.setContent(messageTO.getMessage());
+                    messageModel.setDate(new Date());
+                    messageModel.setId(id);
+                    messageModel.setConversation(conversationModel);
+
+                    return messageModel;
+                });
+    }
 }

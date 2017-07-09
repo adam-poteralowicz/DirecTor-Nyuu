@@ -22,9 +22,10 @@ public class LoginInteractor extends BaseInteractor<ResponseBody, AccountModel> 
     private SignCodeInteractor signCodeInteractor;
 
     @Inject
-    public LoginInteractor(LoginRepository loginRepository, GetCodeInteractor getCodeInteractor) {
+    public LoginInteractor(LoginRepository loginRepository, GetCodeInteractor getCodeInteractor, SignCodeInteractor signCodeInteractor) {
         this.loginRepository = loginRepository;
         this.getCodeInteractor = getCodeInteractor;
+        this.signCodeInteractor = signCodeInteractor;
     }
 
     @Inject

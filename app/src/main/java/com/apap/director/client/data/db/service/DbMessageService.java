@@ -1,6 +1,7 @@
 package com.apap.director.client.data.db.service;
 
 import com.apap.director.client.data.db.entity.MessageEntity;
+import com.apap.director.client.data.db.entity.SignedKeyEntity;
 
 import javax.inject.Inject;
 
@@ -13,6 +14,8 @@ import io.realm.RealmResults;
  */
 
 public class DbMessageService {
+
+    private static final String ID_COLUMN = "id";
 
     private Realm realm;
 
@@ -29,7 +32,17 @@ public class DbMessageService {
 
     public void saveMessage(MessageEntity messageEntity) {
         realm.beginTransaction();
-        realm.copyToRealm(messageEntity);
+        realm.copyToRealmOrUpdate(messageEntity);
         realm.commitTransaction();
+    }
+
+    public long findNextId() {
+        Number lastId = realm.where(MessageEntity.class).max(ID_COLUMN).longValue();
+
+        if (lastId == null) {
+            return 0;
+        } else {
+            return lastId.longValue() + 1;
+        }
     }
 }

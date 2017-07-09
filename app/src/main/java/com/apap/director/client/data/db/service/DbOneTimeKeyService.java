@@ -22,7 +22,7 @@ public class DbOneTimeKeyService {
         this.realm = realm;
     }
 
-    public long findLastId() {
+    public long findNextId() {
         Number lastId = realm.where(OneTimeKeyEntity.class).max(ID_COLUMN).longValue();
 
         if (lastId == null) {
