@@ -106,7 +106,7 @@ public class NewMsgActivity extends Activity implements NewMsgContract.View {
 
         ConversationEntity conversation = conversationManager.getConversationByContactId(contactIdFromIntent);
 
-        ClientService.sendEncryptedMessage(conversation.getContact().getContactKeys().get(0).getKeyBase64(), realm.where(AccountEntity.class).equalTo("active", true).findFirst().getKeyBase64(), newMessage);
+        ClientService.sendEncryptedMessage(conversation.getContact().getContactKey().getKeyBase64(), realm.where(AccountEntity.class).equalTo("active", true).findFirst().getKeyBase64(), newMessage);
         newMessageField.setText("");
     }
 

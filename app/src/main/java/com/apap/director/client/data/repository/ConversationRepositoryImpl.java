@@ -4,6 +4,7 @@ import com.apap.director.client.data.db.entity.ConversationEntity;
 import com.apap.director.client.data.db.mapper.ConversationMapper;
 import com.apap.director.client.data.db.service.DbConversationService;
 import com.apap.director.client.domain.model.ConversationModel;
+import com.apap.director.client.domain.model.SessionModel;
 import com.apap.director.client.domain.repository.ConversationRepository;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 
 /**
- * Created by Adam on 2017-07-05.
+ * Created by Adam Poterałowicz
  */
 
 public class ConversationRepositoryImpl implements ConversationRepository {
@@ -35,6 +36,12 @@ public class ConversationRepositoryImpl implements ConversationRepository {
     @Override
     public Observable<Long> findLastId() {
         return Observable.just(dbConversationService.findNextId());
+    }
+
+    @Override
+    public Observable<ConversationModel> addSession(ConversationModel conversationModel, SessionModel sessionModel) {
+        conversationModel.setSession(sessionModel);
+        return Observable.just(conversationModel);
     }
 
     @Override

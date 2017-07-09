@@ -1,9 +1,5 @@
 package com.apap.director.client.presentation.ui.register.presenter;
 
-import android.util.Log;
-
-import com.apap.director.client.data.db.entity.AccountEntity;
-import com.apap.director.client.domain.interactor.base.Callback;
 import com.apap.director.client.domain.interactor.register.CreateAccountInteractor;
 import com.apap.director.client.domain.interactor.register.RegisterAccountInteractor;
 import com.apap.director.client.domain.interactor.register.SaveAccountInteractor;
@@ -13,13 +9,7 @@ import com.apap.director.client.presentation.ui.register.contract.RegisterContra
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
-import okhttp3.ResponseBody;
-import rx.subscriptions.CompositeSubscription;
 
 public class RegisterPresenter implements RegisterContract.Presenter {
 

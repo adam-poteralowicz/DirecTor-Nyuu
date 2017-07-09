@@ -22,6 +22,7 @@ import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.manager.AccountManager;
 import com.apap.director.client.data.net.rest.service.RestAccountService;
 import com.apap.director.client.data.net.service.ClientService;
+import com.apap.director.client.domain.model.AccountModel;
 import com.apap.director.client.presentation.ui.common.view.NetActivity;
 import com.apap.director.client.presentation.ui.home.HomeActivity;
 import com.apap.director.client.presentation.ui.login.adapter.AccountAdapter;
@@ -240,7 +241,7 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     }
 
     @Override
-    public void refreshAccountList(List<AccountEntity> newList) {
+    public void refreshAccountList(List<AccountModel> newList) {
         arrayAdapter.clear();
         arrayAdapter.addAll(newList);
         arrayAdapter.notifyDataSetChanged();

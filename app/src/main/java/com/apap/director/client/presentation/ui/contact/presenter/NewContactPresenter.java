@@ -7,7 +7,7 @@ import com.apap.director.client.presentation.ui.contact.contract.NewContactContr
 import javax.inject.Inject;
 
 /**
- * Created by Adam on 2017-07-03.
+ * Created by Adam Poterałowicz
  */
 
 public class NewContactPresenter implements BasePresenter, NewContactContract.Presenter {
