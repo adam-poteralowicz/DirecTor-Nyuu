@@ -33,6 +33,11 @@ public class ContactRepositoryImpl implements ContactRepository {
     }
 
     @Override
+    public Observable<ContactModel> getContact(String ownerId, String name) {
+        return
+    }
+
+    @Override
     public Observable<Long> findNextId() {
         return Observable.just(dbContactService.findLastId());
     }

@@ -1,5 +1,6 @@
 package com.apap.director.client.data.db.service;
 
+import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.db.entity.ContactEntity;
 import com.apap.director.client.data.db.entity.OneTimeKeyEntity;
 
@@ -39,6 +40,10 @@ public class DbContactService {
 
     public ContactEntity getContactById(Long contactId) {
         return realm.where(ContactEntity.class).equalTo("id", contactId).findFirst();
+    }
+
+    public ContactEntity getContactByKey(String ownerId, String contactKey) {
+        return realm.where(ContactEntity.class).equalTo("owner.keyBase64", ownerId).contains("contactKeys.keyBase64", contactKey).findFirst();
     }
 
     public long findLastId() {

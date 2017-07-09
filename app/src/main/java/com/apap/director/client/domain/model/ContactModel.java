@@ -16,7 +16,7 @@ public class ContactModel {
 
     private long id;
     private String name;
-    private List<ContactKeyModel> contactKeys;
+    private ContactKeyModel contactKey;
     private AccountModel owner;
     private String image;
 

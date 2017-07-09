@@ -14,6 +14,7 @@ import io.reactivex.Observable;
 public interface ContactRepository {
 
     Observable<List<ContactModel>> getContactList();
+    Observable<ContactModel> getContact(String ownerId, String name);
 
     Observable<Long> findNextId();
 }

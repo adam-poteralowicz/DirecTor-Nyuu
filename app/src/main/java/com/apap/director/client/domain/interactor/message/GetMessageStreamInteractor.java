@@ -4,21 +4,25 @@ import com.apap.director.client.data.db.mapper.base.BaseMapper;
 import com.apap.director.client.data.net.service.WebSocketService;
 import com.apap.director.client.data.net.to.MessageTO;
 import com.apap.director.client.domain.interactor.base.BaseInteractor;
+import com.apap.director.client.domain.model.AccountModel;
 import com.apap.director.client.domain.model.MessageModel;
 import com.apap.director.client.domain.repository.ContactRepository;
 import com.apap.director.client.domain.repository.MessageRepository;
 import com.apap.director.client.domain.util.EncryptionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
+
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import ua.naiksoftware.stomp.client.StompMessage;
 
 /**
  * Created by Alicja Michniewicz
  */
 
-public class GetMessageStreamInteractor extends BaseInteractor<MessageModel, String> {
+public class GetMessageStreamInteractor extends BaseInteractor<MessageModel, AccountModel> {
 
     private WebSocketService webSocketService;
     private MessageRepository messageRepository;
@@ -33,20 +37,23 @@ public class GetMessageStreamInteractor extends BaseInteractor<MessageModel, Str
     }
 
     @Override
-    protected Observable<MessageModel> buildObservable(String cookie) {
-        return webSocketService.getMessages(cookie)
-                .map(stompMessage -> {
-                    ObjectMapper mapper = new ObjectMapper();
-                    MessageTO messageTO = mapper.readValue(stompMessage.getPayload(), MessageTO.class);
+    protected Observable<MessageModel> buildObservable(AccountModel account) {
 
+        return webSocketService.getMessages(account.getCookie())
+                .map(this::mapToMessageTO)
+                .flatMap(messageTO -> )}
 
-
-                });}
-
-    private MessageModel createMessageModel(MessageTO messageTO) {
+    private MessageModel createMessageModel(MessageTO messageTO, AccountModel account) {
         MessageModel messageModel = new MessageModel();
         messageModel.setContent(messageTO.getMessage());
 
+        contactRepository.getContact(account.getKeyBase64(), messageTO.getFrom());
+        messageModel.
 
+    }
+
+    private MessageTO mapToMessageTO(StompMessage stompMessage) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(stompMessage.getPayload(), MessageTO.class);
     }
 }

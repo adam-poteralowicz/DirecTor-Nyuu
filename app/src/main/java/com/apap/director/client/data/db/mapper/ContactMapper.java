@@ -29,7 +29,7 @@ public class ContactMapper extends BaseMapper<ContactModel, ContactEntity> {
         ContactEntity contactEntity = new ContactEntity();
         contactEntity.setName(model.getName());
         contactEntity.setId(model.getId());
-        contactEntity.setContactKeys(mapToRealmList(contactKeyMapper, model.getContactKeys()));
+        contactEntity.setContactKey(contactKeyMapper.mapToEntity(model.getContactKey()));
         contactEntity.setImage(model.getImage());
         contactEntity.setOwner(accountMapper.mapToEntity(model.getOwner()));
 
@@ -44,7 +44,7 @@ public class ContactMapper extends BaseMapper<ContactModel, ContactEntity> {
         ContactModel contactModel = new ContactModel();
         contactModel.setName(entity.getName());
         contactModel.setId(entity.getId());
-        contactModel.setContactKeys(mapToList(contactKeyMapper, entity.getContactKeys()));
+        contactModel.setContactKey(contactKeyMapper.mapToModel(entity.getContactKey()));
         contactModel.setImage(entity.getImage());
         contactModel.setOwner(accountMapper.mapToModel(entity.getOwner()));
 

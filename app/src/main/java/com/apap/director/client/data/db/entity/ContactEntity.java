@@ -15,7 +15,7 @@ public class ContactEntity extends RealmObject {
     @PrimaryKey
     private long id;
     private String name;
-    private RealmList<ContactKeyEntity> contactKeys;
+    private ContactKeyEntity contactKey;
     private AccountEntity owner;
     private String image;
 
