@@ -1,5 +1,6 @@
 package com.apap.director.client.data.repository;
 
+import com.apap.director.client.data.db.entity.ContactEntity;
 import com.apap.director.client.data.db.mapper.ContactMapper;
 import com.apap.director.client.data.db.service.DbContactService;
 import com.apap.director.client.data.net.rest.service.KeyService;
@@ -15,7 +16,7 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 
 /**
- * Created by Adam on 2017-07-03.
+ * Created by Adam Poterałowicz
  */
 
 public class  ContactRepositoryImpl implements ContactRepository {
@@ -55,5 +56,12 @@ public class  ContactRepositoryImpl implements ContactRepository {
     public Observable<SignedKeyTO> getSignedKey(ContactModel contactModel) {
         String ownerId = contactModel.getContactKey().getKeyBase64();
         return keyService.getSignedKey(ownerId);
+    }
+
+    @Override
+    public Observable<ContactModel> updateContact(ContactModel contactModel) {
+        ContactEntity entity = contactMapper.mapToEntity(contactModel);
+        dbContactService.updateContact(entity);
+        return Observable.just(contactMapper.mapToModel(entity));
     }
 }

@@ -1,8 +1,6 @@
 package com.apap.director.client.data.db.service;
 
-import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.db.entity.ContactEntity;
-import com.apap.director.client.data.db.entity.OneTimeKeyEntity;
 
 import javax.inject.Inject;
 
@@ -54,5 +52,11 @@ public class DbContactService {
         } else {
             return lastId.longValue() + 1;
         }
+    }
+
+    public void updateContact(ContactEntity contactEntity) {
+        realm.beginTransaction();
+        realm.copyToRealmOrUpdate(contactEntity);
+        realm.commitTransaction();
     }
 }

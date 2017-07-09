@@ -1,6 +1,5 @@
 package com.apap.director.client.domain.interactor.contact;
 
-import com.apap.director.client.data.net.to.SignedKeyTO;
 import com.apap.director.client.domain.interactor.base.BaseInteractor;
 import com.apap.director.client.domain.model.ContactModel;
 import com.apap.director.client.domain.repository.ContactRepository;
@@ -13,17 +12,17 @@ import io.reactivex.Observable;
  * Created by Adam Poterałowicz
  */
 
-public class GetSignedKeyInteractor extends BaseInteractor<SignedKeyTO, ContactModel> {
+public class UpdateContactInteractor extends BaseInteractor<ContactModel, ContactModel> {
 
     private ContactRepository contactRepository;
 
     @Inject
-    public GetSignedKeyInteractor(ContactRepository contactRepository) {
+    public UpdateContactInteractor(ContactRepository contactRepository) {
         this.contactRepository = contactRepository;
     }
 
     @Override
-    protected Observable<SignedKeyTO> buildObservable(ContactModel contactModel) {
-        return contactRepository.getSignedKey(contactModel);
+    protected Observable<ContactModel> buildObservable(ContactModel contactModel) {
+        return contactRepository.updateContact(contactModel);
     }
 }

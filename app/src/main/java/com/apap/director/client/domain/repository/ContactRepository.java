@@ -23,4 +23,6 @@ public interface ContactRepository {
     Observable<OneTimeKeyTO> getOneTimeKey(ContactModel contactModel);
 
     Observable<SignedKeyTO> getSignedKey(ContactModel contactModel);
+
+    Observable<ContactModel> updateContact(ContactModel contactModel);
 }
