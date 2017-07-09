@@ -27,4 +27,6 @@ public interface AccountRepository {
     Observable<Integer> findLastOneTimeKeyId(AccountModel account);
 
     Observable<AccountModel> saveAccount(AccountModel account);
+
+    Observable<AccountModel> chooseAccount(AccountModel account);
 }
