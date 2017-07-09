@@ -14,4 +14,5 @@ import io.reactivex.Observable;
 public interface ConversationRepository {
     Observable<List<ConversationModel>> getConversationList();
     Observable<Long> findLastId();
+    Observable<ConversationModel> getConversation(long ownerId);
 }

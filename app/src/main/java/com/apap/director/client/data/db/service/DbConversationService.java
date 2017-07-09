@@ -43,4 +43,8 @@ public class DbConversationService {
             return lastId.longValue() + 1;
         }
     }
+
+    public ConversationEntity getConversation(Long ownerId) {
+        return realm.where(ConversationEntity.class).equalTo("ownerId.id", ownerId).findFirst();
+    }
 }

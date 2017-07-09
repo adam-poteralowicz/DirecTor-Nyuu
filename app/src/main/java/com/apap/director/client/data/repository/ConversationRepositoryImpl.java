@@ -36,4 +36,18 @@ public class ConversationRepositoryImpl implements ConversationRepository {
     public Observable<Long> findLastId() {
         return Observable.just(dbConversationService.findNextId());
     }
+
+    @Override
+    public Observable<ConversationModel> getConversation(Long ownerId) {
+        ConversationEntity conversationEntity = dbConversationService.getConversation(ownerId);
+
+        if(conversationEntity == null) {
+            return Observable.empty();
+        }
+        else {
+            return Observable.just(conversationMapper.mapToModel(conversationEntity));
+        }
+    }
+
+
 }

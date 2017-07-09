@@ -1,4 +1,4 @@
-package com.apap.director.client.domain.interactor.message;
+package com.apap.director.client.domain.interactor.login;
 
 import com.apap.director.client.domain.interactor.base.BaseInteractor;
 import com.apap.director.client.domain.model.AccountModel;

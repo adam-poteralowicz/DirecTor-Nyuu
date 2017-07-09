@@ -37,8 +37,15 @@ public class  ContactRepositoryImpl implements ContactRepository {
     }
 
     @Override
-    public Observable<ContactModel> getContact(String ownerId, String name) {
-        return
+    public Observable<ContactModel> getContact(String ownerId, String key) {
+        ContactEntity contactEntity = dbContactService.getContactByKey(ownerId, key);
+
+        if(contactEntity == null) {
+            return Observable.empty();
+        }
+        else {
+            return Observable.just(contactMapper.mapToModel(contactEntity));
+        }
     }
 
     @Override

@@ -16,7 +16,7 @@ public interface ContactRepository {
 
     Observable<List<ContactModel>> getContactList();
 
-    Observable<ContactModel> getContact(String ownerId, String name);
+    Observable<ContactModel> getContact(String ownerId, String key);
 
     Observable<Long> findNextId();
 

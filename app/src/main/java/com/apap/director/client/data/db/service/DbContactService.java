@@ -41,7 +41,7 @@ public class DbContactService {
     }
 
     public ContactEntity getContactByKey(String ownerId, String contactKey) {
-        return realm.where(ContactEntity.class).equalTo("owner.keyBase64", ownerId).contains("contactKeys.keyBase64", contactKey).findFirst();
+        return realm.where(ContactEntity.class).equalTo("owner.keyBase64", ownerId).equalTo("contactKeys.keyBase64", contactKey).findFirst();
     }
 
     public long findLastId() {
