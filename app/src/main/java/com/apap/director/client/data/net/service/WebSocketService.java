@@ -4,6 +4,7 @@ import com.apap.director.client.data.net.rest.Paths;
 
 import org.java_websocket.WebSocket;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +53,10 @@ public class WebSocketService {
 
     //TODO leak - wait for RxJava2 comaptibility or figure out sth else
     public Observable<StompMessage> getMessages(String cookie) {
+
+        if(client == null) return Observable.error(new IOException("Client not connected"));
+        if(!client.isConnected()) return Observable.error(new IOException("Client not connected"));
+
         PublishSubject<StompMessage> eventBus = PublishSubject.create();
 
         return  eventBus.doOnSubscribe(disposable -> client.topic(INBOX_PATH, prepareStompHeaders(cookie))
@@ -60,6 +65,10 @@ public class WebSocketService {
 
     //TODO leak - wait for RxJava2 comaptibility or figure out sth else
     public Observable<Void> sendMessage(String message, String recipentId) {
+
+        if(client == null) return Observable.error(new IOException("Client not connected"));
+        if(!client.isConnected()) return Observable.error(new IOException("Client not connected"));
+
         PublishSubject<Void> eventBus = PublishSubject.create();
 
         return eventBus.doOnSubscribe(disposable -> client.send(String.format("%s/%s", MESSAGE_ENDPOINT_PATH, recipentId), message)

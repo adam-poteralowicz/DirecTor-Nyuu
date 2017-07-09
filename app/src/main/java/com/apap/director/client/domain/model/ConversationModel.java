@@ -16,8 +16,7 @@ import lombok.Setter;
 public class ConversationModel {
 
     private long id;
-    private AccountModel owner;
-    private ContactModel interlocutor;
+    private ContactModel contact;
     private List<MessageModel> messages;
-    private List<SessionModel> sessions;
+    private SessionModel session;
 }

@@ -19,4 +19,5 @@ public class ContactModel {
     private List<ContactKeyModel> contactKeys;
     private AccountModel owner;
     private String image;
+
 }

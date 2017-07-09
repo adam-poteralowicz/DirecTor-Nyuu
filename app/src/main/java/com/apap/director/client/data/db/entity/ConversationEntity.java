@@ -15,8 +15,8 @@ public class ConversationEntity extends RealmObject {
     @PrimaryKey
     private long id;
     private AccountEntity owner;
-    private ContactEntity interlocutor;
+    private ContactEntity contact;
     private RealmList<MessageEntity> messages;
-    private RealmList<SessionEntity> sessions;
+    private SessionEntity session;
 
 }

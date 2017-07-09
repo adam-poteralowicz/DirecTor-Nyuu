@@ -166,7 +166,7 @@ public class SingleContactActivity extends Activity implements SingleContactCont
     @Override
     public void setConversationContact(ConversationEntity conversation, ContactEntity contact) {
         realm.beginTransaction();
-        conversation.setInterlocutor(contact);
+        conversation.setContact(contact);
         realm.copyToRealmOrUpdate(conversation);
         realm.commitTransaction();
     }
