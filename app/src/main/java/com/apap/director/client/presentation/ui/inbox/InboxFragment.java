@@ -32,7 +32,6 @@ import butterknife.ButterKnife;
 import butterknife.OnItemClick;
 import butterknife.OnItemLongClick;
 import io.realm.Realm;
-import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
 public class InboxFragment extends Fragment implements InboxContract.View {
@@ -92,12 +91,14 @@ public class InboxFragment extends Fragment implements InboxContract.View {
     @Override
     public void addChangeListener(List<ConversationEntity> data) {
         conversations = (RealmResults<ConversationEntity>) data;
-        conversations.addChangeListener(new RealmChangeListener<RealmResults<ConversationEntity>>() {
-            @Override
-            public void onChange(RealmResults<ConversationEntity> results) {
-                conversations.size();
-            }
+        conversations.addChangeListener(results -> {
+            conversations.size();
         });
+    }
+
+    @Override
+    public void handleSuccess(String message) {
+        Log.v(getClass().getSimpleName(), message);
     }
 
     @Override
@@ -116,7 +117,7 @@ public class InboxFragment extends Fragment implements InboxContract.View {
 
     @OnItemLongClick(R.id.msgList)
     public boolean deleteConversation(int position) {
-        conversationManager.deleteConversationByContactId(conversationList.get(position).getContact().getId());
+        inboxPresenter.deleteConversation(conversationList.get(position));
         conversationList.remove(position);
         arrayAdapter.notifyDataSetChanged();
         return true;

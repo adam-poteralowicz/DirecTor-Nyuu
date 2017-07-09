@@ -10,7 +10,7 @@ import io.reactivex.annotations.Nullable;
 import io.realm.RealmResults;
 
 /**
- * Created by Adam on 2017-07-05.
+ * Created by Adam Poterałowicz
  */
 
 public interface InboxContract {
@@ -20,9 +20,13 @@ public interface InboxContract {
         void refreshConversationList(List<ConversationEntity> data);
 
         void addChangeListener(List<ConversationEntity> data);
+
+        void handleSuccess(String message);
     }
 
     interface Presenter extends BasePresenter {
         void getConversations(@Nullable RealmResults<ConversationEntity> conversations);
+
+        void deleteConversation(ConversationEntity conversationEntity);
     }
 }

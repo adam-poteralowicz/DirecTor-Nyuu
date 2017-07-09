@@ -45,6 +45,13 @@ public class ConversationRepositoryImpl implements ConversationRepository {
     }
 
     @Override
+    public Observable<Boolean> deleteConversation(ConversationModel conversationModel) {
+        ConversationEntity entity = conversationMapper.mapToEntity(conversationModel);
+        dbConversationService.deleteConversation(entity);
+        return Observable.just(!entity.isValid());
+    }
+
+    @Override
     public Observable<ConversationModel> getConversation(Long ownerId) {
         ConversationEntity conversationEntity = dbConversationService.getConversation(ownerId);
 

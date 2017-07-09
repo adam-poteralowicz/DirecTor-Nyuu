@@ -20,4 +20,6 @@ public interface ConversationRepository {
     Observable<ConversationModel> getConversation(Long ownerId);
 
     Observable<ConversationModel> addSession(ConversationModel conversationModel, SessionModel sessionModel);
+
+    Observable<Boolean> deleteConversation(ConversationModel conversationModel);
 }
