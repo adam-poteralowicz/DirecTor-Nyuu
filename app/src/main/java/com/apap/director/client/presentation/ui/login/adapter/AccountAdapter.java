@@ -17,7 +17,7 @@ import java.util.List;
 import butterknife.BindView;
 
 /**
- * Created by Adam on 2017-07-04.
+ * Created by Adam Poterałowicz
  */
 
 public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> {
@@ -55,6 +55,11 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> {
 
     public void update(List<AccountEntity> accountList) {
         this.accountList = accountList;
+        notifyDataSetChanged();
+    }
+
+    public void clear() {
+        this.accountList.clear();
         notifyDataSetChanged();
     }
 }

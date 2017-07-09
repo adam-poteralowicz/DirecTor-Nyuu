@@ -33,15 +33,15 @@ public class NewAccountActivity extends Activity implements Validator.Validation
 
     private final String RESULT_EXTRA = "result";
 
+    @Inject
+    RegisterPresenter presenter;
+
     @Length(min = 1)
     @BindView(R.id.contactNameEditText)
     EditText accountNameEditText;
 
     @BindView(R.id.saveAccButton)
     Button saveButton;
-
-    @Inject
-    RegisterPresenter presenter;
 
     private Validator validator;
 
@@ -58,27 +58,6 @@ public class NewAccountActivity extends Activity implements Validator.Validation
         setUpValidator();
 
         accountNameEditText.setHint("ACCOUNT NAME");
-    }
-
-    @OnClick(R.id.saveAccButton)
-    public void saveAccount(View view) {
-        String accountName = String.valueOf(accountNameEditText.getText());
-
-        presenter.signUp(accountName);
-    }
-
-    private void setUpValidator() {
-        validator = new Validator(this);
-        validator.setValidationListener(this);
-        validator.validate();
-    }
-
-    private void setUpInjection() {
-        DaggerRegisterContractComponent.builder()
-                .mainComponent(((App) getApplication()).getComponent())
-                .registerContractModule(new RegisterContractModule(this))
-                .build()
-                .inject(this);
     }
 
     @Override
@@ -109,9 +88,30 @@ public class NewAccountActivity extends Activity implements Validator.Validation
 
         Intent returnIntent = new Intent();
         returnIntent.putExtra(RESULT_EXTRA, true);
-        setResult(Activity.RESULT_OK,returnIntent);
+        setResult(Activity.RESULT_OK, returnIntent);
 
         finish();
+    }
+
+    @OnClick(R.id.saveAccButton)
+    public void saveAccount(View view) {
+        String accountName = String.valueOf(accountNameEditText.getText());
+
+        presenter.signUp(accountName);
+    }
+
+    private void setUpValidator() {
+        validator = new Validator(this);
+        validator.setValidationListener(this);
+        validator.validate();
+    }
+
+    private void setUpInjection() {
+        DaggerRegisterContractComponent.builder()
+                .mainComponent(((App) getApplication()).getComponent())
+                .registerContractModule(new RegisterContractModule(this))
+                .build()
+                .inject(this);
     }
 
 }

@@ -84,6 +84,13 @@ public class AccountStore {
         realm.commitTransaction();
     }
 
+    public void setAccountActive(AccountEntity accountEntity) {
+        realm.beginTransaction();
+        accountEntity.setActive(true);
+        realm.copyToRealmOrUpdate(accountEntity);
+        realm.commitTransaction();
+    }
+
     public String getSignedKeySignature(AccountEntity accountEntity) {
         SignedPreKeyRecord record = null;
         try {
