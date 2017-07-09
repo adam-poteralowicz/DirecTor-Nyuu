@@ -1,14 +1,16 @@
 package com.apap.director.client.domain.util;
 
 import android.util.Base64;
-import android.util.Log;
 
-import com.apap.director.client.data.net.model.Message;
-import com.apap.director.client.data.net.to.MessageTO;
-import com.apap.director.client.data.store.PreKeyStoreImpl;
-import com.apap.director.client.data.store.SessionStoreImpl;
+import com.apap.director.client.data.net.model.OneTimeKey;
+import com.apap.director.client.data.net.model.SignedKey;
+import com.apap.director.client.data.net.to.OneTimeKeyTO;
+import com.apap.director.client.data.net.to.SignedKeyTO;
 import com.apap.director.client.domain.model.ContactKeyModel;
 import com.apap.director.client.domain.model.MessageModel;
+import com.apap.director.client.domain.model.OneTimeKeyModel;
+import com.apap.director.client.domain.model.SessionModel;
+import com.apap.director.client.domain.model.SignedKeyModel;
 
 import org.whispersystems.curve25519.Curve25519;
 import org.whispersystems.libsignal.DuplicateMessageException;
@@ -20,16 +22,19 @@ import org.whispersystems.libsignal.InvalidMessageException;
 import org.whispersystems.libsignal.InvalidVersionException;
 import org.whispersystems.libsignal.LegacyMessageException;
 import org.whispersystems.libsignal.NoSessionException;
+import org.whispersystems.libsignal.SessionBuilder;
 import org.whispersystems.libsignal.SessionCipher;
 import org.whispersystems.libsignal.SignalProtocolAddress;
 import org.whispersystems.libsignal.UntrustedIdentityException;
+import org.whispersystems.libsignal.ecc.Curve;
+import org.whispersystems.libsignal.ecc.ECPublicKey;
 import org.whispersystems.libsignal.protocol.CiphertextMessage;
 import org.whispersystems.libsignal.protocol.PreKeySignalMessage;
 import org.whispersystems.libsignal.protocol.SignalMessage;
 import org.whispersystems.libsignal.state.IdentityKeyStore;
+import org.whispersystems.libsignal.state.PreKeyBundle;
 import org.whispersystems.libsignal.state.PreKeyStore;
 import org.whispersystems.libsignal.state.SessionRecord;
-import org.whispersystems.libsignal.state.SessionState;
 import org.whispersystems.libsignal.state.SessionStore;
 import org.whispersystems.libsignal.state.SignedPreKeyStore;
 
@@ -40,6 +45,7 @@ import org.whispersystems.libsignal.state.SignedPreKeyStore;
 public class EncryptionService {
 
     private static final String TAG = EncryptionService.class.getSimpleName();
+    private static int IRRELEVANT_ARG = 0;
 
     private Curve25519 curve;
     private IdentityKeyStore identityKeyStore;
@@ -60,17 +66,56 @@ public class EncryptionService {
     }
 
     public MessageModel encryptMessage(IdentityKeyPair keyPair, MessageModel message) {
-        // TODO
         return null;
     }
 
+    public SessionModel buildSession(ContactKeyModel contactKey, OneTimeKeyTO oneTimeKey, SignedKeyTO signedKey) throws InvalidKeyException, UntrustedIdentityException {
+        SignalProtocolAddress address = new SignalProtocolAddress(contactKey.getKeyBase64(), contactKey.getDeviceId());
+        SessionBuilder sessionBuilder = new SessionBuilder(sessionStore, preKeyStore, signedPreKeyStore, identityKeyStore, address);
+
+        sessionBuilder.process(buildPreKeyBundle(contactKey, oneTimeKey, signedKey));
+
+        return
+    }
+
+
     public MessageModel decryptMessage(ContactKeyModel contactKey, MessageModel message, int messageType) throws NoSessionException, UntrustedIdentityException, LegacyMessageException, InvalidVersionException, InvalidMessageException, DuplicateMessageException, InvalidKeyException, InvalidKeyIdException {
         SignalProtocolAddress address = new SignalProtocolAddress(contactKey.getKeyBase64(), contactKey.getDeviceId());
-        byte[] decodedMessage = Base64.decode(message.getContent(), Base64.NO_WRAP | Base64.URL_SAFE);
+        byte[] decodedMessage = Base64Util.convertToBytes(message.getContent());
 
         message.setContent(decryptText(address, decodedMessage, messageType));
 
         return message;
+    }
+
+    //TODO create mapper
+    private SessionModel mapRecordToSessionModel(SessionRecord sessionRecord) {
+        SessionModel sessionModel = new SessionModel();
+        sessionStore.loadSession()
+    }
+
+    private PreKeyBundle buildPreKeyBundle(ContactKeyModel contactKey, OneTimeKeyTO preKey, SignedKeyTO signedKey) throws InvalidKeyException {
+        ECPublicKey signedKeyEC = getPublicKey(preKey.getKeyBase64());
+        ECPublicKey preKeyEC = getPublicKey(preKey.getKeyBase64());
+
+        byte[] signature = getSignature(signedKey);
+        IdentityKey contactIdentity = new IdentityKey(contactKey.getSerialized(), 0);
+
+        return new PreKeyBundle(IRRELEVANT_ARG, IRRELEVANT_ARG, preKey.getOneTimeKeyId(), preKeyEC, signedKey.getSignedKeyId(), signedKeyEC, signature, contactIdentity);
+    }
+
+    private ECPublicKey getPublicKey(String keyBase64) throws InvalidKeyException {
+        byte[] decodedKey = Base64Util.convertToBytes(keyBase64);
+        return Curve.decodePoint(decodedKey, 0);
+    }
+
+    private byte[] getSignature(SignedKeyTO signedKeyTO) {
+        return Base64Util.convertToBytes(signedKeyTO.getSignatureBase64());
+    }
+
+    private SessionRecord loadSession(ContactKeyModel contactKey) {
+        SignalProtocolAddress address = new SignalProtocolAddress(contactKey.getKeyBase64(), contactKey.getDeviceId());
+        return sessionStore.loadSession(address);
     }
 
     private String decryptText(SignalProtocolAddress address, byte[] decodedMessage, int messageType) throws InvalidVersionException, InvalidMessageException, InvalidKeyException, DuplicateMessageException, InvalidKeyIdException, UntrustedIdentityException, LegacyMessageException, NoSessionException {

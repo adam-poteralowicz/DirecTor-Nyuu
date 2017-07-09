@@ -16,6 +16,7 @@ public class SessionEntity extends RealmObject {
     private int deviceId;
     private byte[] serializedKey;
     private String name;
+    private AccountEntity owner;
 
 
 }

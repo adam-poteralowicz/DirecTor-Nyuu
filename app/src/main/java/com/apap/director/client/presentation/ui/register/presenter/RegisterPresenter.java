@@ -2,7 +2,7 @@ package com.apap.director.client.presentation.ui.register.presenter;
 
 import com.apap.director.client.domain.interactor.account.CreateAccountInteractor;
 import com.apap.director.client.domain.interactor.register.RegisterAccountInteractor;
-import com.apap.director.client.domain.interactor.register.SaveAccountInteractor;
+import com.apap.director.client.domain.interactor.account.SaveAccountInteractor;
 import com.apap.director.client.domain.model.AccountModel;
 import com.apap.director.client.presentation.ui.register.contract.RegisterContract;
 

@@ -22,4 +22,8 @@ public class Base64Util {
     public static String convertToBase64(byte[] bytes) {
         return Base64.encodeToString(bytes, Base64.URL_SAFE | Base64.NO_WRAP);
     }
+
+    public static byte[] convertToBytes(String string) {
+        return Base64.decode(string, Base64.NO_WRAP | Base64.URL_SAFE);
+    }
 }
