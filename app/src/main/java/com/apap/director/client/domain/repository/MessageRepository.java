@@ -15,4 +15,6 @@ public interface MessageRepository {
     Observable<List<MessageModel>> getMessagesByContact(Long contactId);
 
     Observable<MessageModel> saveMessage(MessageModel message);
+
+    Observable<Long> findNextId();
 }

@@ -3,7 +3,6 @@ package com.apap.director.client.domain.interactor.inbox;
 import com.apap.director.client.domain.interactor.base.BaseInteractor;
 import com.apap.director.client.domain.model.ContactModel;
 import com.apap.director.client.domain.model.ConversationModel;
-import com.apap.director.client.domain.repository.AccountRepository;
 import com.apap.director.client.domain.repository.ConversationRepository;
 
 import javax.inject.Inject;
