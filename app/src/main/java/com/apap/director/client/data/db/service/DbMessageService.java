@@ -1,7 +1,11 @@
 package com.apap.director.client.data.db.service;
 
+import com.apap.director.client.data.db.entity.ContactEntity;
+import com.apap.director.client.data.db.entity.ConversationEntity;
 import com.apap.director.client.data.db.entity.MessageEntity;
 import com.apap.director.client.data.db.entity.SignedKeyEntity;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -32,7 +36,15 @@ public class DbMessageService {
 
     public void saveMessage(MessageEntity messageEntity) {
         realm.beginTransaction();
-        realm.copyToRealmOrUpdate(messageEntity);
+
+        ContactEntity managedContact = realm.copyToRealmOrUpdate(messageEntity.getConversation().getContact());
+        ConversationEntity managedConversation = realm.copyToRealmOrUpdate(messageEntity.getConversation());
+        managedConversation.setContact(managedContact);
+
+        MessageEntity managedMessage = realm.copyToRealmOrUpdate(messageEntity);
+        List<MessageEntity> managedMessageList = realm.copyFromRealm(managedConversation.getMessages());
+        managedMessageList.add(managedMessage);
+
         realm.commitTransaction();
     }
 

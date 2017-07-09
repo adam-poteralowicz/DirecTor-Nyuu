@@ -1,9 +1,15 @@
 package com.apap.director.client.domain.interactor.inbox;
 
 import com.apap.director.client.domain.interactor.base.BaseInteractor;
+import com.apap.director.client.domain.interactor.contact.GetOneTimeKeyInteractor;
+import com.apap.director.client.domain.interactor.contact.GetSignedKeyInteractor;
 import com.apap.director.client.domain.model.ContactModel;
 import com.apap.director.client.domain.model.ConversationModel;
+import com.apap.director.client.domain.model.SessionModel;
 import com.apap.director.client.domain.repository.ConversationRepository;
+import com.apap.director.client.domain.util.EncryptionService;
+
+import org.whispersystems.libsignal.SessionBuilder;
 
 import java.util.ArrayList;
 
@@ -18,10 +24,15 @@ import io.reactivex.Observable;
 public class CreateConversationInteractor extends BaseInteractor<ConversationModel, ContactModel> {
 
     private ConversationRepository conversationRepository;
+    private GetOneTimeKeyInteractor getOneTimeKeyInteractor;
+    private GetSignedKeyInteractor getSignedKeyInteractor;
+    private EncryptionService encryptionService;
 
     @Inject
-    public CreateConversationInteractor(ConversationRepository conversationRepository) {
+    public CreateConversationInteractor(ConversationRepository conversationRepository, GetOneTimeKeyInteractor getOneTimeKeyInteractor, GetSignedKeyInteractor getSignedKeyInteractor) {
         this.conversationRepository = conversationRepository;
+        this.getOneTimeKeyInteractor = getOneTimeKeyInteractor;
+        this.getSignedKeyInteractor = getSignedKeyInteractor;
     }
 
     @Override
@@ -37,5 +48,8 @@ public class CreateConversationInteractor extends BaseInteractor<ConversationMod
         conversationModel.setId(id);
 
         return Observable.just(conversationModel);
+    }
+
+    private Observable<SessionModel> buildSession() {
     }
 }

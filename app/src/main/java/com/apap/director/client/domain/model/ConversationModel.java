@@ -18,5 +18,4 @@ public class ConversationModel {
     private long id;
     private ContactModel contact;
     private List<MessageModel> messages;
-    private SessionModel session;
 }

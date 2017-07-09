@@ -10,7 +10,7 @@ import com.apap.director.client.domain.interactor.account.CreateAccountInteracto
 import com.apap.director.client.domain.interactor.register.GenerateOneTimeKeysInteractor;
 import com.apap.director.client.domain.interactor.register.GenerateSignedKeyInteractor;
 import com.apap.director.client.domain.interactor.register.RegisterAccountInteractor;
-import com.apap.director.client.domain.interactor.register.SaveAccountInteractor;
+import com.apap.director.client.domain.interactor.account.SaveAccountInteractor;
 import com.apap.director.client.domain.repository.AccountRepository;
 import com.apap.director.client.domain.repository.ContactRepository;
 import com.apap.director.client.domain.repository.ConversationRepository;
