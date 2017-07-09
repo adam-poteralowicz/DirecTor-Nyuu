@@ -26,4 +26,10 @@ public class DbMessageService {
         realmList.addAll(results);
         return realmList;
     }
+
+    public void saveMessage(MessageEntity messageEntity) {
+        realm.beginTransaction();
+        realm.copyToRealm(messageEntity);
+        realm.commitTransaction();
+    }
 }

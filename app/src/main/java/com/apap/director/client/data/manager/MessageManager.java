@@ -2,7 +2,6 @@ package com.apap.director.client.data.manager;
 
 import android.util.Log;
 
-import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.db.entity.ConversationEntity;
 import com.apap.director.client.data.db.entity.MessageEntity;
 
@@ -54,8 +53,6 @@ public class MessageManager {
         message.setConversation(conv);
         message.setContent(msg);
         message.setDate(new Date());
-        message.setRecipient(recipient);
-        message.setAccount(realm.where(AccountEntity.class).equalTo("active", true).findFirst());
         message.setMine(owned);
         RealmList<MessageEntity> conversationMsg = conversation.getMessages();
         conversationMsg.add(message);

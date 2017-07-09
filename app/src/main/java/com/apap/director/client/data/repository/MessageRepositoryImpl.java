@@ -31,4 +31,11 @@ public class MessageRepositoryImpl implements MessageRepository {
     public Observable<List<MessageModel>> getMessagesByContact(Long contactId) {
         return Observable.just(messageMapper.mapToList(messageMapper, dbMessageService.getMessagesByContact(contactId)));
     }
+
+    @Override
+    public Observable<MessageModel> saveMessage(MessageModel message) {
+        MessageEntity entity = messageMapper.mapToEntity(message);
+        dbMessageService.saveMessage(entity);
+        return Observable.just(message);
+    }
 }
