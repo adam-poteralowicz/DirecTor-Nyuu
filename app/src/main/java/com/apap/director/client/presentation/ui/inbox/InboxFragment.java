@@ -107,16 +107,16 @@ public class InboxFragment extends Fragment implements InboxContract.View {
 
     @OnItemClick(R.id.msgList)
     public void startSendMessageActivity(int position) {
-        Snackbar.make(getView(), conversationList.get(position).getInterlocutor().getName(), Snackbar.LENGTH_LONG).show();
+        Snackbar.make(getView(), conversationList.get(position).getContact().getName(), Snackbar.LENGTH_LONG).show();
         Intent intent = new Intent(getActivity(), NewMsgActivity.class)
-                .putExtra("contactId", conversationList.get(position).getInterlocutor().getId())
-                .putExtra("msgTitle", conversationList.get(position).getInterlocutor().getName());
+                .putExtra("contactId", conversationList.get(position).getContact().getId())
+                .putExtra("msgTitle", conversationList.get(position).getContact().getName());
         startActivity(intent);
     }
 
     @OnItemLongClick(R.id.msgList)
     public boolean deleteConversation(int position) {
-        conversationManager.deleteConversationByContactId(conversationList.get(position).getInterlocutor().getId());
+        conversationManager.deleteConversationByContactId(conversationList.get(position).getContact().getId());
         conversationList.remove(position);
         arrayAdapter.notifyDataSetChanged();
         return true;

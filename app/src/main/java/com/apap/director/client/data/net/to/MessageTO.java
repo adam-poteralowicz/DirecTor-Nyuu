@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 public class MessageTO {
 
-    public String from;
-    public String message;
-    public int type;
+    private String from;
+    private String message;
+    private int type;
 }

@@ -1,6 +1,7 @@
 package com.apap.director.client.domain.repository;
 
 import com.apap.director.client.data.db.entity.MessageEntity;
+import com.apap.director.client.domain.model.MessageModel;
 
 import java.util.List;
 
@@ -12,5 +13,5 @@ import io.reactivex.Observable;
 
 public interface MessageRepository {
 
-    Observable<List<MessageEntity>> getMessagesByContact(Long contactId);
+    Observable<List<MessageModel>> getMessagesByContact(Long contactId);
 }

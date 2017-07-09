@@ -45,9 +45,6 @@ public class IdentityKeyStoreImpl implements IdentityKeyStore {
     public void saveIdentity(SignalProtocolAddress address, IdentityKey identityKey) {
 
         //TODO: refactor, będzie powodowało błędy, nie mam pomysłu, dlaczego zamknięcie na końcu nie działa :(
-        Realm realm = Realm.getDefaultInstance();
-
-        realm.close();
 
         realm.beginTransaction();
             ContactKeyEntity sameName = realm.where(ContactKeyEntity.class).equalTo("keyBase64", address.getName()).equalTo("deviceId", address.getDeviceId()).findFirst();

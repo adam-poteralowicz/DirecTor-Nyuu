@@ -3,6 +3,7 @@ package com.apap.director.client.data.db.mapper;
 import com.apap.director.client.data.db.entity.ConversationEntity;
 import com.apap.director.client.data.db.mapper.base.BaseMapper;
 import com.apap.director.client.domain.model.ConversationModel;
+import com.apap.director.client.domain.model.SessionModel;
 
 import javax.inject.Inject;
 
@@ -32,9 +33,8 @@ public class ConversationMapper extends BaseMapper<ConversationModel, Conversati
 
         ConversationEntity entity = new ConversationEntity();
         entity.setId(model.getId());
-        entity.setOwner(accountMapper.mapToEntity(model.getOwner()));
-        entity.setInterlocutor(contactMapper.mapToEntity(model.getInterlocutor()));
-        entity.setSessions(mapToRealmList(sessionMapper, model.getSessions()));
+        entity.setContact(contactMapper.mapToEntity(model.getContact()));
+        entity.setSession(sessionMapper.mapToEntity(model.getSession()));
         entity.setMessages(mapToRealmList(messageMapper, model.getMessages()));
 
         return entity;
@@ -47,9 +47,8 @@ public class ConversationMapper extends BaseMapper<ConversationModel, Conversati
 
         ConversationModel model = new ConversationModel();
         model.setId(entity.getId());
-        model.setOwner(accountMapper.mapToModel(entity.getOwner()));
-        model.setInterlocutor(contactMapper.mapToModel(entity.getInterlocutor()));
-        model.setSessions(mapToList(sessionMapper, entity.getSessions()));
+        model.setContact(contactMapper.mapToModel(entity.getContact()));
+        model.setSession(sessionMapper.mapToModel(entity.getSession()));
         model.setMessages(mapToList(messageMapper, entity.getMessages()));
 
         return model;

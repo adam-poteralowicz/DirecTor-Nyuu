@@ -4,7 +4,7 @@ import com.apap.director.client.domain.interactor.base.BaseInteractor;
 import com.apap.director.client.domain.model.AccountModel;
 import com.apap.director.client.domain.repository.AccountRepository;
 import com.apap.director.client.domain.repository.LoginRepository;
-import com.apap.director.client.domain.util.EncryptionUtil;
+import com.apap.director.client.domain.util.EncryptionService;
 
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.InvalidKeyException;
@@ -20,11 +20,12 @@ import io.reactivex.Observable;
 public class SignCodeInteractor extends BaseInteractor<String, String> {
 
     private AccountRepository accountRepository;
-    private LoginRepository loginRepository;
+    private EncryptionService encryptionService;
 
-    public SignCodeInteractor(AccountRepository accountRepository, LoginRepository loginRepository) {
+    @Inject
+    public SignCodeInteractor(AccountRepository accountRepository, EncryptionService encryptionService) {
         this.accountRepository = accountRepository;
-        this.loginRepository = loginRepository;
+        this.encryptionService = encryptionService;
     }
 
     @Inject
@@ -39,6 +40,6 @@ public class SignCodeInteractor extends BaseInteractor<String, String> {
     }
 
     private Observable<String> signKey(AccountModel account, String code) throws InvalidKeyException {
-        return Observable.just(EncryptionUtil.signMessage(new IdentityKeyPair(account.getKeyPair()), code));
+        return Observable.just(encryptionService.signMessage(new IdentityKeyPair(account.getKeyPair()), code));
     }
 }

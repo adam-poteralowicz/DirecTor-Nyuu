@@ -31,8 +31,6 @@ public class SessionStoreImpl implements SessionStore {
     @Override
     public SessionRecord loadSession(SignalProtocolAddress address) {
 
-        Realm realm = Realm.getDefaultInstance();
-
         try {
             SessionEntity session = realm.where(SessionEntity.class)
                     .equalTo("name", address.getName())
@@ -43,9 +41,6 @@ public class SessionStoreImpl implements SessionStore {
         } catch (IOException e) {
             Log.getStackTraceString(e);
             return null;
-        }
-        finally {
-            realm.close();
         }
     }
 

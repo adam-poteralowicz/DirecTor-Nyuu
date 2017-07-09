@@ -2,11 +2,11 @@ package com.apap.director.client.data.db.service;
 
 import com.apap.director.client.data.db.entity.ContactEntity;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import io.realm.Realm;
+import io.realm.RealmList;
+import io.realm.RealmResults;
 
 /**
  * Created by Adam on 2017-07-03.
@@ -21,8 +21,13 @@ public class DbContactService {
         this.realm = realm;
     }
 
-    public List<ContactEntity> getContactList() {
-        return realm.where(ContactEntity.class).findAll();
+    public RealmList<ContactEntity> getContactList() {
+        RealmList<ContactEntity> list = new RealmList<>();
+        RealmResults<ContactEntity> results = realm.where(ContactEntity.class).findAll();
+
+        list.addAll(results);
+
+        return list;
     }
 
     public ContactEntity getContactByName(String contactName) {
