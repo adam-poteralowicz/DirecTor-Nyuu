@@ -17,12 +17,12 @@ import lombok.Setter;
 @NoArgsConstructor
 public class SignedKeyModel {
 
-    public SignedKeyModel(IdentityKeyPair keyPair, int id) throws InvalidKeyException {
-        KeyHelper.generateSignedPreKey(keyPair, id);
-    }
-
     private long id;
     private int signedKeyId;
     private byte[] serializedKey;
+
+    public SignedKeyModel(IdentityKeyPair keyPair, int id) throws InvalidKeyException {
+        KeyHelper.generateSignedPreKey(keyPair, id);
+    }
 
 }

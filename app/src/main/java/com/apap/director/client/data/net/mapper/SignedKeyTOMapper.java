@@ -1,37 +1,51 @@
 package com.apap.director.client.data.net.mapper;
 
+import android.util.Log;
+
 import com.apap.director.client.data.net.mapper.base.BaseTOMapper;
-import com.apap.director.client.data.net.model.SignedKey;
 import com.apap.director.client.data.net.to.SignedKeyTO;
+import com.apap.director.client.domain.model.SignedKeyModel;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  * Created by Adam Poterałowicz
  */
 
-public class SignedKeyTOMapper extends BaseTOMapper<SignedKey, SignedKeyTO> {
+public class SignedKeyTOMapper extends BaseTOMapper<SignedKeyModel, SignedKeyTO> {
 
     @Override
-    public SignedKeyTO mapToTO(SignedKey model) {
-        if (model == null)
-            return null;
-
+    public SignedKeyTO mapToTO(SignedKeyModel model) {
         SignedKeyTO signedKeyTO = new SignedKeyTO();
-        signedKeyTO.setSignedKeyId(model.getSignedKeyId());
-        signedKeyTO.setKeyBase64(model.getKeyBase64());
-        signedKeyTO.setSignatureBase64(model.getSignatureBase64());
+
+        try {
+            if (model == null)
+                return null;
+
+            signedKeyTO.setSignedKeyId(model.getSignedKeyId());
+            signedKeyTO.setKeyBase64(new String(model.getSerializedKey(), "UTF-8"));
+            //signedKeyTO.setSignatureBase64(model.getSignatureBase64());
+        } catch (UnsupportedEncodingException e) {
+            Log.getStackTraceString(e);
+        }
 
         return signedKeyTO;
     }
 
     @Override
-    public SignedKey mapToModel(SignedKeyTO to) {
-        if (to == null)
-            return null;
+    public SignedKeyModel mapToModel(SignedKeyTO to) {
+        SignedKeyModel signedKey = new SignedKeyModel();
 
-        SignedKey signedKey = new SignedKey();
-        signedKey.setSignedKeyId(to.getSignedKeyId());
-        signedKey.setKeyBase64(to.getKeyBase64());
-        signedKey.setSignatureBase64(to.getSignatureBase64());
+        try {
+            if (to == null)
+                return null;
+
+            signedKey.setSignedKeyId(to.getSignedKeyId());
+            signedKey.setSerializedKey(to.getKeyBase64().getBytes("UTF-8"));
+            //signedKey.setSignatureBase64(to.getSignatureBase64());
+        } catch (UnsupportedEncodingException e) {
+            Log.getStackTraceString(e);
+        }
 
         return signedKey;
     }

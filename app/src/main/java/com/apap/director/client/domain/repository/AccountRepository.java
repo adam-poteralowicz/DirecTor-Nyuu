@@ -1,6 +1,5 @@
 package com.apap.director.client.domain.repository;
 
-import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.domain.model.AccountModel;
 
 import java.util.List;
@@ -29,4 +28,8 @@ public interface AccountRepository {
     Observable<AccountModel> saveAccount(AccountModel account);
 
     Observable<AccountModel> chooseAccount(AccountModel account);
+
+    Observable<ResponseBody> postOneTimeKeys(AccountModel account);
+
+    Observable<ResponseBody> postSignedKeys(AccountModel account);
 }

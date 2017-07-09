@@ -1,9 +1,14 @@
 package com.apap.director.client.data.db.service;
 
+import android.util.Base64;
+import android.util.Log;
+
 import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.db.mapper.AccountMapper;
 
-import java.util.List;
+import org.whispersystems.libsignal.state.SignedPreKeyRecord;
+
+import java.io.IOException;
 
 import javax.inject.Inject;
 
@@ -77,5 +82,16 @@ public class AccountStore {
         realm.beginTransaction();
         realm.copyToRealmOrUpdate(accountEntity);
         realm.commitTransaction();
+    }
+
+    public String getSignedKeySignature(AccountEntity accountEntity) {
+        SignedPreKeyRecord record = null;
+        try {
+            record = new SignedPreKeyRecord(accountEntity.getSignedKey().getSerializedKey());
+        } catch (IOException e) {
+            Log.getStackTraceString(e);
+        }
+
+        return Base64.encodeToString(record.getSignature(), Base64.NO_WRAP | Base64.URL_SAFE);
     }
 }
