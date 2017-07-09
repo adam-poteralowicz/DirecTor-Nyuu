@@ -1,4 +1,4 @@
-package com.apap.director.client.domain.interactor.login;
+package com.apap.director.client.domain.interactor.message;
 
 import com.apap.director.client.domain.interactor.base.BaseInteractor;
 import com.apap.director.client.domain.model.AccountModel;
@@ -7,22 +7,23 @@ import com.apap.director.client.domain.repository.AccountRepository;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import okhttp3.ResponseBody;
 
 /**
  * Created by Adam Poterałowicz
  */
 
-public class ChooseAccountInteractor extends BaseInteractor<AccountModel, AccountModel> {
+public class PostOneTimeKeysInteractor extends BaseInteractor<ResponseBody, AccountModel> {
 
     private AccountRepository accountRepository;
 
     @Inject
-    public ChooseAccountInteractor(AccountRepository accountRepository) {
+    public PostOneTimeKeysInteractor(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
     }
 
     @Override
-    protected Observable<AccountModel> buildObservable(AccountModel accountModel) {
-        return accountRepository.chooseAccount(accountModel);
+    protected Observable<ResponseBody> buildObservable(AccountModel accountModel) {
+        return accountRepository.postOneTimeKeys(accountModel);
     }
 }

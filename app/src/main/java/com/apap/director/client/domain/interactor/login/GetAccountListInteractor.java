@@ -1,7 +1,7 @@
 package com.apap.director.client.domain.interactor.login;
 
-import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.domain.interactor.base.BaseInteractor;
+import com.apap.director.client.domain.model.AccountModel;
 import com.apap.director.client.domain.repository.AccountRepository;
 
 import java.util.List;
@@ -9,14 +9,12 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.realm.Realm;
-import io.realm.RealmList;
 
 /**
  * Created by Alicja Michniewicz
  */
 
-public class GetAccountListInteractor extends BaseInteractor<List<AccountEntity>, Void> {
+public class GetAccountListInteractor extends BaseInteractor<List<AccountModel>, Void> {
 
     private AccountRepository accountRepository;
 
@@ -26,7 +24,7 @@ public class GetAccountListInteractor extends BaseInteractor<List<AccountEntity>
     }
 
     @Override
-    public Observable<List<AccountEntity>> buildObservable(Void unused) {
+    public Observable<List<AccountModel>> buildObservable(Void unused) {
         return accountRepository.getAccountList();
     }
 

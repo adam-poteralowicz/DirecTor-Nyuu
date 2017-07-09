@@ -1,37 +1,51 @@
 package com.apap.director.client.data.net.mapper;
 
+import android.util.Log;
+
 import com.apap.director.client.data.net.mapper.base.BaseTOMapper;
-import com.apap.director.client.data.net.model.OneTimeKey;
 import com.apap.director.client.data.net.to.OneTimeKeyTO;
+import com.apap.director.client.domain.model.OneTimeKeyModel;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  * Created by Adam Poterałowicz
  */
 
-public class OneTimeKeyTOMapper extends BaseTOMapper<OneTimeKey, OneTimeKeyTO> {
+public class OneTimeKeyTOMapper extends BaseTOMapper<OneTimeKeyModel, OneTimeKeyTO> {
 
     @Override
-    public OneTimeKeyTO mapToTO(OneTimeKey model) {
-        if (model == null)
-            return null;
-
+    public OneTimeKeyTO mapToTO(OneTimeKeyModel model) {
         OneTimeKeyTO oneTimeKeyTO = new OneTimeKeyTO();
-        oneTimeKeyTO.setOneTimeKeyId(model.getOneTimeKeyId());
-        oneTimeKeyTO.setKeyId(model.getKeyId());
-        oneTimeKeyTO.setKeyBase64(model.getKeyBase64());
+
+        try {
+            if (model == null)
+                return null;
+
+            oneTimeKeyTO.setOneTimeKeyId(model.getOneTimeKeyId());
+            oneTimeKeyTO.setKeyId(model.getId());
+            oneTimeKeyTO.setKeyBase64(new String(model.getSerializedKey(), "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            Log.getStackTraceString(e);
+        }
 
         return oneTimeKeyTO;
     }
 
     @Override
-    public OneTimeKey mapToModel(OneTimeKeyTO to) {
-        if (to == null)
-            return null;
+    public OneTimeKeyModel mapToModel(OneTimeKeyTO to) {
+        OneTimeKeyModel oneTimeKey = new OneTimeKeyModel();
 
-        OneTimeKey oneTimeKey = new OneTimeKey();
-        oneTimeKey.setOneTimeKeyId(to.getOneTimeKeyId());
-        oneTimeKey.setKeyId(to.getKeyId());
-        oneTimeKey.setKeyBase64(to.getKeyBase64());
+        try {
+            if (to == null)
+                return null;
+
+            oneTimeKey.setOneTimeKeyId(to.getOneTimeKeyId());
+            oneTimeKey.setId(to.getKeyId());
+            oneTimeKey.setSerializedKey(to.getKeyBase64().getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            Log.getStackTraceString(e);
+        }
 
         return oneTimeKey;
     }
