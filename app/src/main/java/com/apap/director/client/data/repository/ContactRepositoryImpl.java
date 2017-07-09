@@ -1,7 +1,9 @@
 package com.apap.director.client.data.repository;
 
 import com.apap.director.client.data.db.entity.ContactEntity;
+import com.apap.director.client.data.db.mapper.ContactMapper;
 import com.apap.director.client.data.db.service.DbContactService;
+import com.apap.director.client.domain.model.ContactModel;
 import com.apap.director.client.domain.repository.ContactRepository;
 
 import java.util.List;
@@ -17,14 +19,21 @@ import io.reactivex.Observable;
 public class ContactRepositoryImpl implements ContactRepository {
 
     private DbContactService dbContactService;
+    private ContactMapper contactMapper;
 
     @Inject
-    public ContactRepositoryImpl(DbContactService dbContactService) {
+    public ContactRepositoryImpl(DbContactService dbContactService, ContactMapper contactMapper) {
         this.dbContactService = dbContactService;
+        this.contactMapper = contactMapper;
     }
 
     @Override
-    public Observable<List<ContactEntity>> getContactList() {
-        return Observable.just(dbContactService.getContactList());
+    public Observable<List<ContactModel>> getContactList() {
+        return Observable.just(contactMapper.mapToList(contactMapper, dbContactService.getContactList()));
+    }
+
+    @Override
+    public Observable<Long> findNextId() {
+        return Observable.just(dbContactService.findLastId());
     }
 }

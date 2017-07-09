@@ -1,6 +1,7 @@
 package com.apap.director.client.data.db.service;
 
 import com.apap.director.client.data.db.entity.ContactEntity;
+import com.apap.director.client.data.db.entity.OneTimeKeyEntity;
 
 import javax.inject.Inject;
 
@@ -13,6 +14,8 @@ import io.realm.RealmResults;
  */
 
 public class DbContactService {
+
+    private static final String ID_COLUMN = "id";
 
     private Realm realm;
 
@@ -36,5 +39,15 @@ public class DbContactService {
 
     public ContactEntity getContactById(Long contactId) {
         return realm.where(ContactEntity.class).equalTo("id", contactId).findFirst();
+    }
+
+    public long findLastId() {
+        Number lastId = realm.where(ContactEntity.class).max(ID_COLUMN).longValue();
+
+        if (lastId == null) {
+            return 0;
+        } else {
+            return lastId.longValue() + 1;
+        }
     }
 }

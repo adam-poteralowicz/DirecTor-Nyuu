@@ -5,6 +5,7 @@ import com.apap.director.client.data.net.service.WebSocketService;
 import com.apap.director.client.data.net.to.MessageTO;
 import com.apap.director.client.domain.interactor.base.BaseInteractor;
 import com.apap.director.client.domain.model.MessageModel;
+import com.apap.director.client.domain.repository.ContactRepository;
 import com.apap.director.client.domain.repository.MessageRepository;
 import com.apap.director.client.domain.util.EncryptionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,6 +23,7 @@ public class GetMessageStreamInteractor extends BaseInteractor<MessageModel, Str
     private WebSocketService webSocketService;
     private MessageRepository messageRepository;
     private EncryptionService encryptionService;
+    private ContactRepository contactRepository;
 
     @Inject
     public GetMessageStreamInteractor(WebSocketService webSocketService, MessageRepository messageRepository, EncryptionService encryptionService) {
@@ -36,6 +38,7 @@ public class GetMessageStreamInteractor extends BaseInteractor<MessageModel, Str
                 .map(stompMessage -> {
                     ObjectMapper mapper = new ObjectMapper();
                     MessageTO messageTO = mapper.readValue(stompMessage.getPayload(), MessageTO.class);
+
 
 
                 });}

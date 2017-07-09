@@ -1,6 +1,7 @@
 package com.apap.director.client.domain.repository;
 
 import com.apap.director.client.data.db.entity.ContactEntity;
+import com.apap.director.client.domain.model.ContactModel;
 
 import java.util.List;
 
@@ -12,5 +13,7 @@ import io.reactivex.Observable;
 
 public interface ContactRepository {
 
-    Observable<List<ContactEntity>> getContactList();
+    Observable<List<ContactModel>> getContactList();
+
+    Observable<Long> findNextId();
 }
