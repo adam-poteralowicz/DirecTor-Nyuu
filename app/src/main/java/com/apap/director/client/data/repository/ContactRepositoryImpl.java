@@ -1,8 +1,10 @@
 package com.apap.director.client.data.repository;
 
-import com.apap.director.client.data.db.entity.ContactEntity;
 import com.apap.director.client.data.db.mapper.ContactMapper;
 import com.apap.director.client.data.db.service.DbContactService;
+import com.apap.director.client.data.net.rest.service.KeyService;
+import com.apap.director.client.data.net.to.OneTimeKeyTO;
+import com.apap.director.client.data.net.to.SignedKeyTO;
 import com.apap.director.client.domain.model.ContactModel;
 import com.apap.director.client.domain.repository.ContactRepository;
 
@@ -16,9 +18,10 @@ import io.reactivex.Observable;
  * Created by Adam on 2017-07-03.
  */
 
-public class ContactRepositoryImpl implements ContactRepository {
+public class  ContactRepositoryImpl implements ContactRepository {
 
     private DbContactService dbContactService;
+    private KeyService keyService;
     private ContactMapper contactMapper;
 
     @Inject
@@ -40,5 +43,17 @@ public class ContactRepositoryImpl implements ContactRepository {
     @Override
     public Observable<Long> findNextId() {
         return Observable.just(dbContactService.findLastId());
+    }
+
+    @Override
+    public Observable<OneTimeKeyTO> getOneTimeKey(ContactModel contactModel) {
+        String ownerId = contactModel.getContactKey().getKeyBase64();
+        return keyService.getOneTimeKey(ownerId);
+    }
+
+    @Override
+    public Observable<SignedKeyTO> getSignedKey(ContactModel contactModel) {
+        String ownerId = contactModel.getContactKey().getKeyBase64();
+        return keyService.getSignedKey(ownerId);
     }
 }

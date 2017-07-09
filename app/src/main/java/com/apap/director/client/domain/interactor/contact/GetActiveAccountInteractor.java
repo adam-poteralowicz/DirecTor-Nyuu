@@ -1,7 +1,7 @@
 package com.apap.director.client.domain.interactor.contact;
 
-import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.domain.interactor.base.BaseInteractor;
+import com.apap.director.client.domain.model.AccountModel;
 import com.apap.director.client.domain.repository.AccountRepository;
 
 import javax.inject.Inject;
@@ -9,10 +9,10 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 
 /**
- * Created by Adam on 2017-07-04.
+ * Created by Adam Poterałowicz
  */
 
-public class GetActiveAccountInteractor extends BaseInteractor<AccountEntity, Void> {
+public class GetActiveAccountInteractor extends BaseInteractor<AccountModel, Void> {
 
     private AccountRepository accountRepository;
 
@@ -22,7 +22,7 @@ public class GetActiveAccountInteractor extends BaseInteractor<AccountEntity, Vo
     }
 
     @Override
-    public Observable<AccountEntity> buildObservable(Void aVoid) {
+    public Observable<AccountModel> buildObservable(Void aVoid) {
         return accountRepository.getActiveAccount();
     }
 }
