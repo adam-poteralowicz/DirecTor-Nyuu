@@ -71,6 +71,7 @@ public class AccountRepositoryImpl implements AccountRepository {
     @Override
     public Observable<AccountModel> chooseAccount(AccountModel account) {
         AccountEntity entity = accountMapper.mapToEntity(account);
+        entity.setActive(true);
         accountStore.updateAccount(entity);
         return Observable.just(accountMapper.mapToModel(entity));
     }
