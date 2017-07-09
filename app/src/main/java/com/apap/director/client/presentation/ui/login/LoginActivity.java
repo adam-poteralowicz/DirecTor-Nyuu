@@ -221,11 +221,7 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     }
 
     public void deleteAccount(String accountName) {
-        boolean deleted = accountManager.deleteAccount(accountName);
-        if (!deleted)
-            Log.v(TAG, accountName + " account failed to delete");
-        else
-            Log.v(TAG, accountName + " account deleted");
+        loginPresenter.deleteAccount(accountName);
     }
 
     @Override

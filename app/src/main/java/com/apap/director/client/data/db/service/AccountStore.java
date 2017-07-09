@@ -84,6 +84,12 @@ public class AccountStore {
         realm.commitTransaction();
     }
 
+    public void deleteAccount(AccountEntity accountEntity) {
+        realm.beginTransaction();
+        accountEntity.deleteFromRealm();
+        realm.commitTransaction();
+    }
+
     public void setAccountActive(AccountEntity accountEntity) {
         realm.beginTransaction();
         accountEntity.setActive(true);

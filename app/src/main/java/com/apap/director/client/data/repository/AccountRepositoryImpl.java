@@ -89,6 +89,13 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
+    public Observable<Boolean> deleteAccount(AccountModel account) {
+        AccountEntity entity = accountMapper.mapToEntity(account);
+        accountStore.deleteAccount(entity);
+        return Observable.just(!entity.isValid());
+    }
+
+    @Override
     public Observable<ResponseBody> postOneTimeKeys(AccountModel account) {
         List<OneTimeKeyTO> keyTOs = new ArrayList<>();
         for (int i = 0; i < account.getOneTimeKeys().size(); i++) {

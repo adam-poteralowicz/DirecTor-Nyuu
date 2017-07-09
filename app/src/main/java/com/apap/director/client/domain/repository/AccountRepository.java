@@ -29,6 +29,8 @@ public interface AccountRepository {
 
     Observable<AccountModel> chooseAccount(AccountModel account);
 
+    Observable<Boolean> deleteAccount(AccountModel account);
+
     Observable<ResponseBody> postOneTimeKeys(AccountModel account);
 
     Observable<ResponseBody> postSignedKeys(AccountModel account);

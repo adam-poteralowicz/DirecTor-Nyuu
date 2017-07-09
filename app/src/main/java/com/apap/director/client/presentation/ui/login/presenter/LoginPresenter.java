@@ -5,13 +5,14 @@ import android.util.Log;
 import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.db.mapper.AccountMapper;
 import com.apap.director.client.data.db.service.AccountStore;
-import com.apap.director.client.domain.interactor.contact.GetActiveAccountInteractor;
+import com.apap.director.client.domain.interactor.account.CreateAccountInteractor;
+import com.apap.director.client.domain.interactor.account.GetActiveAccountInteractor;
 import com.apap.director.client.domain.interactor.login.ChooseAccountInteractor;
+import com.apap.director.client.domain.interactor.login.DeleteAccountInteractor;
 import com.apap.director.client.domain.interactor.login.GetAccountListInteractor;
 import com.apap.director.client.domain.interactor.login.LoginInteractor;
 import com.apap.director.client.domain.interactor.login.PostOneTimeKeysInteractor;
 import com.apap.director.client.domain.interactor.login.PostSignedKeysInteractor;
-import com.apap.director.client.domain.interactor.register.CreateAccountInteractor;
 import com.apap.director.client.domain.model.AccountModel;
 import com.apap.director.client.presentation.ui.login.contract.LoginContract;
 
@@ -35,6 +36,7 @@ public class LoginPresenter implements LoginContract.Presenter {
     private PostOneTimeKeysInteractor postOneTimeKeysInteractor;
     private PostSignedKeysInteractor postSignedKeysInteractor;
     private ChooseAccountInteractor chooseAccountInteractor;
+    private DeleteAccountInteractor deleteAccountInteractor;
 
     private AccountMapper accountMapper;
     private AccountStore accountStore;
@@ -48,7 +50,8 @@ public class LoginPresenter implements LoginContract.Presenter {
                           LoginInteractor loginInteractor,
                           PostOneTimeKeysInteractor postOneTimeKeysInteractor,
                           PostSignedKeysInteractor postSignedKeysInteractor,
-                          ChooseAccountInteractor chooseAccountInteractor) {
+                          ChooseAccountInteractor chooseAccountInteractor,
+                          DeleteAccountInteractor deleteAccountInteractor) {
         this.view = view;
         this.getAccountListInteractor = getAccountListInteractor;
         this.getActiveAccountInteractor = getActiveAccountInteractor;
@@ -57,6 +60,7 @@ public class LoginPresenter implements LoginContract.Presenter {
         this.postOneTimeKeysInteractor = postOneTimeKeysInteractor;
         this.postSignedKeysInteractor = postSignedKeysInteractor;
         this.chooseAccountInteractor = chooseAccountInteractor;
+        this.deleteAccountInteractor = deleteAccountInteractor;
 
         subscriptions = new CompositeDisposable();
     }
@@ -142,14 +146,16 @@ public class LoginPresenter implements LoginContract.Presenter {
     public void chooseAccount(String name) {
         subscriptions.add(chooseAccountInteractor.execute(accountMapper.mapToModel(accountStore.findAccountByName(name)))
                 .subscribe(accountModel -> {
-                   accountStore.setAccountActive(accountMapper.mapToEntity(accountModel));
+                    accountStore.setAccountActive(accountMapper.mapToEntity(accountModel));
                     view.handleSuccess(accountModel.getName() + " account chosen.");
                 }, throwable -> view.handleException(throwable)));
     }
 
     @Override
     public void deleteAccount(String name) {
-        // implement DeleteAccountInteractor
+        subscriptions.add(deleteAccountInteractor.execute(accountMapper.mapToModel(accountStore.findAccountByName(name)))
+                .subscribe(aBoolean -> view.handleSuccess("Account " + name + " deleted: " + aBoolean),
+                        throwable -> view.handleException(throwable)));
     }
 
 }
