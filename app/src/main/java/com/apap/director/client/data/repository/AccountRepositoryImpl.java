@@ -32,18 +32,18 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public Observable<List<AccountEntity>> getAccountList() {
-        return Observable.just(accountStore.getAccountList());
+    public Observable<List<AccountModel>> getAccountList() {
+        return Observable.just(accountMapper.mapToList(accountMapper, accountStore.getAccountList()));
     }
 
     @Override
-    public Observable<AccountEntity> getActiveAccount() {
-        return Observable.just(accountStore.getActiveAccount());
+    public Observable<AccountModel> getActiveAccount() {
+        return Observable.just(accountMapper.mapToModel(accountStore.getActiveAccount()));
     }
 
     @Override
-    public Observable<AccountEntity> getAccount(String name) {
-        return Observable.just(accountStore.findAccountByName(name));
+    public Observable<AccountModel> getAccount(String name) {
+        return Observable.just(accountMapper.mapToModel(accountStore.findAccountByName(name)));
     }
 
     @Override
