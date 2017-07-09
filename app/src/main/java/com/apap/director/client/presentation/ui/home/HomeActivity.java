@@ -28,7 +28,6 @@ public class HomeActivity extends FragmentActivity implements HomeContract.View 
 
     @Inject
     HomePresenter homePresenter;
-
     @Inject
     AccountManager accountManager;
 

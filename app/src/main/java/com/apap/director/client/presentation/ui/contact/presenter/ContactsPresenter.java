@@ -13,7 +13,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 /**
- * Created by Adam on 2017-07-04.
+ * Created by Adam Poterałowicz
  */
 
 public class ContactsPresenter implements BasePresenter, ContactsContract.Presenter {

@@ -21,7 +21,6 @@ import com.apap.director.client.R;
 import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.db.entity.ContactEntity;
 import com.apap.director.client.data.db.entity.ConversationEntity;
-import com.apap.director.client.data.manager.AccountManager;
 import com.apap.director.client.data.manager.ContactManager;
 import com.apap.director.client.data.manager.ConversationManager;
 import com.apap.director.client.presentation.ui.contact.contract.SingleContactContract;
@@ -48,8 +47,6 @@ public class SingleContactActivity extends Activity implements SingleContactCont
     Realm realm;
     @Inject
     ContactManager contactManager;
-    @Inject
-    AccountManager accountManager;
     @Inject
     ConversationManager conversationManager;
 

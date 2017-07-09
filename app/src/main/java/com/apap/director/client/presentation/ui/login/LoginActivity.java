@@ -19,8 +19,6 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.db.mapper.AccountMapper;
-import com.apap.director.client.data.manager.AccountManager;
-import com.apap.director.client.data.net.rest.service.RestAccountService;
 import com.apap.director.client.data.net.service.ClientService;
 import com.apap.director.client.presentation.ui.common.view.NetActivity;
 import com.apap.director.client.presentation.ui.home.HomeActivity;
@@ -54,10 +52,6 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     private static final String SHARED_PREFERENCES_FILENAME = "prefs";
     private static final String KEY = "masterPassword";
 
-    @Inject
-    AccountManager accountManager;
-    @Inject
-    RestAccountService restAccountService;
     @Inject
     Realm realm;
     @Inject
