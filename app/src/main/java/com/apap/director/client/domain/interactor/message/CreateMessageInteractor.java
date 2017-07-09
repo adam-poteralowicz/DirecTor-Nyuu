@@ -18,6 +18,8 @@ import com.apap.director.client.domain.repository.MessageRepository;
 
 import java.util.Date;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 
 /**
@@ -32,8 +34,16 @@ public class CreateMessageInteractor extends BaseInteractor<MessageModel, Messag
     private GetContactInteractor getContactInteractor;
     private CreateConversationInteractor createConversationInteractor;
     private GetConversationInteractor getConversationInteractor;
-    private AccountRepository accountRepository;
     private MessageRepository messageRepository;
+
+    @Inject
+    public CreateMessageInteractor(CreateContactInteractor createContactInteractor, GetContactInteractor getContactInteractor, CreateConversationInteractor createConversationInteractor, GetConversationInteractor getConversationInteractor, MessageRepository messageRepository) {
+        this.createContactInteractor = createContactInteractor;
+        this.getContactInteractor = getContactInteractor;
+        this.createConversationInteractor = createConversationInteractor;
+        this.getConversationInteractor = getConversationInteractor;
+        this.messageRepository = messageRepository;
+    }
 
     @Override
     protected Observable<MessageModel> buildObservable(MessageTO messageTO) {
