@@ -4,6 +4,8 @@ import com.apap.director.client.data.net.rest.service.LoginDetails;
 import com.apap.director.client.data.net.rest.service.RestAccountService;
 import com.apap.director.client.domain.repository.LoginRepository;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 import okhttp3.ResponseBody;
 
@@ -15,6 +17,7 @@ public class LoginRepositoryImpl implements LoginRepository {
 
     private RestAccountService restAccountService;
 
+    @Inject
     public LoginRepositoryImpl(RestAccountService restAccountService) {
         this.restAccountService = restAccountService;
     }

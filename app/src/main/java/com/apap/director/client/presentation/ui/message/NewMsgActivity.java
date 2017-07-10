@@ -15,7 +15,6 @@ import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.db.entity.ConversationEntity;
 import com.apap.director.client.data.db.entity.MessageEntity;
 import com.apap.director.client.data.db.service.DbConversationService;
-import com.apap.director.client.data.net.service.ClientService;
 import com.apap.director.client.domain.repository.MessageRepository;
 import com.apap.director.client.presentation.ui.home.adapter.MessageAdapter;
 import com.apap.director.client.presentation.ui.listener.ArrayAdapterChangeListener;
@@ -64,7 +63,6 @@ public class NewMsgActivity extends Activity implements NewMsgContract.View {
         setContentView(R.layout.new_msg_view);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        ClientService.sendMessage("NewMsgActivity");
         decorateMsgScreen();
         setUpInjection();
         ButterKnife.bind(this);
@@ -105,9 +103,7 @@ public class NewMsgActivity extends Activity implements NewMsgContract.View {
         if ("".equals(newMessage))
             return;
 
-        ConversationEntity conversation = dbConversationService.getConversationByContactId(contactIdFromIntent);
-
-        ClientService.sendEncryptedMessage(conversation.getContact().getContactKey().getKeyBase64(), realm.where(AccountEntity.class).equalTo("active", true).findFirst().getKeyBase64(), newMessage);
+        // todo use presenter to send encrypted msg
         newMessageField.setText("");
     }
 

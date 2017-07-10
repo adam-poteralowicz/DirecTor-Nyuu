@@ -28,11 +28,6 @@ public class LoginInteractor extends BaseInteractor<ResponseBody, AccountModel> 
         this.signCodeInteractor = signCodeInteractor;
     }
 
-    @Inject
-    public LoginInteractor(LoginRepository loginRepository) {
-        this.loginRepository = loginRepository;
-    }
-
     @Override
     protected Observable<ResponseBody> buildObservable(AccountModel accountModel) {
 

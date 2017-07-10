@@ -16,7 +16,7 @@ import com.apap.director.client.R;
 import com.apap.director.client.data.db.entity.ConversationEntity;
 import com.apap.director.client.domain.repository.ConversationRepository;
 import com.apap.director.client.presentation.ui.inbox.contract.InboxContract;
-import com.apap.director.client.presentation.ui.inbox.di.DaggerInboxComponent;
+import com.apap.director.client.presentation.ui.inbox.di.component.DaggerInboxComponent;
 import com.apap.director.client.presentation.ui.inbox.di.module.InboxContractModule;
 import com.apap.director.client.presentation.ui.inbox.presenter.InboxPresenter;
 import com.apap.director.client.presentation.ui.message.NewMsgActivity;
@@ -123,7 +123,7 @@ public class InboxFragment extends Fragment implements InboxContract.View {
     private void setUpInjection() {
         DaggerInboxComponent.builder()
                 .mainComponent(((App) getActivity().getApplication()).getComponent())
-                .inboxContractModule(new InboxContractModule((InboxContract.View) getView(), conversationRepository))
+                .inboxContractModule(new InboxContractModule((InboxContract.View) getView()))
                 .build()
                 .inject(this);
     }

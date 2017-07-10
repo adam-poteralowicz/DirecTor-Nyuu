@@ -7,13 +7,18 @@ import com.apap.director.client.data.manager.AccountManager;
 import com.apap.director.client.data.manager.MessageManager;
 import com.apap.director.client.data.net.rest.service.KeyService;
 import com.apap.director.client.data.net.rest.service.RestAccountService;
-import com.apap.director.client.data.net.service.MessageAction;
 import com.apap.director.client.data.store.IdentityKeyStoreImpl;
 import com.apap.director.client.data.store.PreKeyStoreImpl;
 import com.apap.director.client.data.store.SessionStoreImpl;
 import com.apap.director.client.data.store.SignedPreKeyStoreImpl;
+import com.apap.director.client.domain.interactor.account.SaveAccountInteractor;
 import com.apap.director.client.domain.repository.AccountRepository;
+import com.apap.director.client.domain.repository.ContactRepository;
+import com.apap.director.client.domain.repository.ConversationRepository;
+import com.apap.director.client.domain.repository.LoginRepository;
+import com.apap.director.client.domain.repository.OneTimeKeyRepository;
 import com.apap.director.client.domain.repository.SignedKeyRepository;
+import com.apap.director.client.domain.util.EncryptionService;
 import com.apap.director.client.presentation.di.module.ContextModule;
 import com.apap.director.client.presentation.di.module.InteractorModule;
 import com.apap.director.client.presentation.di.module.ManagerModule;
@@ -42,8 +47,6 @@ import io.realm.Realm;
         ContextModule.class})
 public interface MainComponent {
 
-    MessageAction getMessageAction();
-
     KeyService getKeyService();
 
     IdentityKeyStoreImpl getDirectorIdentityKeyStore();
@@ -62,11 +65,23 @@ public interface MainComponent {
 
     AccountRepository accountRepository();
 
+    ContactRepository contactRepository();
+
     SignedKeyRepository signedKeyRepository();
+
+    ConversationRepository conversationRepository();
+
+    OneTimeKeyRepository oneTimeKeyRepository();
+
+    LoginRepository loginRepository();
 
     Context context();
 
     MessageManager messageManager();
 
     OneTimeKeyMapper oneTimeKeyMapper();
+
+    EncryptionService encryptionService();
+
+    SaveAccountInteractor saveAccountInteractor();
 }

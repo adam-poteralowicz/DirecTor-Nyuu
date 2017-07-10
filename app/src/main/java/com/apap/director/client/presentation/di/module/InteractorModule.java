@@ -5,6 +5,7 @@ import com.apap.director.client.domain.interactor.inbox.GetConversationListInter
 import com.apap.director.client.domain.interactor.login.GetAccountListInteractor;
 import com.apap.director.client.domain.interactor.login.GetCodeInteractor;
 import com.apap.director.client.domain.interactor.login.LoginInteractor;
+import com.apap.director.client.domain.interactor.login.SignCodeInteractor;
 import com.apap.director.client.domain.interactor.message.GetMessageListInteractor;
 import com.apap.director.client.domain.interactor.account.CreateAccountInteractor;
 import com.apap.director.client.domain.interactor.register.GenerateOneTimeKeysInteractor;
@@ -63,8 +64,8 @@ public class InteractorModule {
 
     @Singleton
     @Provides
-    LoginInteractor provideLoginInteractor(LoginRepository loginRepository) {
-        return new LoginInteractor(loginRepository);
+    LoginInteractor provideLoginInteractor(LoginRepository loginRepository, GetCodeInteractor getCodeInteractor, SignCodeInteractor signCodeInteractor) {
+        return new LoginInteractor(loginRepository, getCodeInteractor, signCodeInteractor);
     }
 
     @Singleton

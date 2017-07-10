@@ -27,11 +27,6 @@ public class SignCodeInteractor extends BaseInteractor<String, String> {
         this.encryptionService = encryptionService;
     }
 
-    @Inject
-    public SignCodeInteractor(AccountRepository accountRepository) {
-        this.accountRepository = accountRepository;
-    }
-
     @Override
     protected Observable<String> buildObservable(String code) {
         return accountRepository.getActiveAccount()

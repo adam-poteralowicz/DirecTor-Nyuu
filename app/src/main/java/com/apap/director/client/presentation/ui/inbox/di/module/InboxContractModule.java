@@ -17,12 +17,10 @@ import dagger.Provides;
 public class InboxContractModule {
 
     private InboxContract.View view;
-    private ConversationRepository conversationRepository;
 
     @Inject
-    public InboxContractModule(InboxContract.View view, ConversationRepository conversationRepository) {
+    public InboxContractModule(InboxContract.View view) {
         this.view = view;
-        this.conversationRepository = conversationRepository;
     }
 
     @Provides
@@ -31,9 +29,4 @@ public class InboxContractModule {
         return view;
     }
 
-    @Provides
-    @Activity
-    ConversationRepository provideConversationRepository() {
-        return conversationRepository;
-    }
 }

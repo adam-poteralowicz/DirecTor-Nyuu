@@ -19,7 +19,7 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.db.mapper.AccountMapper;
-import com.apap.director.client.data.net.service.ClientService;
+import com.apap.director.client.data.net.service.WebSocketService;
 import com.apap.director.client.presentation.ui.common.view.NetActivity;
 import com.apap.director.client.presentation.ui.home.HomeActivity;
 import com.apap.director.client.presentation.ui.login.adapter.AccountAdapter;
@@ -52,8 +52,7 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     private static final String SHARED_PREFERENCES_FILENAME = "prefs";
     private static final String KEY = "masterPassword";
 
-    @Inject
-    Realm realm;
+
     @Inject
     LoginPresenter loginPresenter;
 
@@ -67,6 +66,9 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     EditText masterPasswordEditText;
     @BindView(R.id.loginActivity_layout)
     View rootLayout;
+
+    @BindView(R.id.postLoginButton)
+    Button loginButton;
 
     private ArrayList<AccountEntity> accountList;
     private String accountName;
@@ -82,7 +84,9 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
 
         setUpInjection();
         setUpRecyclerView();
-//        NetCipher.useTor();
+
+        loginButton.setEnabled(false);
+        loginButton.setAlpha(0.5f);
     }
 
     private void setUpRecyclerView() {
@@ -126,49 +130,15 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
 
     @OnClick(R.id.postLoginButton)
     public void onClick(View view) {
-        try {
-            if (loginPresenter.getActiveAccount() == null) {
-                Snackbar.make(rootLayout, "Choose an account", Snackbar.LENGTH_LONG).show();
-                return;
-            } else Log.d("active account", loginPresenter.getActiveAccount().getName());
+        if (loginPresenter.getActiveAccount() == null) {
+            Snackbar.make(rootLayout, "Choose an account", Snackbar.LENGTH_LONG).show();
+            return;
+        } else Log.d("active account", loginPresenter.getActiveAccount().getName());
 
-            String cookie = null;
-
-            for (int i = 0; i < 3; i++) {
-                AsyncTask<Void, Void, String> asyncTask = new AsyncTask<Void, Void, String>() {
-                    @Override
-                    protected String doInBackground(Void... params) {
-                        return loginPresenter.logIn(accountMapper.mapToModel(loginPresenter.getActiveAccount()));
-                    }
-                };
-                cookie = asyncTask.execute().get();
-                if (cookie != null)
-                    break;
-            }
+        Log.v(TAG, "Chosen account: " + loginPresenter.getActiveAccount() + " cookie" + loginPresenter.getActiveAccount().getCookie());
 
 
-            AsyncTask<Void, Void, Void> keysTask = new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... params) {
-                    Log.v(TAG, "Trying to post keys");
-                    loginPresenter.postSignedKey(accountMapper.mapToModel(loginPresenter.getActiveAccount()));
-                    loginPresenter.postOneTimeKeys(accountMapper.mapToModel(loginPresenter.getActiveAccount()));
-
-                    return null;
-                }
-            };
-
-            keysTask.execute().get();
-
-            Log.v(TAG, "Chosen account: " + loginPresenter.getActiveAccount() + " cookie" + loginPresenter.getActiveAccount().getCookie());
-
-            ClientService.connect(cookie);
-
-            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
-
-        } catch (InterruptedException | ExecutionException e) {
-            Log.getStackTraceString(e);
-        }
+        startActivity(new Intent(LoginActivity.this, HomeActivity.class));
     }
 
     @OnClick(R.id.newAccButton)
@@ -190,6 +160,8 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     @OnItemClick(R.id.accountsView)
     public void chooseAccount(int position) {
         loginPresenter.chooseAccount(accountList.get(position).getName());
+        loginButton.setEnabled(true);
+        loginButton.setAlpha(1);
     }
 
     @OnItemLongClick(R.id.accountsView)

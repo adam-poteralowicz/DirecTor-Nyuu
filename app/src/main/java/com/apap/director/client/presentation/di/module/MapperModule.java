@@ -28,50 +28,50 @@ public class MapperModule {
     
     @Provides
     @Singleton
-    MessageMapper provideMessageMapper(MessageMapper messageMapper) {
-        return messageMapper;
+    MessageMapper provideMessageMapper(ConversationMapper conversationMapper) {
+        return new MessageMapper(conversationMapper);
     }
 
     @Provides
     @Singleton
-    ContactMapper provideContactMapper(ContactMapper contactMapper) {
-        return contactMapper;
+    ContactMapper provideContactMapper(AccountMapper accountMapper, ContactKeyMapper contactKeyMapper) {
+        return new ContactMapper(contactKeyMapper, accountMapper);
     }
 
     @Provides
     @Singleton
-    ConversationMapper provideConversationMapper(ConversationMapper conversationMapper) {
-        return conversationMapper;
+    ConversationMapper provideConversationMapper(ContactMapper contactMapper) {
+        return new ConversationMapper(contactMapper);
     }
 
     @Provides
     @Singleton
-    SessionMapper provideSessionMapper(SessionMapper sessionMapper) {
-        return sessionMapper;
+    SessionMapper provideSessionMapper(AccountMapper accountMapper) {
+        return new SessionMapper(accountMapper);
     }
 
     @Provides
     @Singleton
-    AccountMapper provideAccountMapper(AccountMapper accountMapper) {
-        return accountMapper;
+    AccountMapper provideAccountMapper(OneTimeKeyMapper oneTimeKeyMapper, SignedKeyMapper signedKeyMapper) {
+        return new AccountMapper(oneTimeKeyMapper, signedKeyMapper);
     }
 
     @Provides
     @Singleton
-    ContactKeyMapper provideContactKeyMapper(ContactKeyMapper contactKeyMapper) {
-        return contactKeyMapper;
+    ContactKeyMapper provideContactKeyMapper() {
+        return new ContactKeyMapper();
     }
 
     @Provides
     @Singleton
-    OneTimeKeyMapper provideOneTimeKeyMapper(OneTimeKeyMapper oneTimeKeyMapper) {
-        return oneTimeKeyMapper;
+    OneTimeKeyMapper provideOneTimeKeyMapper() {
+        return new OneTimeKeyMapper();
     }
 
     @Provides
     @Singleton
-    SignedKeyMapper provideSignedKeyMapper(SignedKeyMapper signedKeyMapper) {
-        return signedKeyMapper;
+    SignedKeyMapper provideSignedKeyMapper() {
+        return new SignedKeyMapper();
     }
 
     /* Transactional Object 2 Model mappers */
@@ -79,19 +79,19 @@ public class MapperModule {
 
     @Provides
     @Singleton
-    MessageTOMapper provideMessageTOMapper(MessageTOMapper messageTOMapper) {
-        return messageTOMapper;
+    MessageTOMapper provideMessageTOMapper() {
+        return new MessageTOMapper();
     }
 
     @Provides
     @Singleton
-    OneTimeKeyTOMapper provideOneTimeKeyTOMapper(OneTimeKeyTOMapper oneTimeKeyTOMapper) {
-        return oneTimeKeyTOMapper;
+    OneTimeKeyTOMapper provideOneTimeKeyTOMapper() {
+        return new OneTimeKeyTOMapper();
     }
 
     @Provides
     @Singleton
-    SignedKeyTOMapper provideSignedKeyTOMapper(SignedKeyTOMapper signedKeyTOMapper) {
-        return signedKeyTOMapper;
+    SignedKeyTOMapper provideSignedKeyTOMapper() {
+        return new SignedKeyTOMapper();
     }
 }

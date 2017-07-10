@@ -5,8 +5,13 @@ import com.apap.director.client.data.store.IdentityKeyStoreImpl;
 import com.apap.director.client.data.store.PreKeyStoreImpl;
 import com.apap.director.client.data.store.SessionStoreImpl;
 import com.apap.director.client.data.store.SignedPreKeyStoreImpl;
+import com.apap.director.client.domain.util.EncryptionService;
 
 import org.whispersystems.curve25519.Curve25519;
+import org.whispersystems.libsignal.state.IdentityKeyStore;
+import org.whispersystems.libsignal.state.PreKeyStore;
+import org.whispersystems.libsignal.state.SessionStore;
+import org.whispersystems.libsignal.state.SignedPreKeyStore;
 
 import javax.inject.Singleton;
 
@@ -25,26 +30,32 @@ public class SignalModule {
 
     @Provides
     @Singleton
-    IdentityKeyStoreImpl provideIdentityKeyStore(AccountStore accountStore) {
-        return new IdentityKeyStoreImpl(accountStore);
+    IdentityKeyStore provideIdentityKeyStore(Realm realm, AccountStore accountStore) {
+        return new IdentityKeyStoreImpl(realm, accountStore);
     }
 
     @Provides
     @Singleton
-    PreKeyStoreImpl providePreKeyStore(Realm realm) {
+    PreKeyStore providePreKeyStore(Realm realm) {
         return new PreKeyStoreImpl(realm);
     }
 
     @Provides
     @Singleton
-    SessionStoreImpl provideSessionStore(Realm realm) {
-        return new SessionStoreImpl(realm);
+    SessionStore provideSessionStore(Realm realm, AccountStore accountStore) {
+        return new SessionStoreImpl(realm, accountStore);
     }
 
     @Provides
     @Singleton
-    SignedPreKeyStoreImpl provideSignedPreKeyStore(Realm realm) {
+    SignedPreKeyStore provideSignedPreKeyStore(Realm realm) {
         return new SignedPreKeyStoreImpl(realm);
+    }
+
+    @Provides
+    @Singleton
+    EncryptionService encryptionService(Curve25519 curve25519, IdentityKeyStore identityKeyStore, PreKeyStore preKeyStore, SessionStore sessionStore, SignedPreKeyStore signedPreKeyStore) {
+        return new EncryptionService(curve25519, identityKeyStore, signedPreKeyStore, sessionStore, preKeyStore);
     }
 
 }

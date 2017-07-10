@@ -17,8 +17,8 @@ public class ConversationMapper extends BaseMapper<ConversationModel, Conversati
     private ContactMapper contactMapper;
 
     @Inject
-    public ConversationMapper(MessageMapper messageMapper, ContactMapper contactMapper) {
-        this.messageMapper = messageMapper;
+    public ConversationMapper(ContactMapper contactMapper) {
+        this.messageMapper = new MessageMapper(this);
         this.contactMapper = contactMapper;
     }
 
