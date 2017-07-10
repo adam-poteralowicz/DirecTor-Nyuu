@@ -2,7 +2,6 @@ package com.apap.director.client.data.store;
 
 import android.util.Log;
 
-
 import com.apap.director.client.data.db.entity.SignedKeyEntity;
 
 import org.whispersystems.libsignal.InvalidKeyIdException;

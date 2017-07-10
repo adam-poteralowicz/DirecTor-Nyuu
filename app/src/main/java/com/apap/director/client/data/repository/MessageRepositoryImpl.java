@@ -13,7 +13,7 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 
 /**
- * Created by Adam on 2017-07-05.
+ * Created by Adam Poterałowicz
  */
 
 public class MessageRepositoryImpl implements MessageRepository {

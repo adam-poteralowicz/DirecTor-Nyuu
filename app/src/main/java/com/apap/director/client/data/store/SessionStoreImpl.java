@@ -2,7 +2,6 @@ package com.apap.director.client.data.store;
 
 import android.util.Log;
 
-import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.db.entity.ContactKeyEntity;
 import com.apap.director.client.data.db.entity.SessionEntity;
 
@@ -78,10 +77,8 @@ public class SessionStoreImpl implements SessionStore {
             }
 
             SessionEntity session = realm.createObject(SessionEntity.class, id);
-            session.setAccount(realm.where(AccountEntity.class).equalTo("active", true).findFirst());
             session.setName(address.getName());
             ContactKeyEntity contactKey = realm.where(ContactKeyEntity.class).equalTo("keyBase64", address.getName()).findFirst();
-            session.setConversation(contactKey.getContact().getConversation());
             session.setDeviceId(address.getDeviceId());
             session.setSerializedKey(record.serialize());
 

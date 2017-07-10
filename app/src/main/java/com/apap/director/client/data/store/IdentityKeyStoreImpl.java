@@ -20,7 +20,6 @@ import io.realm.Realm;
 public class IdentityKeyStoreImpl implements IdentityKeyStore {
 
     private AccountStore accountStore;
-    private AccountManager accountManager;
 
     @Inject
     public IdentityKeyStoreImpl(AccountStore accountStore) {
