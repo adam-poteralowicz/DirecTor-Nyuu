@@ -33,6 +33,10 @@ public class DbMessageService {
         return realmList;
     }
 
+    public MessageEntity getMessageByMessageId(Long messageId) {
+        return realm.where(MessageEntity.class).equalTo("id", messageId).findFirst();
+    }
+
     public void saveMessage(MessageEntity messageEntity) {
         realm.beginTransaction();
 
@@ -44,6 +48,12 @@ public class DbMessageService {
         List<MessageEntity> managedMessageList = realm.copyFromRealm(managedConversation.getMessages());
         managedMessageList.add(managedMessage);
 
+        realm.commitTransaction();
+    }
+
+    public void deleteMessage(MessageEntity messageEntity) {
+        realm.beginTransaction();
+        messageEntity.deleteFromRealm();
         realm.commitTransaction();
     }
 

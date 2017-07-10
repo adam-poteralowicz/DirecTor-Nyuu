@@ -15,8 +15,6 @@ import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.db.entity.ConversationEntity;
 import com.apap.director.client.data.db.entity.MessageEntity;
 import com.apap.director.client.data.db.service.DbConversationService;
-import com.apap.director.client.data.manager.ConversationManager;
-import com.apap.director.client.data.manager.MessageManager;
 import com.apap.director.client.data.net.service.ClientService;
 import com.apap.director.client.domain.repository.MessageRepository;
 import com.apap.director.client.presentation.ui.home.adapter.MessageAdapter;
@@ -42,10 +40,6 @@ public class NewMsgActivity extends Activity implements NewMsgContract.View {
 
     @Inject
     Realm realm;
-    @Inject
-    MessageManager messageManager;
-    @Inject
-    ConversationManager conversationManager;
     @Inject
     NewMsgPresenter newMsgPresenter;
 
@@ -96,6 +90,11 @@ public class NewMsgActivity extends Activity implements NewMsgContract.View {
     }
 
     @Override
+    public void handleSuccess(String message) {
+        Log.v(TAG, message);
+    }
+
+    @Override
     public void handleException(Throwable throwable) {
         Log.getStackTraceString(throwable);
     }
@@ -116,7 +115,7 @@ public class NewMsgActivity extends Activity implements NewMsgContract.View {
     public boolean deleteMessage(int position) {
         Log.v(TAG, "Deleting message, position: " + position);
         Long messageId = myMessages.get(position).getId();
-        messageManager.deleteMessage(messageId);
+        newMsgPresenter.deleteMessage(messageId);
         return true;
     }
 

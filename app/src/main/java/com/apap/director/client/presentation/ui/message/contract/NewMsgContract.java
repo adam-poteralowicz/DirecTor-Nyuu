@@ -15,10 +15,14 @@ public interface NewMsgContract {
     interface View extends BaseView {
 
         void refreshMessageList(List<MessageEntity> data);
+
+        void handleSuccess(String message);
     }
 
     interface Presenter extends BasePresenter {
 
-        void getMessagesByContact(Long contactIdFromIntent);
+        void getMessagesByContact(Long contactId);
+
+        void deleteMessage(Long messageId);
     }
 }

@@ -43,4 +43,11 @@ public class MessageRepositoryImpl implements MessageRepository {
     public Observable<Long> findNextId() {
         return Observable.just(dbMessageService.findNextId());
     }
+
+    @Override
+    public Observable<Boolean> deleteMessage(MessageModel messageModel) {
+        MessageEntity entity = messageMapper.mapToEntity(messageModel);
+        dbMessageService.deleteMessage(entity);
+        return Observable.just(!entity.isValid());
+    }
 }

@@ -17,4 +17,6 @@ public interface MessageRepository {
     Observable<MessageModel> saveMessage(MessageModel message);
 
     Observable<Long> findNextId();
+
+    Observable<Boolean> deleteMessage(MessageModel message);
 }
