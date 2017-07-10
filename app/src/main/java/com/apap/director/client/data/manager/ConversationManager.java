@@ -2,11 +2,8 @@ package com.apap.director.client.data.manager;
 
 import android.util.Log;
 
-
 import com.apap.director.client.data.db.entity.ContactEntity;
 import com.apap.director.client.data.db.entity.ConversationEntity;
-import com.apap.director.client.data.db.entity.MessageEntity;
-import com.apap.director.client.data.db.entity.SessionEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,15 +72,10 @@ public class ConversationManager {
         Realm realm = Realm.getDefaultInstance();
 
         realm.beginTransaction();
-        ContactEntity managedContact = realm.copyToRealmOrUpdate(contact);
         ConversationEntity conversation = realm.createObject(ConversationEntity.class, generateConversationId(realm));
         conversation.setContact(contact);
-        RealmList<SessionEntity> sessions = new RealmList<>();
-        conversation.setSessions(sessions);
-        conversation.setMessages(new RealmList<MessageEntity>());
-        conversation.setAccount(accountManager.getActiveAccount());
+        conversation.setMessages(new RealmList<>());
 
-        managedContact.setConversation(conversation);
         realm.copyToRealmOrUpdate(conversation);
         realm.commitTransaction();
 
@@ -131,46 +123,7 @@ public class ConversationManager {
         } else return false;
     }
 
-    public boolean updateConversationSessionsById(Long id, SessionEntity session) {
-        ConversationEntity conversation = realm.where(ConversationEntity.class).equalTo("id", id).findFirst();
-        if (conversation == null)
-            return false;
-
-        realm.beginTransaction();
-        RealmList<SessionEntity> sessions = conversation.getSessions();
-        sessions.add(session);
-        realm.copyToRealmOrUpdate(sessions);
-        realm.commitTransaction();
-        return true;
-    }
-
-    public boolean updateConversationSessionsByContactName(String name, SessionEntity session) {
-        ConversationEntity conversation = realm.where(ConversationEntity.class).equalTo("contacts.name", name).findFirst();
-        if (conversation == null)
-            return false;
-
-        realm.beginTransaction();
-        RealmList<SessionEntity> sessions = conversation.getSessions();
-        sessions.add(session);
-        realm.copyToRealmOrUpdate(sessions);
-        realm.commitTransaction();
-        return true;
-    }
-
-    public boolean updateConversationSessionsByContactId(Long contactId, SessionEntity session) {
-        ConversationEntity conversation = realm.where(ConversationEntity.class).equalTo("contacts.id", contactId).findFirst();
-        if (conversation == null)
-            return false;
-
-        realm.beginTransaction();
-        RealmList<SessionEntity> sessions = conversation.getSessions();
-        sessions.add(session);
-        realm.copyToRealmOrUpdate(sessions);
-        realm.commitTransaction();
-        return true;
-    }
-
-    public long generateConversationId(Realm realm) {
+    private long generateConversationId(Realm realm) {
         long id;
         try {
             if (realm.where(ConversationEntity.class).max("id") == null) {

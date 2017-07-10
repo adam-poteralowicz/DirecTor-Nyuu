@@ -1,7 +1,6 @@
 package com.apap.director.client.domain.repository;
 
 import com.apap.director.client.domain.model.ConversationModel;
-import com.apap.director.client.domain.model.SessionModel;
 
 import java.util.List;
 
@@ -19,5 +18,5 @@ public interface ConversationRepository {
 
     Observable<ConversationModel> getConversation(Long ownerId);
 
-    Observable<ConversationModel> addSession(ConversationModel conversationModel, SessionModel sessionModel);
+    Observable<Boolean> deleteConversation(ConversationModel conversationModel);
 }

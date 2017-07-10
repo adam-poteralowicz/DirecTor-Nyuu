@@ -4,8 +4,6 @@ import com.apap.director.client.data.net.rest.service.LoginDetails;
 
 import io.reactivex.Observable;
 import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.http.Body;
 
 /**
  * Created by Alicja Michniewicz
@@ -16,5 +14,4 @@ public interface LoginRepository {
     Observable<String> getCode(String userId);
 
     Observable<ResponseBody> login(LoginDetails details);
-
 }

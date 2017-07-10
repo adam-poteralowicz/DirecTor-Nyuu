@@ -26,7 +26,7 @@ public class LoginRepositoryImpl implements LoginRepository {
 
     @Override
     public Observable<ResponseBody> login(LoginDetails details) {
-        return null;
+        return restAccountService.login(details);
     }
 
 }

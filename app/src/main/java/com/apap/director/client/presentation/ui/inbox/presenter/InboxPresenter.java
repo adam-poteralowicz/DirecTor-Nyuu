@@ -2,6 +2,7 @@ package com.apap.director.client.presentation.ui.inbox.presenter;
 
 import com.apap.director.client.data.db.entity.ConversationEntity;
 import com.apap.director.client.data.db.mapper.ConversationMapper;
+import com.apap.director.client.domain.interactor.inbox.DeleteConversationInteractor;
 import com.apap.director.client.domain.interactor.inbox.GetConversationListInteractor;
 import com.apap.director.client.presentation.ui.base.contract.presenter.BasePresenter;
 import com.apap.director.client.presentation.ui.inbox.contract.InboxContract;
@@ -23,14 +24,18 @@ public class InboxPresenter implements BasePresenter, InboxContract.Presenter {
 
     private InboxContract.View view;
     private GetConversationListInteractor getConversationListInteractor;
+    private DeleteConversationInteractor deleteConversationInteractor;
 
     private CompositeDisposable subscriptions;
     private ConversationMapper conversationMapper;
 
     @Inject
-    public InboxPresenter(InboxContract.View view, GetConversationListInteractor getConversationListInteractor) {
+    public InboxPresenter(InboxContract.View view, GetConversationListInteractor getConversationListInteractor, DeleteConversationInteractor deleteConversationInteractor) {
         this.view = view;
         this.getConversationListInteractor = getConversationListInteractor;
+        this.deleteConversationInteractor = deleteConversationInteractor;
+
+        subscriptions = new CompositeDisposable();
     }
 
     @Override
@@ -54,5 +59,13 @@ public class InboxPresenter implements BasePresenter, InboxContract.Presenter {
                     else
                         view.addChangeListener(entities);
                 }, throwable -> view.handleException(throwable)));
+    }
+
+    @Override
+    public void deleteConversation(ConversationEntity conversationEntity) {
+        subscriptions.add(deleteConversationInteractor.execute(conversationMapper.mapToModel(conversationEntity))
+                .subscribe(aBoolean -> view.handleSuccess("Conversation with " + conversationEntity.getContact().getName() + " deleted: " + aBoolean),
+                        throwable -> view.handleException(throwable)));
+
     }
 }

@@ -1,8 +1,6 @@
 package com.apap.director.client.data.db.service;
 
 import com.apap.director.client.data.db.entity.ConversationEntity;
-import com.apap.director.client.data.db.entity.SignedKeyEntity;
-import com.apap.director.client.data.manager.ContactManager;
 
 import javax.inject.Inject;
 
@@ -11,7 +9,7 @@ import io.realm.RealmList;
 import io.realm.RealmResults;
 
 /**
- * Created by Adam on 2017-07-03.
+ * Created by Adam Poterałowicz
  */
 
 public class DbConversationService {
@@ -46,5 +44,15 @@ public class DbConversationService {
 
     public ConversationEntity getConversation(Long ownerId) {
         return realm.where(ConversationEntity.class).equalTo("ownerId.id", ownerId).findFirst();
+    }
+
+    public ConversationEntity getConversationByContactId(Long contactId) {
+        return realm.where(ConversationEntity.class).equalTo("contacts.id", contactId).findFirst();
+    }
+
+    public void deleteConversation(ConversationEntity conversationEntity) {
+        realm.beginTransaction();
+        conversationEntity.deleteFromRealm();
+        realm.commitTransaction();
     }
 }

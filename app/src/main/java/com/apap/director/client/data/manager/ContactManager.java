@@ -1,17 +1,13 @@
 package com.apap.director.client.data.manager;
 
 import android.util.Base64;
-import android.util.Log;
 
-import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.db.entity.ContactEntity;
 import com.apap.director.client.data.db.entity.ContactKeyEntity;
 import com.apap.director.client.data.db.entity.ConversationEntity;
-import com.apap.director.client.data.net.rest.service.KeyService;
 
 import org.whispersystems.libsignal.util.ByteUtil;
 
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,12 +19,10 @@ import io.realm.RealmResults;
 
 public class ContactManager {
     private Realm realm;
-    private AccountManager accountManager;
 
     @Inject
-    public ContactManager(Realm realm, AccountManager manager, KeyService service) {
+    public ContactManager(Realm realm) {
         this.realm = realm;
-        this.accountManager = manager;
     }
 
     public List<ContactEntity> listAllContacts() {
@@ -38,16 +32,6 @@ public class ContactManager {
 
     public ContactEntity getContact(String name) {
         return realm.where(ContactEntity.class).equalTo("name", name).findFirst();
-    }
-
-    public ContactEntity getContactByContactKey(String keyBase64) {
-
-        ContactKeyEntity contactKey = realm.where(ContactKeyEntity.class).equalTo("keyBase64", keyBase64).findFirst();
-
-        if (contactKey == null) {
-            return null;
-        }
-        return contactKey.getContact();
     }
 
     public void addContact(String name, String keyBase64) {
@@ -66,8 +50,7 @@ public class ContactManager {
         contact.setName(name);
 
         RealmList<ContactKeyEntity> keys = new RealmList<>();
-        ContactKeyEntity contactKey = localRealm.createObject(ContactKeyEntity.class, generateContactKeyId(localRealm));
-        contactKey.setAccount(localRealm.where(AccountEntity.class).equalTo("active", true).findFirst());
+        ContactKeyEntity contactKey = localRealm.createObject(ContactKeyEntity.class, generateContactKeyId());
 
         byte[] decodedKey = Base64.decode(keyBase64, Base64.NO_WRAP | Base64.URL_SAFE);
         contactKey.setSerialized(decodedKey);
@@ -78,10 +61,7 @@ public class ContactManager {
 
         contactKey.setDeviceId(0);
         keys.add(contactKey);
-        contact.setContactKeys(keys);
-        contact.setAccount(localRealm.where(AccountEntity.class).equalTo("active", true).findFirst());
-
-        contactKey.setContact(contact);
+        contact.setContactKey(keys.first());
 
         localRealm.commitTransaction();
         localRealm.close();
@@ -93,13 +73,7 @@ public class ContactManager {
             return false;
 
         realm.beginTransaction();
-        contactToDelete.getContactKeys().deleteAllFromRealm();
-
-        ConversationEntity conversationToDelete = contactToDelete.getConversation();
-        conversationToDelete.getSessions().deleteAllFromRealm();
-        conversationToDelete.getMessages().deleteAllFromRealm();
-        conversationToDelete.deleteFromRealm();
-
+        contactToDelete.getContactKey().deleteFromRealm();
         contactToDelete.deleteFromRealm();
         realm.commitTransaction();
         return true;
@@ -113,14 +87,8 @@ public class ContactManager {
         if (image != null) {
             contact.setImage(image);
         }
-        if (conversation != null) {
-            contact.setConversation(conversation);
-        }
         if (contactKey != null) {
-            if (!contact.getContactKeys().isEmpty()) {
-                RealmList<ContactKeyEntity> contactKeys = contact.getContactKeys();
-                contactKeys.add(contactKey);
-            } else contact.setContactKeys(new RealmList<>(contactKey));
+           contact.setContactKey(contactKey);
         }
         realm.insertOrUpdate(contact);
         realm.commitTransaction();

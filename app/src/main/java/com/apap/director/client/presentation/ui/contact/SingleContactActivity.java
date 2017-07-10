@@ -10,7 +10,6 @@ import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -18,11 +17,10 @@ import android.widget.ListView;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.db.entity.ContactEntity;
 import com.apap.director.client.data.db.entity.ConversationEntity;
-import com.apap.director.client.data.manager.ContactManager;
-import com.apap.director.client.data.manager.ConversationManager;
+import com.apap.director.client.data.db.service.DbContactService;
+import com.apap.director.client.data.db.service.DbConversationService;
 import com.apap.director.client.presentation.ui.contact.contract.SingleContactContract;
 import com.apap.director.client.presentation.ui.contact.di.component.DaggerSingleContactComponent;
 import com.apap.director.client.presentation.ui.contact.di.module.SingleContactContractModule;
@@ -45,10 +43,6 @@ public class SingleContactActivity extends Activity implements SingleContactCont
     SingleContactPresenter singleContactPresenter;
     @Inject
     Realm realm;
-    @Inject
-    ContactManager contactManager;
-    @Inject
-    ConversationManager conversationManager;
 
     @BindView(R.id.contactName)
     EditText contactName;
@@ -65,6 +59,8 @@ public class SingleContactActivity extends Activity implements SingleContactCont
     Intent intent;
     String contactNameFromIntent;
     Long contactIdFromIntent;
+    DbContactService dbContactService;
+    DbConversationService dbConversationService;
 
     public void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.single_contact_view);
@@ -86,40 +82,33 @@ public class SingleContactActivity extends Activity implements SingleContactCont
                 myOptionsList);
         optionsListView.setAdapter(arrayAdapter);
 
-        optionsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        optionsListView.setOnItemClickListener((adapterView, view, position, id) -> {
+            Snackbar.make(rootView, myOptionsList.get(position), Snackbar.LENGTH_LONG).show();
 
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Snackbar.make(rootView, myOptionsList.get(position), Snackbar.LENGTH_LONG).show();
+            switch (position) {
+                case 0:
+                    Log.d(TAG, contactIdFromIntent.toString());
 
-                switch (position) {
-                    case 0:
-                        Log.d(TAG, contactIdFromIntent.toString());
-                        if (conversationManager == null) {
-                            Log.d("CONVMAN", "NULL");
-                        }
+                    ConversationEntity conv = dbConversationService.getConversationByContactId(contactIdFromIntent);
+                    if (conv == null) {
+                        conv = singleContactPresenter.createConversation(dbContactService.getContactByName(contactNameFromIntent));
+                        singleContactPresenter.decorateConversation(conv, contactIdFromIntent);
+                    }
 
-                        ConversationEntity conv = conversationManager.getConversationByContactId(contactIdFromIntent);
-                        if (conv == null) {
-                            conv = conversationManager.createConversation();
-                            singleContactPresenter.decorateConversation(conv, contactIdFromIntent);
-                        }
-
-                        intent = new Intent(App.getContext(), NewMsgActivity.class)
-                                .putExtra("recipient", contactNameFromIntent)
-                                .putExtra("contactId", contactIdFromIntent);
-                        startActivity(intent);
-                        break;
-                    case 1:
-                        contactManager.deleteContact(contactNameFromIntent);
-                        startActivity(new Intent(App.getContext(), HomeActivity.class));
-                        break;
-                    case 2:
-                        startActivity(new Intent(App.getContext(), HomeActivity.class));
-                        break;
-                    default:
-                        break;
-                }
+                    intent = new Intent(App.getContext(), NewMsgActivity.class)
+                            .putExtra("recipient", contactNameFromIntent)
+                            .putExtra("contactId", contactIdFromIntent);
+                    startActivity(intent);
+                    break;
+                case 1:
+                    singleContactPresenter.deleteContact(dbContactService.getContactByName(contactNameFromIntent));
+                    startActivity(new Intent(App.getContext(), HomeActivity.class));
+                    break;
+                case 2:
+                    startActivity(new Intent(App.getContext(), HomeActivity.class));
+                    break;
+                default:
+                    break;
             }
         });
 
@@ -169,11 +158,8 @@ public class SingleContactActivity extends Activity implements SingleContactCont
     }
 
     @Override
-    public void setConversationAccount(ConversationEntity conversation, AccountEntity account) {
-        realm.beginTransaction();
-        conversation.setOwner(account);
-        realm.copyToRealmOrUpdate(conversation);
-        realm.commitTransaction();
+    public void handleSuccess(String message) {
+        Log.v(TAG, message);
     }
 
     @OnClick(R.id.imageView)

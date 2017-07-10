@@ -28,6 +28,8 @@ public class ContactsPresenter implements BasePresenter, ContactsContract.Presen
         this.view = view;
         this.getActiveAccountInteractor = getActiveAccountInteractor;
         this.getContactListInteractor = getContactListInteractor;
+
+        subscriptions = new CompositeDisposable();
     }
 
     @Override

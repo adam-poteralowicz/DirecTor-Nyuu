@@ -7,9 +7,14 @@ import android.util.Log;
 
 import com.apap.director.client.data.db.entity.ContactEntity;
 import com.apap.director.client.data.db.entity.ConversationEntity;
+import com.apap.director.client.data.db.mapper.ContactMapper;
+import com.apap.director.client.data.db.mapper.ConversationMapper;
 import com.apap.director.client.data.db.service.DbContactService;
 import com.apap.director.client.data.manager.AccountManager;
 import com.apap.director.client.data.manager.ContactManager;
+import com.apap.director.client.domain.interactor.contact.DeleteContactInteractor;
+import com.apap.director.client.domain.interactor.inbox.CreateConversationInteractor;
+import com.apap.director.client.domain.model.ConversationModel;
 import com.apap.director.client.presentation.ui.base.contract.presenter.BasePresenter;
 import com.apap.director.client.presentation.ui.contact.contract.SingleContactContract;
 
@@ -17,10 +22,11 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.disposables.CompositeDisposable;
 import io.realm.Realm;
 
 /**
- * Created by Adam on 2017-07-03.
+ * Created by Adam Poterałowicz.
  */
 
 public class SingleContactPresenter implements BasePresenter, SingleContactContract.Presenter {
@@ -33,16 +39,27 @@ public class SingleContactPresenter implements BasePresenter, SingleContactContr
     AccountManager accountManager;
 
     private SingleContactContract.View view;
+    private DeleteContactInteractor deleteContactInteractor;
+    private CreateConversationInteractor createConversationInteractor;
+
     private DbContactService dbContactService;
+    private ContactMapper contactMapper;
+    private ConversationMapper conversationMapper;
+    private CompositeDisposable subscriptions;
 
     @Inject
-    SingleContactPresenter(SingleContactContract.View view) {
+    SingleContactPresenter(SingleContactContract.View view, DeleteContactInteractor deleteContactInteractor, CreateConversationInteractor createConversationInteractor) {
         this.view = view;
+        this.deleteContactInteractor = deleteContactInteractor;
+        this.createConversationInteractor = createConversationInteractor;
+
+        subscriptions = new CompositeDisposable();
     }
 
     @Override
     public void dispose() {
-
+        subscriptions.dispose();
+        subscriptions.clear();
     }
 
     @Override
@@ -78,7 +95,23 @@ public class SingleContactPresenter implements BasePresenter, SingleContactContr
 
     @Override
     public void decorateConversation(ConversationEntity conversation, Long contactId) {
-        view.setConversationAccount(conversation, accountManager.getActiveAccount());
         view.setConversationContact(conversation, dbContactService.getContactById(contactId));
+    }
+
+    @Override
+    public void deleteContact(ContactEntity contactEntity) {
+        subscriptions.add(deleteContactInteractor.execute(contactMapper.mapToModel(contactEntity))
+                .subscribe(aBoolean -> view.handleSuccess("Contact " + contactEntity.getName() + " deleted: " + aBoolean),
+                        throwable -> view.handleException(throwable)));
+    }
+
+    @Override
+    public ConversationEntity createConversation(ContactEntity contactEntity) {
+        final ConversationModel[] model = { new ConversationModel() };
+        subscriptions.add(createConversationInteractor.execute(contactMapper.mapToModel(contactEntity))
+                .subscribe(conversationModel -> model[0] = conversationModel,
+                        throwable -> view.handleException(throwable)));
+
+        return conversationMapper.mapToEntity(model[0]);
     }
 }
