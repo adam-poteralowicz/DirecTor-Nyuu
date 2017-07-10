@@ -3,7 +3,6 @@ package com.apap.director.client.domain.interactor.login;
 import com.apap.director.client.domain.interactor.base.BaseInteractor;
 import com.apap.director.client.domain.model.AccountModel;
 import com.apap.director.client.domain.repository.AccountRepository;
-import com.apap.director.client.domain.repository.LoginRepository;
 import com.apap.director.client.domain.util.EncryptionService;
 
 import org.whispersystems.libsignal.IdentityKeyPair;

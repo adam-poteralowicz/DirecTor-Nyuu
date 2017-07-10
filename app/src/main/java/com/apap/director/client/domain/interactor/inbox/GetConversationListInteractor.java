@@ -1,6 +1,5 @@
 package com.apap.director.client.domain.interactor.inbox;
 
-import com.apap.director.client.data.db.entity.ConversationEntity;
 import com.apap.director.client.domain.interactor.base.BaseInteractor;
 import com.apap.director.client.domain.model.ConversationModel;
 import com.apap.director.client.domain.repository.ConversationRepository;
@@ -12,7 +11,7 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 
 /**
- * Created by Adam on 2017-07-05.
+ * Created by Adam Poterałowicz
  */
 
 public class GetConversationListInteractor extends BaseInteractor<List<ConversationModel>, Void> {

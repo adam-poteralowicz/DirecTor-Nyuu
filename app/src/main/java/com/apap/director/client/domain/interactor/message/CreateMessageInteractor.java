@@ -1,19 +1,13 @@
 package com.apap.director.client.domain.interactor.message;
 
-import android.support.v4.util.Pair;
-
 import com.apap.director.client.data.net.to.MessageTO;
 import com.apap.director.client.domain.interactor.base.BaseInteractor;
-import com.apap.director.client.domain.interactor.contact.CreateContactInteractor;
 import com.apap.director.client.domain.interactor.contact.GetContactInteractor;
 import com.apap.director.client.domain.interactor.inbox.CreateConversationInteractor;
 import com.apap.director.client.domain.interactor.inbox.GetConversationInteractor;
-import com.apap.director.client.domain.model.AccountModel;
 import com.apap.director.client.domain.model.ContactModel;
 import com.apap.director.client.domain.model.ConversationModel;
 import com.apap.director.client.domain.model.MessageModel;
-import com.apap.director.client.domain.repository.AccountRepository;
-import com.apap.director.client.domain.repository.ContactRepository;
 import com.apap.director.client.domain.repository.MessageRepository;
 
 import java.util.Date;

@@ -17,6 +17,7 @@ public class NewMsgPresenter implements BasePresenter, NewMsgContract.Presenter 
 
     private NewMsgContract.View view;
     private GetMessageListInteractor getMessageListInteractor;
+
     private CompositeDisposable subscriptions;
     private DbMessageService dbMessageService;
 

@@ -1,7 +1,5 @@
 package com.apap.director.client.domain.model;
 
-import com.apap.director.client.data.db.entity.AccountEntity;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

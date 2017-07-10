@@ -1,6 +1,7 @@
 package com.apap.director.client.presentation.ui.contact.presenter;
 
 import com.apap.director.client.data.db.mapper.AccountMapper;
+import com.apap.director.client.data.db.mapper.ContactMapper;
 import com.apap.director.client.domain.interactor.account.GetActiveAccountInteractor;
 import com.apap.director.client.domain.interactor.contact.GetContactListInteractor;
 import com.apap.director.client.presentation.ui.base.contract.presenter.BasePresenter;
@@ -22,6 +23,7 @@ public class ContactsPresenter implements BasePresenter, ContactsContract.Presen
 
     private CompositeDisposable subscriptions;
     private AccountMapper accountMapper;
+    private ContactMapper contactMapper;
 
     @Inject
     public ContactsPresenter(ContactsContract.View view, GetActiveAccountInteractor getActiveAccountInteractor, GetContactListInteractor getContactListInteractor) {
@@ -48,7 +50,7 @@ public class ContactsPresenter implements BasePresenter, ContactsContract.Presen
     @Override
     public void getContactList() {
         subscriptions.add(getContactListInteractor.execute(null)
-                .subscribe(contactEntities -> view.refreshContactList(contactEntities),
+                .subscribe(contactModels -> view.refreshContactList(contactMapper.mapToRealmList(contactMapper, contactModels)),
                         throwable -> view.handleException(throwable)));
     }
 }

@@ -7,7 +7,7 @@ import java.util.List;
 import io.reactivex.Observable;
 
 /**
- * Created by Adam on 2017-07-04.
+ * Created by Adam Poterałowicz
  */
 
 public interface MessageRepository {

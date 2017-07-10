@@ -1,7 +1,7 @@
 package com.apap.director.client.domain.interactor.contact;
 
-import com.apap.director.client.data.db.entity.ContactEntity;
 import com.apap.director.client.domain.interactor.base.BaseInteractor;
+import com.apap.director.client.domain.model.ContactModel;
 import com.apap.director.client.domain.repository.ContactRepository;
 
 import java.util.List;
@@ -11,10 +11,10 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 
 /**
- * Created by Adam on 2017-07-03.
+ * Created by Adam Poterałowicz
  */
 
-public class GetContactListInteractor extends BaseInteractor<List<ContactEntity>, Void> {
+public class GetContactListInteractor extends BaseInteractor<List<ContactModel>, Void> {
 
     private ContactRepository contactRepository;
 
@@ -24,7 +24,7 @@ public class GetContactListInteractor extends BaseInteractor<List<ContactEntity>
     }
 
     @Override
-    public Observable<List<ContactEntity>> buildObservable(Void unused) {
+    public Observable<List<ContactModel>> buildObservable(Void unused) {
         return contactRepository.getContactList();
     }
 }

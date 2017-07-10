@@ -8,7 +8,7 @@ import com.apap.director.client.presentation.ui.message.di.module.NewMsgContract
 import dagger.Component;
 
 /**
- * Created by Adam on 2017-07-04.
+ * Created by Adam Poterałowicz
  */
 
 @Activity

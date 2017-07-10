@@ -1,16 +1,10 @@
 package com.apap.director.client.domain.util;
 
-import android.util.Base64;
-
-import com.apap.director.client.data.net.model.OneTimeKey;
-import com.apap.director.client.data.net.model.SignedKey;
 import com.apap.director.client.data.net.to.OneTimeKeyTO;
 import com.apap.director.client.data.net.to.SignedKeyTO;
 import com.apap.director.client.domain.model.ContactKeyModel;
 import com.apap.director.client.domain.model.MessageModel;
-import com.apap.director.client.domain.model.OneTimeKeyModel;
 import com.apap.director.client.domain.model.SessionModel;
-import com.apap.director.client.domain.model.SignedKeyModel;
 
 import org.whispersystems.curve25519.Curve25519;
 import org.whispersystems.libsignal.DuplicateMessageException;

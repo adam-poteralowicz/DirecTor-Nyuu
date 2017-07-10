@@ -1,16 +1,12 @@
 package com.apap.director.client.presentation.di.module;
 
-import android.content.Context;
-
-import com.apap.director.client.data.manager.AccountManager;
+import com.apap.director.client.data.db.service.AccountStore;
 import com.apap.director.client.data.store.IdentityKeyStoreImpl;
 import com.apap.director.client.data.store.PreKeyStoreImpl;
 import com.apap.director.client.data.store.SessionStoreImpl;
 import com.apap.director.client.data.store.SignedPreKeyStoreImpl;
 
 import org.whispersystems.curve25519.Curve25519;
-import org.whispersystems.libsignal.state.SignalProtocolStore;
-import org.whispersystems.libsignal.state.SignedPreKeyStore;
 
 import javax.inject.Singleton;
 
@@ -29,8 +25,8 @@ public class SignalModule {
 
     @Provides
     @Singleton
-    IdentityKeyStoreImpl provideIdentityKeyStore(Realm realm, AccountManager manager) {
-        return new IdentityKeyStoreImpl(realm, manager);
+    IdentityKeyStoreImpl provideIdentityKeyStore(AccountStore accountStore) {
+        return new IdentityKeyStoreImpl(accountStore);
     }
 
     @Provides

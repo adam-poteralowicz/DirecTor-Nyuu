@@ -1,6 +1,5 @@
 package com.apap.director.client.domain.interactor.register;
 
-import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.domain.interactor.base.BaseInteractor;
 import com.apap.director.client.domain.model.AccountModel;
 import com.apap.director.client.domain.repository.AccountRepository;

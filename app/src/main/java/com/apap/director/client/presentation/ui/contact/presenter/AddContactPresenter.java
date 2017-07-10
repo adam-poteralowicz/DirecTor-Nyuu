@@ -81,9 +81,7 @@ public class AddContactPresenter implements BasePresenter, AddContactContract.Pr
     public AccountEntity getActiveAccount() {
         final AccountEntity[] entity = {new AccountEntity()};
         subscriptions.add(getActiveAccountInteractor.execute(null)
-                .subscribe(accountModel -> {
-                            entity[0] = accountMapper.mapToEntity(accountModel);
-                        },
+                .subscribe(accountModel -> entity[0] = accountMapper.mapToEntity(accountModel),
                         throwable -> view.handleException(throwable)));
 
         return entity[0];

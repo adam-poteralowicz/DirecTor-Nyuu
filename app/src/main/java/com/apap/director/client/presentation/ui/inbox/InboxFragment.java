@@ -14,7 +14,6 @@ import android.widget.ListView;
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.data.db.entity.ConversationEntity;
-import com.apap.director.client.data.manager.ConversationManager;
 import com.apap.director.client.domain.repository.ConversationRepository;
 import com.apap.director.client.presentation.ui.inbox.contract.InboxContract;
 import com.apap.director.client.presentation.ui.inbox.di.DaggerInboxComponent;
@@ -38,8 +37,6 @@ public class InboxFragment extends Fragment implements InboxContract.View {
 
     @Inject
     InboxPresenter inboxPresenter;
-    @Inject
-    ConversationManager conversationManager;
 
     @BindView(R.id.msgList)
     ListView msgListView;
