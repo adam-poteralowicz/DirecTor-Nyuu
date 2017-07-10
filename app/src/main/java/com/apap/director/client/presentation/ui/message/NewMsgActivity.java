@@ -14,6 +14,7 @@ import com.apap.director.client.R;
 import com.apap.director.client.data.db.entity.AccountEntity;
 import com.apap.director.client.data.db.entity.ConversationEntity;
 import com.apap.director.client.data.db.entity.MessageEntity;
+import com.apap.director.client.data.db.service.DbConversationService;
 import com.apap.director.client.data.manager.ConversationManager;
 import com.apap.director.client.data.manager.MessageManager;
 import com.apap.director.client.data.net.service.ClientService;
@@ -62,6 +63,7 @@ public class NewMsgActivity extends Activity implements NewMsgContract.View {
     private ArrayAdapterChangeListener<MessageEntity, RealmResults<MessageEntity>> changeListener;
     private RealmResults<MessageEntity> allMessages;
     private MessageRepository messageRepository;
+    private DbConversationService dbConversationService;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,7 +106,7 @@ public class NewMsgActivity extends Activity implements NewMsgContract.View {
         if ("".equals(newMessage))
             return;
 
-        ConversationEntity conversation = conversationManager.getConversationByContactId(contactIdFromIntent);
+        ConversationEntity conversation = dbConversationService.getConversationByContactId(contactIdFromIntent);
 
         ClientService.sendEncryptedMessage(conversation.getContact().getContactKey().getKeyBase64(), realm.where(AccountEntity.class).equalTo("active", true).findFirst().getKeyBase64(), newMessage);
         newMessageField.setText("");

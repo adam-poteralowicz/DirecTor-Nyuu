@@ -18,15 +18,14 @@ import dagger.Module;
 import dagger.Provides;
 
 /**
- * Created by Adam on 2017-07-06.
+ * Created by Adam Poterałowicz
  */
 
 @Module
 public class MapperModule {
 
     /* Entity 2 Model mappers */
-
-
+    
     @Provides
     @Singleton
     MessageMapper provideMessageMapper(MessageMapper messageMapper) {

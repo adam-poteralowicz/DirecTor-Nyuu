@@ -11,7 +11,6 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
-import rx.functions.Action1;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompHeader;
 import ua.naiksoftware.stomp.client.StompClient;
@@ -32,12 +31,13 @@ public class WebSocketService {
     private StompClient client;
 
     public void createClient(String cookie) {
-        if(client != null) return;
+        if (client != null)
+            return;
         client = Stomp.over(WebSocket.class, WEBSOCKET_ADRESS, prepareConnectionHeaders(cookie));
     }
 
     public void destroyClient() {
-        if(client != null) {
+        if (client != null) {
             client.disconnect();
             client = null;
         }
@@ -54,20 +54,24 @@ public class WebSocketService {
     //TODO leak - wait for RxJava2 comaptibility or figure out sth else
     public Observable<StompMessage> getMessages(String cookie) {
 
-        if(client == null) return Observable.error(new IOException("Client not connected"));
-        if(!client.isConnected()) return Observable.error(new IOException("Client not connected"));
+        if (client == null)
+            return Observable.error(new IOException("Client not connected"));
+        if (!client.isConnected())
+            return Observable.error(new IOException("Client not connected"));
 
         PublishSubject<StompMessage> eventBus = PublishSubject.create();
 
-        return  eventBus.doOnSubscribe(disposable -> client.topic(INBOX_PATH, prepareStompHeaders(cookie))
+        return eventBus.doOnSubscribe(disposable -> client.topic(INBOX_PATH, prepareStompHeaders(cookie))
                 .subscribe(eventBus::onNext));
     }
 
     //TODO leak - wait for RxJava2 comaptibility or figure out sth else
     public Observable<Void> sendMessage(String message, String recipentId) {
 
-        if(client == null) return Observable.error(new IOException("Client not connected"));
-        if(!client.isConnected()) return Observable.error(new IOException("Client not connected"));
+        if (client == null)
+            return Observable.error(new IOException("Client not connected"));
+        if (!client.isConnected())
+            return Observable.error(new IOException("Client not connected"));
 
         PublishSubject<Void> eventBus = PublishSubject.create();
 

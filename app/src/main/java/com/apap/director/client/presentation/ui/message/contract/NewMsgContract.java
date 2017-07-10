@@ -7,16 +7,18 @@ import com.apap.director.client.presentation.ui.base.contract.view.BaseView;
 import java.util.List;
 
 /**
- * Created by Adam on 2017-07-04.
+ * Created by Adam Poterałowicz
  */
 
 public interface NewMsgContract {
 
     interface View extends BaseView {
+
         void refreshMessageList(List<MessageEntity> data);
     }
 
     interface Presenter extends BasePresenter {
+
         void getMessagesByContact(Long contactIdFromIntent);
     }
 }

@@ -10,7 +10,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Created by Adam on 2017-07-04.
+ * Created by Adam Poterałowicz
  */
 
 public class AccountViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

@@ -1,7 +1,5 @@
 package com.apap.director.client.presentation.di.module;
 
-import android.content.Context;
-
 import javax.inject.Singleton;
 
 import dagger.Module;

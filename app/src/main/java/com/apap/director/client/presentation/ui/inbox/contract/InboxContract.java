@@ -25,6 +25,7 @@ public interface InboxContract {
     }
 
     interface Presenter extends BasePresenter {
+
         void getConversations(@Nullable RealmResults<ConversationEntity> conversations);
 
         void deleteConversation(ConversationEntity conversationEntity);

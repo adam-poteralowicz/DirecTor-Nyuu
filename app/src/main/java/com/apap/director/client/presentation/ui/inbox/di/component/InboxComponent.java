@@ -8,7 +8,7 @@ import com.apap.director.client.presentation.ui.inbox.di.module.InboxContractMod
 import dagger.Component;
 
 /**
- * Created by Adam on 2017-07-05.
+ * Created by Adam Poterałowicz
  */
 
 @Activity

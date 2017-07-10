@@ -11,7 +11,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 /**
  * Created by Alicja Michniewicz
  */
@@ -30,7 +29,6 @@ public class AccountModel {
     private boolean registered;
     private boolean active;
     private String cookie;
-
 
 
     public void generateOneTimeKeys(int startLocalId, int startPreKeyId, int count) {

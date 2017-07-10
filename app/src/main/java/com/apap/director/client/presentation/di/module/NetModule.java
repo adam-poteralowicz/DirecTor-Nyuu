@@ -1,23 +1,17 @@
 package com.apap.director.client.presentation.di.module;
 
 import android.content.Context;
-import android.content.Intent;
 
 import com.apap.director.client.data.net.rest.Paths;
 import com.apap.director.client.data.net.rest.service.KeyService;
 import com.apap.director.client.data.net.rest.service.RestAccountService;
-import com.apap.director.client.data.net.service.HttpService;
 import com.apap.director.client.data.net.service.WebSocketService;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import info.guardianproject.netcipher.client.StrongBuilder;
-import info.guardianproject.netcipher.client.StrongConnectionBuilder;
-import info.guardianproject.netcipher.client.StrongOkHttpClientBuilder;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

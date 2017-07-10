@@ -1,7 +1,5 @@
 package com.apap.director.client.domain.model;
 
-import java.util.List;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

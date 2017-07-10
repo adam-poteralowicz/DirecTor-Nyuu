@@ -9,7 +9,6 @@ import com.apap.director.client.data.net.to.OneTimeKeyTO;
 import com.apap.director.client.data.net.to.SignedKeyTO;
 import com.apap.director.client.domain.model.ContactKeyModel;
 import com.apap.director.client.domain.model.MessageModel;
-import com.apap.director.client.domain.model.OneTimeKeyModel;
 import com.apap.director.client.domain.model.SessionModel;
 import com.apap.director.client.domain.model.SignedKeyModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,8 +38,6 @@ import org.whispersystems.libsignal.state.PreKeyStore;
 import org.whispersystems.libsignal.state.SessionRecord;
 import org.whispersystems.libsignal.state.SessionStore;
 import org.whispersystems.libsignal.state.SignedPreKeyStore;
-
-import java.io.UnsupportedEncodingException;
 
 /**
  * Created by Alicja Michniewicz

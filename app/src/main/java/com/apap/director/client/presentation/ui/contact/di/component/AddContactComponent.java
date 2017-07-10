@@ -8,7 +8,7 @@ import com.apap.director.client.presentation.ui.contact.di.module.AddContactCont
 import dagger.Component;
 
 /**
- * Created by Adam on 2017-07-03.
+ * Created by Adam Poterałowicz
  */
 
 @Activity

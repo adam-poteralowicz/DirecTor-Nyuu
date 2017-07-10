@@ -11,7 +11,7 @@ import info.guardianproject.netcipher.client.StrongOkHttpClientBuilder;
 import okhttp3.OkHttpClient;
 
 /**
- * Created by Alicja Michniewicz on 03/07/2017.
+ * Created by Alicja Michniewicz
  */
 
 public class NetActivity extends Activity implements StrongOkHttpClientBuilder.Callback<OkHttpClient> {

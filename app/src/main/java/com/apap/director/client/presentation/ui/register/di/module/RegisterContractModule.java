@@ -1,7 +1,6 @@
 package com.apap.director.client.presentation.ui.register.di.module;
 
 import com.apap.director.client.presentation.di.scope.Activity;
-import com.apap.director.client.presentation.ui.login.contract.LoginContract;
 import com.apap.director.client.presentation.ui.register.contract.RegisterContract;
 
 import dagger.Module;

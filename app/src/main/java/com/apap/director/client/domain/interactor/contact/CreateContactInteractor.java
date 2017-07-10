@@ -3,7 +3,6 @@ package com.apap.director.client.domain.interactor.contact;
 import android.support.v4.util.Pair;
 
 import com.apap.director.client.domain.interactor.base.BaseInteractor;
-import com.apap.director.client.domain.interactor.inbox.CreateConversationInteractor;
 import com.apap.director.client.domain.model.AccountModel;
 import com.apap.director.client.domain.model.ContactModel;
 import com.apap.director.client.domain.repository.AccountRepository;
@@ -23,7 +22,7 @@ public class CreateContactInteractor extends BaseInteractor<ContactModel, Pair<S
     private AccountRepository accountRepository;
 
     @Inject
-    public CreateContactInteractor(ContactRepository contactRepository, AccountRepository accountRepository, CreateConversationInteractor createConversationInteractor) {
+    public CreateContactInteractor(ContactRepository contactRepository, AccountRepository accountRepository) {
         this.contactRepository = contactRepository;
         this.accountRepository = accountRepository;
     }

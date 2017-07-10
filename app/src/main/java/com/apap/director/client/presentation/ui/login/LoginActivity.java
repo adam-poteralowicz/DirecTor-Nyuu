@@ -124,17 +124,6 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-
     @OnClick(R.id.postLoginButton)
     public void onClick(View view) {
         try {

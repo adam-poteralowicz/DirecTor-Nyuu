@@ -1,6 +1,5 @@
 package com.apap.director.client.domain.interactor.message;
 
-import com.apap.director.client.data.db.entity.MessageEntity;
 import com.apap.director.client.domain.interactor.base.BaseInteractor;
 import com.apap.director.client.domain.model.MessageModel;
 import com.apap.director.client.domain.repository.MessageRepository;
@@ -12,7 +11,7 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 
 /**
- * Created by Adam on 2017-07-04.
+ * Created by Adam Poterałowicz
  */
 
 public class GetMessageListInteractor extends BaseInteractor<List<MessageModel>, Long> {
