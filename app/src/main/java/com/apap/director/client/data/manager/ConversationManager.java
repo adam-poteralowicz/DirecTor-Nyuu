@@ -16,12 +16,10 @@ import io.realm.RealmResults;
 
 public class ConversationManager {
     private Realm realm;
-    private AccountManager accountManager;
 
     @Inject
-    public ConversationManager(Realm realm, AccountManager accountManager) {
+    public ConversationManager(Realm realm) {
         this.realm = realm;
-        this.accountManager = accountManager;
 
     }
 

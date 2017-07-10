@@ -4,18 +4,20 @@ import com.apap.director.client.presentation.ui.base.contract.presenter.BasePres
 import com.apap.director.client.presentation.ui.base.contract.view.BaseView;
 
 /**
- * Created by Adam on 2017-07-03.
+ * Created by Adam Poterałowicz
  */
 
 public interface NewContactContract {
 
     interface View extends BaseView {
+
         void showSnackbar(String text);
-        void addConversation(String contactName);
+
+        void handleSuccess(String text);
     }
 
     interface Presenter extends BasePresenter {
+
         void addContact(String name, String publicKey);
-        void addConversation(String contactName);
     }
 }

@@ -12,8 +12,6 @@ import android.widget.TextView;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.client.data.db.service.DbContactService;
-import com.apap.director.client.data.manager.ConversationManager;
 import com.apap.director.client.presentation.ui.contact.contract.NewContactContract;
 import com.apap.director.client.presentation.ui.contact.di.component.DaggerNewContactComponent;
 import com.apap.director.client.presentation.ui.contact.di.module.NewContactContractModule;
@@ -27,10 +25,10 @@ import butterknife.OnClick;
 
 public class NewContactActivity extends Activity implements NewContactContract.View {
 
+    private final String TAG = getClass().getSimpleName();
+
     @Inject
     NewContactPresenter newContactPresenter;
-    @Inject
-    ConversationManager conversationManager;
 
     @BindView(R.id.contactNameEditText)
     EditText contactNameEditText;
@@ -40,7 +38,6 @@ public class NewContactActivity extends Activity implements NewContactContract.V
     View rootView;
 
     private String contactPublicKey;
-    private DbContactService dbContactService;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,7 +56,6 @@ public class NewContactActivity extends Activity implements NewContactContract.V
 
         String contactName = String.valueOf(contactNameEditText.getText());
         newContactPresenter.addContact(contactName, contactPublicKey);
-        newContactPresenter.addConversation(contactName);
 
         Snackbar.make(rootView, contactPublicKey, Snackbar.LENGTH_LONG).show();
 
@@ -73,8 +69,8 @@ public class NewContactActivity extends Activity implements NewContactContract.V
     }
 
     @Override
-    public void addConversation(String contactName) {
-        conversationManager.addConversation(dbContactService.getContactByName(contactName));
+    public void handleSuccess(String text) {
+        Log.v(TAG, text);
     }
 
     @Override

@@ -19,7 +19,7 @@ import io.reactivex.Observable;
  * Created by Adam Poterałowicz
  */
 
-public class  ContactRepositoryImpl implements ContactRepository {
+public class ContactRepositoryImpl implements ContactRepository {
 
     private DbContactService dbContactService;
     private KeyService keyService;
