@@ -2,7 +2,6 @@ package com.apap.director.client.presentation.di.module;
 
 import com.apap.director.client.data.manager.AccountManager;
 import com.apap.director.client.data.manager.ContactManager;
-import com.apap.director.client.data.manager.ConversationManager;
 import com.apap.director.client.data.manager.MessageManager;
 
 import javax.inject.Singleton;
@@ -31,11 +30,4 @@ public class ManagerModule {
     MessageManager provideMessageManager(Realm realm) {
         return new MessageManager(realm);
     }
-
-    @Provides
-    @Singleton
-    ConversationManager provideConversationManager(Realm realm) {
-        return new ConversationManager(realm);
-    }
-
 }

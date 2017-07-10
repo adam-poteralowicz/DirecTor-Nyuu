@@ -4,16 +4,14 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.apap.director.client.data.db.entity.ContactEntity;
-import com.apap.director.client.data.manager.ContactManager;
-import com.apap.director.client.data.manager.ConversationManager;
+import com.apap.director.client.data.db.entity.ContactKeyEntity;
+import com.apap.director.client.data.db.entity.ConversationEntity;
 import com.apap.director.client.data.manager.MessageManager;
 import com.apap.director.client.data.net.to.MessageTO;
 import com.apap.director.client.data.store.IdentityKeyStoreImpl;
 import com.apap.director.client.data.store.PreKeyStoreImpl;
 import com.apap.director.client.data.store.SessionStoreImpl;
 import com.apap.director.client.data.store.SignedPreKeyStoreImpl;
-import com.apap.director.client.data.db.entity.ContactKeyEntity;
-import com.apap.director.client.data.db.entity.ConversationEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.whispersystems.libsignal.DuplicateMessageException;
@@ -50,7 +48,7 @@ public class MessageAction implements Action1<StompMessage> {
     private String TAG = this.getClass().getSimpleName();
 
     @Inject
-    public MessageAction(PreKeyStoreImpl preKeyStore, IdentityKeyStoreImpl identityKeyStore, SessionStoreImpl sessionStore, SignedPreKeyStoreImpl signedPreKeyStore, MessageManager messageManager, ContactManager contactManager, ConversationManager conversationManager) {
+    public MessageAction(PreKeyStoreImpl preKeyStore, IdentityKeyStoreImpl identityKeyStore, SessionStoreImpl sessionStore, SignedPreKeyStoreImpl signedPreKeyStore, MessageManager messageManager) {
         this.preKeyStore = preKeyStore;
         this.identityKeyStore = identityKeyStore;
         this.sessionStore = sessionStore;
@@ -80,7 +78,6 @@ public class MessageAction implements Action1<StompMessage> {
             localRealm.close();
 
             ContactEntity contact = key.getContact();
-
 
             Log.v(TAG, "ContactEntity name " + contact.getName());
 

@@ -3,7 +3,6 @@ package com.apap.director.client.domain.interactor.message;
 import com.apap.director.client.data.net.service.WebSocketService;
 import com.apap.director.client.data.net.to.MessageTO;
 import com.apap.director.client.domain.interactor.base.BaseInteractor;
-import com.apap.director.client.domain.interactor.contact.GetOneTimeKeyInteractor;
 import com.apap.director.client.domain.model.AccountModel;
 import com.apap.director.client.domain.model.ContactKeyModel;
 import com.apap.director.client.domain.model.MessageModel;
