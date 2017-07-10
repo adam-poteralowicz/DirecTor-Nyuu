@@ -12,7 +12,7 @@ import javax.inject.Inject;
 
 public class SessionMapper extends BaseMapper<SessionModel, SessionEntity> {
 
-    AccountMapper accountMapper;
+    private AccountMapper accountMapper;
 
     @Inject
     public SessionMapper(AccountMapper accountMapper) {

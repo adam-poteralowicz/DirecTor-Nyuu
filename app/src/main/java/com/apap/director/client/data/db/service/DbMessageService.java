@@ -3,7 +3,6 @@ package com.apap.director.client.data.db.service;
 import com.apap.director.client.data.db.entity.ContactEntity;
 import com.apap.director.client.data.db.entity.ConversationEntity;
 import com.apap.director.client.data.db.entity.MessageEntity;
-import com.apap.director.client.data.db.entity.SignedKeyEntity;
 
 import java.util.List;
 
@@ -14,7 +13,7 @@ import io.realm.RealmList;
 import io.realm.RealmResults;
 
 /**
- * Created by Adam on 2017-07-04.
+ * Created by Adam Poterałowicz
  */
 
 public class DbMessageService {

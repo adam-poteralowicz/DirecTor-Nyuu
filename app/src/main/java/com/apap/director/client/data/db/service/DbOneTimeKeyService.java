@@ -1,7 +1,6 @@
 package com.apap.director.client.data.db.service;
 
 import com.apap.director.client.data.db.entity.OneTimeKeyEntity;
-import com.apap.director.client.data.db.entity.SignedKeyEntity;
 
 import javax.inject.Inject;
 
