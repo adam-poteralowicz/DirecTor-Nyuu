@@ -31,7 +31,7 @@ import butterknife.OnClick;
 
 public class NewAccountActivity extends Activity implements Validator.ValidationListener, RegisterContract.View {
 
-    private final String RESULT_EXTRA = "result";
+    private static final String RESULT_EXTRA = "result";
 
     @Inject
     RegisterPresenter presenter;

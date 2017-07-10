@@ -158,8 +158,7 @@ public class ClientService {
             String encodedText = Base64.encodeToString(message.serialize(), Base64.URL_SAFE | Base64.NO_WRAP);
 
             MessageTO frame = new MessageTO(from, encodedText, message.getType());
-            ObjectMapper mapper = new ObjectMapper();
-            String json = mapper.writeValueAsString(frame);
+            
 
             client.send("/app/message/test/" + to, json)
                     .subscribe(aVoid -> {
