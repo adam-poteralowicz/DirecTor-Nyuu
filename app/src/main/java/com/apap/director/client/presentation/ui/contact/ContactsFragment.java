@@ -64,7 +64,7 @@ public class ContactsFragment extends Fragment implements ContactsContract.View 
         contactsPresenter.getActiveAccount();
         contactsPresenter.getContactList();
 
-        changeListener = new ArrayAdapterChangeListener<>(setUpAdapter(), "contacts fragment listner");
+        changeListener = new ArrayAdapterChangeListener<>(setUpAdapter(), "contacts fragment listener");
         allContacts.addChangeListener(changeListener);
     }
 

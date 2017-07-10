@@ -5,12 +5,17 @@ import android.nfc.NfcAdapter;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
 
+import com.apap.director.client.data.db.entity.AccountEntity;
+import com.apap.director.client.data.db.mapper.AccountMapper;
+import com.apap.director.client.domain.interactor.account.GetActiveAccountInteractor;
 import com.apap.director.client.presentation.ui.base.contract.presenter.BasePresenter;
 import com.apap.director.client.presentation.ui.contact.contract.AddContactContract;
 
 import java.util.List;
 
 import javax.inject.Inject;
+
+import io.reactivex.disposables.CompositeDisposable;
 
 /**
  * Created by Adam Poterałowicz
@@ -20,15 +25,23 @@ public class AddContactPresenter implements BasePresenter, AddContactContract.Pr
 
     private static final String MIME_TYPE = "text/plain";
     private AddContactContract.View view;
+    private GetActiveAccountInteractor getActiveAccountInteractor;
+
+    private CompositeDisposable subscriptions;
+    private AccountMapper accountMapper;
 
     @Inject
-    AddContactPresenter(AddContactContract.View view) {
+    AddContactPresenter(AddContactContract.View view, GetActiveAccountInteractor getActiveAccountInteractor) {
         this.view = view;
+        this.getActiveAccountInteractor = getActiveAccountInteractor;
+
+        subscriptions = new CompositeDisposable();
     }
 
     @Override
     public void dispose() {
-
+        subscriptions.dispose();
+        subscriptions.clear();
     }
 
     @Override
@@ -62,6 +75,18 @@ public class AddContactPresenter implements BasePresenter, AddContactContract.Pr
 
             view.getReadIntentFilters(ndefDetected);
         }
+    }
+
+    @Override
+    public AccountEntity getActiveAccount() {
+        final AccountEntity[] entity = {new AccountEntity()};
+        subscriptions.add(getActiveAccountInteractor.execute(null)
+                .subscribe(accountModel -> {
+                            entity[0] = accountMapper.mapToEntity(accountModel);
+                        },
+                        throwable -> view.handleException(throwable)));
+
+        return entity[0];
     }
 }
 
