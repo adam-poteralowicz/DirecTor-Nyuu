@@ -1,10 +1,12 @@
 package com.apap.director.client.domain.util;
 
+import android.util.Base64;
+
+import com.apap.director.client.data.net.to.MessageTO;
 import com.apap.director.client.data.net.to.OneTimeKeyTO;
 import com.apap.director.client.data.net.to.SignedKeyTO;
 import com.apap.director.client.domain.model.ContactKeyModel;
 import com.apap.director.client.domain.model.MessageModel;
-import com.apap.director.client.domain.model.SessionModel;
 
 import org.whispersystems.curve25519.Curve25519;
 import org.whispersystems.libsignal.DuplicateMessageException;
@@ -28,9 +30,10 @@ import org.whispersystems.libsignal.protocol.SignalMessage;
 import org.whispersystems.libsignal.state.IdentityKeyStore;
 import org.whispersystems.libsignal.state.PreKeyBundle;
 import org.whispersystems.libsignal.state.PreKeyStore;
-import org.whispersystems.libsignal.state.SessionRecord;
 import org.whispersystems.libsignal.state.SessionStore;
 import org.whispersystems.libsignal.state.SignedPreKeyStore;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  * Created by Alicja Michniewicz
@@ -59,19 +62,22 @@ public class EncryptionService {
         return new String(curve.calculateSignature(keyPair.getPrivateKey().serialize(), message.getBytes()));
     }
 
-    public MessageModel encryptMessage(IdentityKeyPair keyPair, MessageModel message) {
-        return null;
+    public MessageTO encryptMessage(ContactKeyModel contactKey, MessageModel message) throws UnsupportedEncodingException {
+        SignalProtocolAddress address = new SignalProtocolAddress(contactKey.getKeyBase64(), contactKey.getDeviceId());
+        SessionCipher sessionCipher = new SessionCipher(sessionStore, preKeyStore, signedPreKeyStore, identityKeyStore, address);
+
+        CiphertextMessage encryptedMessage = sessionCipher.encrypt(message.getContent().getBytes("UTF-8"));
+        String encodedText = Base64.encodeToString(encryptedMessage.serialize(), Base64.URL_SAFE | Base64.NO_WRAP);
+
+        return new  MessageTO(null, encodedText, encryptedMessage.getType());
     }
 
-    public SessionModel buildSession(ContactKeyModel contactKey, OneTimeKeyTO oneTimeKey, SignedKeyTO signedKey) throws InvalidKeyException, UntrustedIdentityException {
+    public void buildSession(ContactKeyModel contactKey, OneTimeKeyTO oneTimeKey, SignedKeyTO signedKey) throws InvalidKeyException, UntrustedIdentityException {
         SignalProtocolAddress address = new SignalProtocolAddress(contactKey.getKeyBase64(), contactKey.getDeviceId());
         SessionBuilder sessionBuilder = new SessionBuilder(sessionStore, preKeyStore, signedPreKeyStore, identityKeyStore, address);
 
         sessionBuilder.process(buildPreKeyBundle(contactKey, oneTimeKey, signedKey));
-
-        return
     }
-
 
     public MessageModel decryptMessage(ContactKeyModel contactKey, MessageModel message, int messageType) throws NoSessionException, UntrustedIdentityException, LegacyMessageException, InvalidVersionException, InvalidMessageException, DuplicateMessageException, InvalidKeyException, InvalidKeyIdException {
         SignalProtocolAddress address = new SignalProtocolAddress(contactKey.getKeyBase64(), contactKey.getDeviceId());
@@ -80,12 +86,6 @@ public class EncryptionService {
         message.setContent(decryptText(address, decodedMessage, messageType));
 
         return message;
-    }
-
-    //TODO create mapper
-    private SessionModel mapRecordToSessionModel(SessionRecord sessionRecord) {
-        SessionModel sessionModel = new SessionModel();
-        sessionStore.loadSession()
     }
 
     private PreKeyBundle buildPreKeyBundle(ContactKeyModel contactKey, OneTimeKeyTO preKey, SignedKeyTO signedKey) throws InvalidKeyException {
@@ -105,11 +105,6 @@ public class EncryptionService {
 
     private byte[] getSignature(SignedKeyTO signedKeyTO) {
         return Base64Util.convertToBytes(signedKeyTO.getSignatureBase64());
-    }
-
-    private SessionRecord loadSession(ContactKeyModel contactKey) {
-        SignalProtocolAddress address = new SignalProtocolAddress(contactKey.getKeyBase64(), contactKey.getDeviceId());
-        return sessionStore.loadSession(address);
     }
 
     private String decryptText(SignalProtocolAddress address, byte[] decodedMessage, int messageType) throws InvalidVersionException, InvalidMessageException, InvalidKeyException, DuplicateMessageException, InvalidKeyIdException, UntrustedIdentityException, LegacyMessageException, NoSessionException {
