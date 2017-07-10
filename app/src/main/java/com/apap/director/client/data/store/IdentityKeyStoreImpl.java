@@ -19,10 +19,12 @@ import io.realm.Realm;
 
 public class IdentityKeyStoreImpl implements IdentityKeyStore {
 
+    private Realm realm;
     private AccountStore accountStore;
 
     @Inject
-    public IdentityKeyStoreImpl(AccountStore accountStore) {
+    public IdentityKeyStoreImpl(Realm realm, AccountStore accountStore) {
+        this.realm = realm;
         this.accountStore = accountStore;
     }
 
@@ -45,12 +47,8 @@ public class IdentityKeyStoreImpl implements IdentityKeyStore {
     @Override
     public void saveIdentity(SignalProtocolAddress address, IdentityKey identityKey) {
 
-        //TODO: refactor, będzie powodowało błędy, nie mam pomysłu, dlaczego zamknięcie na końcu nie działa :(
-        Realm realm = Realm.getDefaultInstance();
-
         realm.beginTransaction();
         ContactKeyEntity sameName = realm.where(ContactKeyEntity.class).equalTo("keyBase64", address.getName()).equalTo("deviceId", address.getDeviceId()).findFirst();
-
 
         if (sameName != null) {
             realm.commitTransaction();

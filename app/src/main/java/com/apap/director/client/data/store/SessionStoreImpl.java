@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.apap.director.client.data.db.entity.ContactKeyEntity;
 import com.apap.director.client.data.db.entity.SessionEntity;
+import com.apap.director.client.data.db.service.AccountStore;
 
 import org.whispersystems.libsignal.SignalProtocolAddress;
 import org.whispersystems.libsignal.state.SessionRecord;
@@ -21,10 +22,12 @@ import io.realm.Realm;
 public class SessionStoreImpl implements SessionStore {
 
     private Realm realm;
+    private AccountStore accountStore;
 
     @Inject
-    public SessionStoreImpl(Realm realm) {
+    public SessionStoreImpl(Realm realm, AccountStore accountStore) {
         this.realm = realm;
+        this.accountStore = accountStore;
     }
 
     @Override
@@ -57,16 +60,13 @@ public class SessionStoreImpl implements SessionStore {
 
     @Override
     public void storeSession(SignalProtocolAddress address, SessionRecord record) {
-        Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
 
             SessionEntity sameName = realm.where(SessionEntity.class).equalTo("name", address.getName()).equalTo("deviceId", address.getDeviceId()).findFirst();
             if (sameName != null) {
                 sameName.setSerializedKey(record.serialize());
                 realm.copyToRealmOrUpdate(sameName);
-                realm.insertOrUpdate(sameName);
                 realm.commitTransaction();
-                realm.close();
                 return;
             }
 
@@ -81,32 +81,26 @@ public class SessionStoreImpl implements SessionStore {
             ContactKeyEntity contactKey = realm.where(ContactKeyEntity.class).equalTo("keyBase64", address.getName()).findFirst();
             session.setDeviceId(address.getDeviceId());
             session.setSerializedKey(record.serialize());
+            session.setOwner(accountStore.getActiveAccount());
 
         realm.commitTransaction();
-        realm.close();
-
     }
 
     @Override
     public boolean containsSession(SignalProtocolAddress address) {
-        Realm realm = Realm.getDefaultInstance();
         SessionEntity session = realm.where(SessionEntity.class)
                 .equalTo("name", address.getName())
                 .equalTo("deviceId", address.getDeviceId())
                 .findFirst();
 
-        realm.close();
         return session != null;
-
     }
 
     @Override
     public void deleteSession(SignalProtocolAddress address) {
-        Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
             realm.where(SessionEntity.class).equalTo("deviceId", address.getDeviceId()).equalTo("name", address.getName()).findFirst().deleteFromRealm();
         realm.commitTransaction();
-        realm.close();
     }
 
     @Override

@@ -27,7 +27,6 @@ public class PreKeyStoreImpl implements PreKeyStore {
 
     @Override
     public PreKeyRecord loadPreKey(int preKeyId) throws InvalidKeyIdException {
-        Realm realm = Realm.getDefaultInstance();
         try {
             OneTimeKeyEntity preKey = realm.where(OneTimeKeyEntity.class).equalTo("oneTimeKeyId", preKeyId).findFirst();
 
@@ -38,9 +37,6 @@ public class PreKeyStoreImpl implements PreKeyStore {
         } catch (IOException e) {
             Log.getStackTraceString(e);
             return null;
-        }
-        finally {
-            realm.close();
         }
     }
 
@@ -61,14 +57,11 @@ public class PreKeyStoreImpl implements PreKeyStore {
             oneTimeKey.setSerializedKey(record.serialize());
             realm.copyToRealmOrUpdate(oneTimeKey);
         realm.commitTransaction();
-
     }
 
     @Override
     public boolean containsPreKey(int preKeyId) {
-
         return realm.where(OneTimeKeyEntity.class).equalTo("oneTimeKeyId", preKeyId).findFirst() != null;
-
     }
 
     @Override
