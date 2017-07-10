@@ -11,7 +11,7 @@ import com.apap.director.client.presentation.ui.base.contract.view.BaseView;
 import java.util.List;
 
 /**
- * Created by Adam on 2017-07-03.
+ * Created by Adam Poterałowicz
  */
 
 public interface SingleContactContract {
@@ -38,5 +38,7 @@ public interface SingleContactContract {
         void deleteContact(ContactEntity contact);
 
         ConversationEntity createConversation(ContactEntity contact);
+
+        void updateContact(String contactName, String imagePath);
     }
 }

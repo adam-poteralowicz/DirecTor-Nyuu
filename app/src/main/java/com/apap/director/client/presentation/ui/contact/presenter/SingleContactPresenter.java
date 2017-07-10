@@ -10,10 +10,10 @@ import com.apap.director.client.data.db.entity.ConversationEntity;
 import com.apap.director.client.data.db.mapper.ContactMapper;
 import com.apap.director.client.data.db.mapper.ConversationMapper;
 import com.apap.director.client.data.db.service.DbContactService;
-import com.apap.director.client.data.manager.AccountManager;
-import com.apap.director.client.data.manager.ContactManager;
 import com.apap.director.client.domain.interactor.contact.DeleteContactInteractor;
+import com.apap.director.client.domain.interactor.contact.UpdateContactInteractor;
 import com.apap.director.client.domain.interactor.inbox.CreateConversationInteractor;
+import com.apap.director.client.domain.model.ContactModel;
 import com.apap.director.client.domain.model.ConversationModel;
 import com.apap.director.client.presentation.ui.base.contract.presenter.BasePresenter;
 import com.apap.director.client.presentation.ui.contact.contract.SingleContactContract;
@@ -33,14 +33,11 @@ public class SingleContactPresenter implements BasePresenter, SingleContactContr
 
     @Inject
     Realm realm;
-    @Inject
-    ContactManager contactManager;
-    @Inject
-    AccountManager accountManager;
 
     private SingleContactContract.View view;
     private DeleteContactInteractor deleteContactInteractor;
     private CreateConversationInteractor createConversationInteractor;
+    private UpdateContactInteractor updateContactInteractor;
 
     private DbContactService dbContactService;
     private ContactMapper contactMapper;
@@ -48,10 +45,14 @@ public class SingleContactPresenter implements BasePresenter, SingleContactContr
     private CompositeDisposable subscriptions;
 
     @Inject
-    SingleContactPresenter(SingleContactContract.View view, DeleteContactInteractor deleteContactInteractor, CreateConversationInteractor createConversationInteractor) {
+    SingleContactPresenter(SingleContactContract.View view,
+                           DeleteContactInteractor deleteContactInteractor,
+                           CreateConversationInteractor createConversationInteractor,
+                           UpdateContactInteractor updateContactInteractor) {
         this.view = view;
         this.deleteContactInteractor = deleteContactInteractor;
         this.createConversationInteractor = createConversationInteractor;
+        this.updateContactInteractor = updateContactInteractor;
 
         subscriptions = new CompositeDisposable();
     }
@@ -86,7 +87,7 @@ public class SingleContactPresenter implements BasePresenter, SingleContactContr
         assert cursor != null;
         cursor.moveToFirst();
         String imagePath = cursor.getString(cursor.getColumnIndex(filePath[0]));
-        contactManager.updateContact(contactName, imagePath, null, null);
+        updateContact(contactName, imagePath);
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
         cursor.close();
 
@@ -113,5 +114,15 @@ public class SingleContactPresenter implements BasePresenter, SingleContactContr
                         throwable -> view.handleException(throwable)));
 
         return conversationMapper.mapToEntity(model[0]);
+    }
+
+    @Override
+    public void updateContact(String contactName, String imagePath) {
+        ContactModel contact = contactMapper.mapToModel(dbContactService.getContactByName(contactName));
+        contact.setImage(imagePath);
+
+        subscriptions.add(updateContactInteractor.execute(contact)
+                .subscribe(contactModel -> view.handleSuccess(contactName + ": avatar retrieved"),
+                        throwable -> view.handleException(throwable)));
     }
 }
