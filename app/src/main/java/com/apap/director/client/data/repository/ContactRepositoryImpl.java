@@ -7,8 +7,6 @@ import com.apap.director.client.data.net.rest.service.KeyService;
 import com.apap.director.client.data.net.to.OneTimeKeyTO;
 import com.apap.director.client.data.net.to.SignedKeyTO;
 import com.apap.director.client.domain.model.ContactModel;
-import com.apap.director.client.domain.model.ConversationModel;
-import com.apap.director.client.domain.model.SessionModel;
 import com.apap.director.client.domain.repository.ContactRepository;
 
 import java.util.List;
@@ -72,5 +70,12 @@ public class  ContactRepositoryImpl implements ContactRepository {
         ContactEntity entity = contactMapper.mapToEntity(contactModel);
         dbContactService.updateContact(entity);
         return Observable.just(contactMapper.mapToModel(entity));
+    }
+
+    @Override
+    public Observable<Boolean> deleteContact(ContactModel contactModel) {
+        ContactEntity entity = contactMapper.mapToEntity(contactModel);
+        dbContactService.deleteContact(entity);
+        return Observable.just(!entity.isValid());
     }
 }

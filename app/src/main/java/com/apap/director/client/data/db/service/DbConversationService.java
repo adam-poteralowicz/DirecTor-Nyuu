@@ -46,6 +46,10 @@ public class DbConversationService {
         return realm.where(ConversationEntity.class).equalTo("ownerId.id", ownerId).findFirst();
     }
 
+    public ConversationEntity getConversationByContactId(Long contactId) {
+        return realm.where(ConversationEntity.class).equalTo("contacts.id", contactId).findFirst();
+    }
+
     public void deleteConversation(ConversationEntity conversationEntity) {
         realm.beginTransaction();
         conversationEntity.deleteFromRealm();

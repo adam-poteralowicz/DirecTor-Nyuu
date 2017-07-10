@@ -9,7 +9,7 @@ import io.realm.RealmList;
 import io.realm.RealmResults;
 
 /**
- * Created by Adam on 2017-07-03.
+ * Created by Adam Poterałowicz
  */
 
 public class DbContactService {
@@ -57,6 +57,12 @@ public class DbContactService {
     public void updateContact(ContactEntity contactEntity) {
         realm.beginTransaction();
         realm.copyToRealmOrUpdate(contactEntity);
+        realm.commitTransaction();
+    }
+
+    public void deleteContact(ContactEntity contactEntity) {
+        realm.beginTransaction();
+        contactEntity.deleteFromRealm();
         realm.commitTransaction();
     }
 }

@@ -39,12 +39,6 @@ public class ConversationRepositoryImpl implements ConversationRepository {
     }
 
     @Override
-    public Observable<ConversationModel> addSession(ConversationModel conversationModel, SessionModel sessionModel) {
-        conversationModel.setSession(sessionModel);
-        return Observable.just(conversationModel);
-    }
-
-    @Override
     public Observable<Boolean> deleteConversation(ConversationModel conversationModel) {
         ConversationEntity entity = conversationMapper.mapToEntity(conversationModel);
         dbConversationService.deleteConversation(entity);

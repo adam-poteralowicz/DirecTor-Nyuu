@@ -34,6 +34,8 @@ public class InboxPresenter implements BasePresenter, InboxContract.Presenter {
         this.view = view;
         this.getConversationListInteractor = getConversationListInteractor;
         this.deleteConversationInteractor = deleteConversationInteractor;
+
+        subscriptions = new CompositeDisposable();
     }
 
     @Override

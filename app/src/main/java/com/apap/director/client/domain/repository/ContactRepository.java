@@ -25,4 +25,6 @@ public interface ContactRepository {
     Observable<SignedKeyTO> getSignedKey(ContactModel contactModel);
 
     Observable<ContactModel> updateContact(ContactModel contactModel);
+
+    Observable<Boolean> deleteContact(ContactModel contactModel);
 }

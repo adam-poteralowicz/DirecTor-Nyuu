@@ -5,11 +5,8 @@ import com.apap.director.client.domain.interactor.contact.GetOneTimeKeyInteracto
 import com.apap.director.client.domain.interactor.contact.GetSignedKeyInteractor;
 import com.apap.director.client.domain.model.ContactModel;
 import com.apap.director.client.domain.model.ConversationModel;
-import com.apap.director.client.domain.model.SessionModel;
 import com.apap.director.client.domain.repository.ConversationRepository;
 import com.apap.director.client.domain.util.EncryptionService;
-
-import org.whispersystems.libsignal.SessionBuilder;
 
 import java.util.ArrayList;
 
@@ -48,8 +45,5 @@ public class CreateConversationInteractor extends BaseInteractor<ConversationMod
         conversationModel.setId(id);
 
         return Observable.just(conversationModel);
-    }
-
-    private Observable<SessionModel> buildSession() {
     }
 }
