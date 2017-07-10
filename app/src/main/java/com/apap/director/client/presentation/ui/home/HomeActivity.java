@@ -9,8 +9,6 @@ import android.util.Log;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
-import com.apap.director.client.data.db.entity.AccountEntity;
-import com.apap.director.client.data.manager.AccountManager;
 import com.apap.director.client.presentation.ui.home.adapter.DirecTorPagerAdapter;
 import com.apap.director.client.presentation.ui.home.contract.HomeContract;
 import com.apap.director.client.presentation.ui.home.di.component.DaggerHomeComponent;
@@ -26,10 +24,10 @@ import io.realm.Realm;
 
 public class HomeActivity extends FragmentActivity implements HomeContract.View {
 
+    private final String TAG = getClass().getSimpleName();
+
     @Inject
     HomePresenter homePresenter;
-    @Inject
-    AccountManager accountManager;
 
     @BindView(R.id.pager)
     ViewPager viewPager;
@@ -53,17 +51,8 @@ public class HomeActivity extends FragmentActivity implements HomeContract.View 
 
     @Override
     public void onBackPressed() {
-        homePresenter.logOut(accountManager.getActiveAccount());
-
+        homePresenter.logOut(homePresenter.getActiveAccount());
         startActivity(new Intent(HomeActivity.this, LoginActivity.class));
-    }
-
-    @Override
-    public void logOut(AccountEntity account) {
-        realm.beginTransaction();
-        account.setActive(false);
-        realm.copyToRealmOrUpdate(account);
-        realm.commitTransaction();
     }
 
     @Override
@@ -77,6 +66,11 @@ public class HomeActivity extends FragmentActivity implements HomeContract.View 
                 .homeContractModule(new HomeContractModule(this))
                 .build()
                 .inject(this);
+    }
+
+    @Override
+    public void handleSuccess(String message) {
+        Log.v(TAG, message);
     }
 }
 

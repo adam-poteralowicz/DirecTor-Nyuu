@@ -34,4 +34,6 @@ public interface AccountRepository {
     Observable<ResponseBody> postOneTimeKeys(AccountModel account);
 
     Observable<ResponseBody> postSignedKeys(AccountModel account);
+
+    Observable<AccountModel> logOut(AccountModel account);
 }

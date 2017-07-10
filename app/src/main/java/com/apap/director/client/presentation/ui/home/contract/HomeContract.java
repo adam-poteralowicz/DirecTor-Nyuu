@@ -5,16 +5,20 @@ import com.apap.director.client.presentation.ui.base.contract.presenter.BasePres
 import com.apap.director.client.presentation.ui.base.contract.view.BaseView;
 
 /**
- * Created by Adam on 2017-07-03.
+ * Created by Adam Poterałowicz
  */
 
 public interface HomeContract {
 
     interface View extends BaseView {
-        void logOut(AccountEntity account);
+
+        void handleSuccess(String message);
     }
 
     interface Presenter extends BasePresenter {
+
         void logOut(AccountEntity account);
+
+        AccountEntity getActiveAccount();
     }
 }

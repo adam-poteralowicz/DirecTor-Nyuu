@@ -93,6 +93,13 @@ public class AccountStore {
         realm.commitTransaction();
     }
 
+    public void logOut(AccountEntity accountEntity) {
+        realm.beginTransaction();
+        accountEntity.setActive(false);
+        realm.copyToRealmOrUpdate(accountEntity);
+        realm.commitTransaction();
+    }
+
     public String getSignedKeySignature(AccountEntity accountEntity) {
         SignedPreKeyRecord record = null;
         try {

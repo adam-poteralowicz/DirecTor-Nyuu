@@ -111,4 +111,11 @@ public class AccountRepositoryImpl implements AccountRepository {
         return keyService.postSignedKeys(keyTO, account.getCookie());
     }
 
+    @Override
+    public Observable<AccountModel> logOut(AccountModel account) {
+        AccountEntity entity = accountMapper.mapToEntity(account);
+        accountStore.logOut(entity);
+        return Observable.just(accountMapper.mapToModel(entity));
+    }
+
 }
