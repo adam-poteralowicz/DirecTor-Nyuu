@@ -29,7 +29,7 @@ public class SessionMapper extends BaseMapper<SessionModel, SessionEntity> {
         entity.setName(model.getName());
         entity.setSerializedKey(model.getSerializedKey());
         entity.setDeviceId(model.getDeviceId());
-        entity.setOwner();
+        entity.setOwner(accountMapper.mapToEntity(model.getOwner()));
         return entity;
     }
 
@@ -43,6 +43,7 @@ public class SessionMapper extends BaseMapper<SessionModel, SessionEntity> {
         model.setName(entity.getName());
         model.setSerializedKey(entity.getSerializedKey());
         model.setDeviceId(entity.getDeviceId());
+        model.setOwner(accountMapper.mapToModel(entity.getOwner()));
 
         return model;
     }
