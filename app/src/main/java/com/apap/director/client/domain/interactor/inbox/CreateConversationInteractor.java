@@ -30,10 +30,11 @@ public class CreateConversationInteractor extends BaseInteractor<ConversationMod
     private EncryptionService encryptionService;
 
     @Inject
-    public CreateConversationInteractor(ConversationRepository conversationRepository, GetOneTimeKeyInteractor getOneTimeKeyInteractor, GetSignedKeyInteractor getSignedKeyInteractor) {
+    public CreateConversationInteractor(ConversationRepository conversationRepository, GetOneTimeKeyInteractor getOneTimeKeyInteractor, GetSignedKeyInteractor getSignedKeyInteractor, EncryptionService encryptionService) {
         this.conversationRepository = conversationRepository;
         this.getOneTimeKeyInteractor = getOneTimeKeyInteractor;
         this.getSignedKeyInteractor = getSignedKeyInteractor;
+        this.encryptionService = encryptionService;
     }
 
     @Override
