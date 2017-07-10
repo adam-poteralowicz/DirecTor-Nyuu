@@ -2,16 +2,11 @@ package com.apap.director.client.domain.util;
 
 import android.util.Base64;
 
-import com.apap.director.client.data.net.model.OneTimeKey;
-import com.apap.director.client.data.net.model.SignedKey;
 import com.apap.director.client.data.net.to.MessageTO;
 import com.apap.director.client.data.net.to.OneTimeKeyTO;
 import com.apap.director.client.data.net.to.SignedKeyTO;
 import com.apap.director.client.domain.model.ContactKeyModel;
 import com.apap.director.client.domain.model.MessageModel;
-import com.apap.director.client.domain.model.SessionModel;
-import com.apap.director.client.domain.model.SignedKeyModel;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.whispersystems.curve25519.Curve25519;
 import org.whispersystems.libsignal.DuplicateMessageException;
@@ -35,9 +30,10 @@ import org.whispersystems.libsignal.protocol.SignalMessage;
 import org.whispersystems.libsignal.state.IdentityKeyStore;
 import org.whispersystems.libsignal.state.PreKeyBundle;
 import org.whispersystems.libsignal.state.PreKeyStore;
-import org.whispersystems.libsignal.state.SessionRecord;
 import org.whispersystems.libsignal.state.SessionStore;
 import org.whispersystems.libsignal.state.SignedPreKeyStore;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  * Created by Alicja Michniewicz
