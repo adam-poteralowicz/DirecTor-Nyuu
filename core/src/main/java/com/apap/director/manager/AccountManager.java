@@ -219,7 +219,7 @@ public class AccountManager {
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Log.v(getClass().getSimpleName(), "Account " + account.getName() + " failed to sign up");
-                Log.v("HAI", t.getMessage() + " " + t.getCause() + " ");
+                Log.v("HAI/Amanager", t.getMessage() + " " + t.getCause() + " ");
                 Log.getStackTraceString(t);
             }
         });
@@ -227,13 +227,18 @@ public class AccountManager {
     }
 
     private String requestCode() {
+        Realm realm = Realm.getDefaultInstance();
 
         try {
-            Realm realm = Realm.getDefaultInstance();
 
             Account active = realm.where(Account.class).equalTo("active", true).equalTo("registered", true).findFirst();
-            if (active == null)
+            if (active == null) {
+                Log.v("HAI/AccountManager", "request code failed - no active account");
+                realm.close();
                 return null;
+
+            }
+
 
             Call<String> requestCodeCall = userService.requestCode(active.getKeyBase64());
             Response<String> codeCallResponse = null;
@@ -244,6 +249,8 @@ public class AccountManager {
 
             if (!codeCallResponse.isSuccessful()) {
                 Log.v(getClass().getSimpleName(), "Failed to fetch code");
+                realm.close();
+
                 return null;
             }
 
@@ -261,13 +268,16 @@ public class AccountManager {
     }
 
     public String logIn() {
+        Realm realm = Realm.getDefaultInstance();
 
         try {
-            Realm realm = Realm.getDefaultInstance();
 
             Account active = realm.where(Account.class).equalTo("active", true).equalTo("registered", true).findFirst();
-            if (active == null)
+            if (active == null) {
+                realm.close();
                 return null;
+
+            }
 
             IdentityKeyPair keyPair = new IdentityKeyPair(active.getKeyPair());
             byte[] signature = curve25519.calculateSignature(keyPair.getPrivateKey().serialize(), requestCode().getBytes());
@@ -291,6 +301,7 @@ public class AccountManager {
 
             if (!loginCallResponse.isSuccessful()) {
                 Log.v(getClass().getSimpleName(), "Failed to login");
+                realm.close();
                 return null;
             }
 

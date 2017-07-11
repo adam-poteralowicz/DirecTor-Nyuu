@@ -22,10 +22,21 @@ import com.apap.director.client.R;
 import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.util.ArrayAdapterChangeListener;
 import com.apap.director.im.websocket.service.ClientService;
+import com.apap.director.im.websocket.service.MessageAction;
 import com.apap.director.manager.AccountManager;
+import com.apap.director.network.rest.service.KeyService;
 import com.apap.director.network.rest.service.UserService;
+import com.apap.director.signal.DirectorIdentityKeyStore;
+import com.apap.director.signal.DirectorPreKeyStore;
+import com.apap.director.signal.DirectorSessionStore;
+import com.apap.director.signal.DirectorSignedPreKeyStore;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
+
+import org.whispersystems.libsignal.state.IdentityKeyStore;
+import org.whispersystems.libsignal.state.PreKeyStore;
+import org.whispersystems.libsignal.state.SessionStore;
+import org.whispersystems.libsignal.state.SignedPreKeyStore;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -67,6 +78,24 @@ public class LoginActivity extends AppCompatActivity {
     private ArrayAdapter<Account> arrayAdapter;
     private String newAccName;
 
+    @Inject
+    DirectorIdentityKeyStore identityKeyStore;
+
+    @Inject
+    DirectorSignedPreKeyStore signedPreKeyStore;
+
+    @Inject
+    DirectorPreKeyStore preKeyStore;
+
+    @Inject
+    DirectorSessionStore sessionStore;
+
+    @Inject
+    MessageAction messageAction;
+
+    @Inject
+    KeyService keyService;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +104,7 @@ public class LoginActivity extends AppCompatActivity {
         ((App) getApplication()).getComponent().inject(this);
         ButterKnife.bind(this);
 
+        ClientService.init(messageAction, sessionStore, identityKeyStore, preKeyStore, signedPreKeyStore, keyService);
         shimmer();
 
         realmAccounts = realm.where(Account.class).findAll();
