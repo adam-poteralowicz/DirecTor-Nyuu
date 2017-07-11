@@ -45,7 +45,7 @@ import info.guardianproject.netcipher.client.StrongBuilder;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-public class LoginActivity extends AppCompatActivity implements StrongBuilder.Callback<HttpClient> {
+public class LoginActivity extends AppCompatActivity {
 
     Shimmer shimmer;
     //    String HS_URL = "http://3zk5ak4bcbfvwgha.onion";
@@ -141,70 +141,6 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
         }
     }
 
-    @Override
-    public void onConnected(final HttpClient httpClient) {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    Log.d("HS_URL", HS_URL);
-                    HttpGet get = new HttpGet(HS_URL);
-
-                    String result = httpClient.execute(get, new BasicResponseHandler());
-
-                    Log.v("LoginActivity", result);
-                } catch (IOException e) {
-                    onConnectionException(e);
-                }
-            }
-        }.start();
-    }
-
-    @Override
-    public void onConnectionException(Exception e) {
-        Log.e(getClass().getSimpleName(),
-                "Exception connecting to hidden service", e);
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(LoginActivity.this, R.string.msg_crash,
-                        Toast.LENGTH_LONG)
-                        .show();
-                finish();
-            }
-        });
-    }
-
-    @Override
-    public void onTimeout() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast
-                        .makeText(LoginActivity.this, R.string.msg_timeout,
-                                Toast.LENGTH_LONG)
-                        .show();
-                Log.d("onTimeout", String.valueOf(R.string.msg_timeout));
-                finish();
-            }
-        });
-    }
-
-    @Override
-    public void onInvalid() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast
-                        .makeText(LoginActivity.this, R.string.msg_invalid,
-                                Toast.LENGTH_LONG)
-                        .show();
-                Log.d("onInvalid", String.valueOf(R.string.msg_invalid));
-                finish();
-            }
-        });
-    }
 
     @Override
     protected void onStart() {

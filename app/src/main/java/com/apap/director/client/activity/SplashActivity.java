@@ -17,7 +17,5 @@ public class SplashActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(LAYOUT_ID);
-
-        startActivity(new Intent(this, LoginActivity.class));
     }
 }
