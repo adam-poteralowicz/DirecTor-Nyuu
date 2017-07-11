@@ -33,7 +33,6 @@
         <activity android:name=".activity.NewContactActivity"/>
         <activity android:name=".activity.SingleContactActivity"
             android:configChanges="orientation|screenSize" />
-        <activity android:name=".activity.ErrorActivity" />
 
     </application>
 
