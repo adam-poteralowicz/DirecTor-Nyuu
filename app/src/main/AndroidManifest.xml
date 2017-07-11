@@ -11,7 +11,7 @@
 
 
         <activity
-            android:name=".activity.LoginActivity"
+            android:name=".activity.SplashActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -23,14 +23,16 @@
         <service android:enabled="true" android:name=".wifi.FileTransferService" />
         <service android:name="com.apap.director.im.websocket.service.StompService" />
 
-        <activity android:name=".activity.AuthUserActivity"></activity>
-        <activity android:name=".activity.InboxActivity"></activity>
-        <activity android:name=".activity.NewMsgActivity"></activity>
-        <activity android:name=".activity.AddContactActivity"></activity>
-        <activity android:name=".activity.NewAccountActivity"></activity>
-        <activity android:name=".activity.NewContactActivity"></activity>
+        <activity android:name=".activity.LoginActivity"/>
+        <activity android:name=".activity.AuthUserActivity"/>
+        <activity android:name=".activity.InboxActivity"/>
+        <activity android:name=".activity.NewMsgActivity"/>
+        <activity android:name=".activity.AddContactActivity"/>
+        <activity android:name=".activity.NewAccountActivity"/>
+        <activity android:name=".activity.NewContactActivity"/>
         <activity android:name=".activity.SingleContactActivity"
             android:configChanges="orientation|screenSize" />
+
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
