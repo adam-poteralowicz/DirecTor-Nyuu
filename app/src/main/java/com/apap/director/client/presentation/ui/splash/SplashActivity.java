@@ -22,12 +22,5 @@ public class SplashActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(LAYOUT_ID);
-
-        if (getSharedPreferences(SHARED_PREFERENCES_FILENAME, MODE_PRIVATE).contains(KEY)) {
-            startActivity(new Intent(SplashActivity.this, LoginActivity.class));
-        } else {
-            startActivity(new Intent(SplashActivity.this, PasswordActivity.class));
-        }
-
     }
 }

@@ -76,8 +76,8 @@ public class InteractorModule {
 
     @Singleton
     @Provides
-    CreateAccountInteractor provideCreateAccountInteractor(GenerateSignedKeyInteractor generateSignedKeyInteractor, GenerateOneTimeKeysInteractor generateOneTimeKeysInteractor) {
-        return new CreateAccountInteractor(generateSignedKeyInteractor, generateOneTimeKeysInteractor);
+    CreateAccountInteractor provideCreateAccountInteractor(AccountRepository accountRepository, GenerateSignedKeyInteractor generateSignedKeyInteractor, GenerateOneTimeKeysInteractor generateOneTimeKeysInteractor) {
+        return new CreateAccountInteractor(accountRepository, generateSignedKeyInteractor, generateOneTimeKeysInteractor);
     }
 
     @Singleton

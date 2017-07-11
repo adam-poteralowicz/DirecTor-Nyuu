@@ -35,14 +35,21 @@ public class CreateAccountInteractor extends BaseInteractor<AccountModel, String
     private GenerateOneTimeKeysInteractor generateOneTimeKeysInteractor;
 
     @Inject
-    public CreateAccountInteractor(GenerateSignedKeyInteractor generateSignedKeyInteractor, GenerateOneTimeKeysInteractor generateOneTimeKeysInteractor) {
+    public CreateAccountInteractor(AccountRepository accountRepository, GenerateSignedKeyInteractor generateSignedKeyInteractor, GenerateOneTimeKeysInteractor generateOneTimeKeysInteractor) {
+        this.accountRepository = accountRepository;
         this.generateSignedKeyInteractor = generateSignedKeyInteractor;
         this.generateOneTimeKeysInteractor = generateOneTimeKeysInteractor;
     }
 
     @Override
     protected Observable<AccountModel> buildObservable(String name) {
-        if(isDuplicate(name)) {
+        return accountRepository.getAccount(name)
+                .isEmpty().toObservable()
+                .flatMap(isEmpty -> chooseSource(!isEmpty, name));
+    }
+
+    private Observable<AccountModel> chooseSource(boolean isDuplicate, String name) {
+        if(isDuplicate) {
             return createError(name);
         }
         else {
@@ -51,7 +58,7 @@ public class CreateAccountInteractor extends BaseInteractor<AccountModel, String
     }
 
     private Observable<AccountModel> createError(String name) {
-        return Observable.error(new DuplicateException(AccountEntity.class.getSimpleName(), NAME_COLUMN, name));
+        return Observable.error(new DuplicateException("Account", NAME_COLUMN, name));
     }
 
     private Observable<AccountModel> createAccount(String name) {
@@ -59,14 +66,11 @@ public class CreateAccountInteractor extends BaseInteractor<AccountModel, String
 
         return Observable.zip(generateSignedKeyInteractor.execute(account),
                 generateOneTimeKeysInteractor.execute(account),
-                new BiFunction<SignedKeyModel, List<OneTimeKeyModel>, AccountModel>() {
-                    @Override
-                    public AccountModel apply(@NonNull SignedKeyModel signedKeyModel, @NonNull List<OneTimeKeyModel> oneTimeKeyModels) throws Exception {
-                        account.setSignedKey(signedKeyModel);
-                        account.setOneTimeKeys(oneTimeKeyModels);
+                (signedKeyModel, oneTimeKeyModels) -> {
+                    account.setSignedKey(signedKeyModel);
+                    account.setOneTimeKeys(oneTimeKeyModels);
 
-                        return account;
-                    }
+                    return account;
                 });
     }
 
@@ -83,7 +87,4 @@ public class CreateAccountInteractor extends BaseInteractor<AccountModel, String
         return accountModel;
     }
 
-    private boolean isDuplicate(String name) {
-        return accountRepository.getAccount(name) != null;
-    }
 }

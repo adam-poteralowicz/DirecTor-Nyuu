@@ -7,6 +7,7 @@ import android.widget.TextView;
 import com.apap.director.client.R;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * Created by Adam Poterałowicz
@@ -22,6 +23,8 @@ public class ErrorActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(LAYOUT_ID);
+
+        ButterKnife.bind(this);
 
         errorTextView.setText(getIntent().getStringExtra("error"));
     }

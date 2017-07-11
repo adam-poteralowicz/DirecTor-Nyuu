@@ -53,6 +53,7 @@ public class NewAccountActivity extends Activity implements Validator.Validation
         ButterKnife.bind(this);
 
         saveButton.setEnabled(false);
+        saveButton.setAlpha(0.5f);
 
         setUpInjection();
         setUpValidator();
@@ -64,6 +65,7 @@ public class NewAccountActivity extends Activity implements Validator.Validation
     public void onValidationSucceeded() {
         Log.v(NewAccountActivity.class.getSimpleName(), "Name validation succeeded");
         saveButton.setEnabled(true);
+        saveButton.setAlpha(1);
         saveButton.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
     }
 

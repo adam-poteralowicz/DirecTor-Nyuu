@@ -52,7 +52,6 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     private static final String SHARED_PREFERENCES_FILENAME = "prefs";
     private static final String KEY = "masterPassword";
 
-
     @Inject
     LoginPresenter loginPresenter;
 
@@ -73,7 +72,6 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     private ArrayList<AccountEntity> accountList;
     private String accountName;
     private AccountAdapter accountAdapter;
-    private AccountMapper accountMapper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -157,19 +155,21 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
         }
     }
 
-    @OnItemClick(R.id.accountsView)
-    public void chooseAccount(int position) {
-        loginPresenter.chooseAccount(accountList.get(position).getName());
-        loginButton.setEnabled(true);
-        loginButton.setAlpha(1);
-    }
+    //TODO: do sth
+//    @OnItemClick(R.id.accountsView)
+//    public void chooseAccount(int position) {
+//        loginPresenter.chooseAccount(accountList.get(position).getName());
+//        loginButton.setEnabled(true);
+//        loginButton.setAlpha(1);
+//    }
 
-    @OnItemLongClick(R.id.accountsView)
-    public boolean displayVerificationDialog(int position) {
-        accountName = accountList.get(position).getName();
-        masterPasswordDialog.setVisibility(VISIBLE);
-        return true;
-    }
+    //TODO : fix
+//    @OnItemLongClick(R.id.accountsView)
+//    public boolean displayVerificationDialog(int position) {
+//        accountName = accountList.get(position).getName();
+//        masterPasswordDialog.setVisibility(VISIBLE);
+//        return true;
+//    }
 
     public boolean verifyMasterPassword(String password) {
         return password.equals(getSharedPreferences(SHARED_PREFERENCES_FILENAME, MODE_PRIVATE).getString(KEY, ""));

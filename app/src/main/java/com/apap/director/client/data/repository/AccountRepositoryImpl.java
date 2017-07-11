@@ -55,7 +55,14 @@ public class AccountRepositoryImpl implements AccountRepository {
 
     @Override
     public Observable<AccountModel> getAccount(String name) {
-        return Observable.just(accountMapper.mapToModel(accountStore.findAccountByName(name)));
+        AccountEntity account = accountStore.findAccountByName(name);
+
+        if(account == null) {
+            return Observable.empty();
+        }
+        else{
+            return Observable.just(accountMapper.mapToModel(account));
+        }
     }
 
     @Override
