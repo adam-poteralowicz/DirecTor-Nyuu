@@ -29,6 +29,7 @@ import com.apap.director.manager.ConversationManager;
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.InvalidKeyException;
 
+import java.security.SecureRandom;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -129,7 +130,12 @@ public class AddContactActivity extends AppCompatActivity {
                 Toast.makeText(this, R.string.nfc_not_supported, Toast.LENGTH_LONG).show();
             }
             return true;
+        } else if (item.getItemId() == R.id.atn_add_contact) {
+            SecureRandom sr = new SecureRandom();
+            setUpNewIntent("publicKey" + sr.nextInt() + sr.nextInt());
+            return true;
         } else {
+
             return super.onOptionsItemSelected(item);
         }
     }
@@ -203,6 +209,12 @@ public class AddContactActivity extends AppCompatActivity {
             intent.putExtra("key", contactPublicKey);
             startActivity(intent);
         }
+    }
+
+    private void setUpNewIntent(String key) {
+        Intent newContactIntent = new Intent(this, NewContactActivity.class);
+        newContactIntent.putExtra("key", key);
+        startActivity(newContactIntent);
     }
 
 }
