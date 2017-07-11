@@ -3,28 +3,23 @@ package com.apap.director.im.websocket.service;
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
-import android.util.Pair;
 
 import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.ContactKey;
-import com.apap.director.db.realm.model.OneTimeKey;
-import com.apap.director.db.realm.model.Session;
 import com.apap.director.db.realm.to.MessageTO;
 import com.apap.director.db.realm.to.OneTimeKeyTO;
 import com.apap.director.db.realm.to.SignedKeyTO;
+import com.apap.director.network.rest.Paths;
+import com.apap.director.network.rest.service.KeyService;
 import com.apap.director.signal.DirectorIdentityKeyStore;
 import com.apap.director.signal.DirectorPreKeyStore;
 import com.apap.director.signal.DirectorSessionStore;
 import com.apap.director.signal.DirectorSignedPreKeyStore;
-import com.apap.director.network.rest.Paths;
-import com.apap.director.network.rest.service.KeyService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.java_websocket.WebSocket;
-import org.whispersystems.curve25519.Curve25519;
 import org.whispersystems.libsignal.IdentityKey;
-import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.InvalidKeyException;
 import org.whispersystems.libsignal.SessionBuilder;
 import org.whispersystems.libsignal.SessionCipher;
@@ -35,8 +30,6 @@ import org.whispersystems.libsignal.ecc.ECPublicKey;
 import org.whispersystems.libsignal.protocol.CiphertextMessage;
 import org.whispersystems.libsignal.state.PreKeyBundle;
 import org.whispersystems.libsignal.state.SessionRecord;
-import org.whispersystems.libsignal.state.SignedPreKeyRecord;
-import org.whispersystems.libsignal.util.KeyHelper;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -66,7 +59,7 @@ public class ClientService {
     private static KeyService keyService;
 
 
-    public static void init(MessageAction messageAction, DirectorSessionStore sessionStore, DirectorIdentityKeyStore identityKeyStore, DirectorPreKeyStore preKeyStore, DirectorSignedPreKeyStore signedPreKeyStore, KeyService keyService){
+    public static void init(MessageAction messageAction, DirectorSessionStore sessionStore, DirectorIdentityKeyStore identityKeyStore, DirectorPreKeyStore preKeyStore, DirectorSignedPreKeyStore signedPreKeyStore, KeyService keyService) {
         ClientService.messageAction = messageAction;
         ClientService.sessionStore = sessionStore;
         ClientService.identityKeyStore = identityKeyStore;
@@ -76,32 +69,32 @@ public class ClientService {
     }
 
 
-    public static void connect(String cookie){
-        Log.v("HAI/StompService", "Cookie : "+cookie);
+    public static void connect(String cookie) {
+        Log.v("HAI/StompService", "Cookie : " + cookie);
         HashMap<String, String> connectionHeaders = new HashMap<>();
         connectionHeaders.put("Cookie", cookie);
 
 
-        client = Stomp.over(WebSocket.class, "ws://"+ Paths.SERVER_IP+":"+Paths.SERVER_PORT + Paths.WEBSOCKET_ENDPOINT+"/websocket", connectionHeaders);
+        client = Stomp.over(WebSocket.class, "ws://" + Paths.SERVER_IP + ":" + Paths.SERVER_PORT + Paths.WEBSOCKET_ENDPOINT + "/websocket", connectionHeaders);
 
-        Log.v("HAI", "Connecting to websocket with cookie "+ cookie+"...");
+        Log.v("HAI", "Connecting to websocket with cookie " + cookie + "...");
         StompHeader cookieHeader = new StompHeader("Cookie", cookie);
         client.connect();
         client.topic("/user/exchange/amq.direct/messages", Arrays.asList(cookieHeader)).subscribe(messageAction, new ErrorAction());
         // client.lifecycle().subscribe(listener);
     }
 
-    public static void sendTestMessage(final String to, final String from, final String text){
+    public static void sendTestMessage(final String to, final String from, final String text) {
         try {
-            String address = "/app/message/test/"+to;
-            Log.v("HAI/StompService", "Sending framed message! " +address);
+            String address = "/app/message/test/" + to;
+            Log.v("HAI/StompService", "Sending framed message! " + address);
 
             MessageTO frame = new MessageTO(from, text, 0);
             ObjectMapper mapper = new ObjectMapper();
 
             String json = mapper.writeValueAsString(frame);
 
-            client.send("/app/message/test/"+to,json)
+            client.send("/app/message/test/" + to, json)
                     .subscribe(new Action1<Void>() {
                         @Override
                         public void call(Void aVoid) {
@@ -118,24 +111,24 @@ public class ClientService {
 
 
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            Log.getStackTraceString(e);
         }
 
     }
 
-    public static void sendEncryptedMessage(final String to, final String from, final String text){
+    public static void sendEncryptedMessage(final String to, final String from, final String text) {
         try {
-            String address = "/app/message/"+to;
-            Log.v("HAI/StompService", "Sending framed message! " +address);
+            String address = "/app/message/" + to;
+            Log.v("HAI/StompService", "Sending framed message! " + address);
 
             Realm realm = Realm.getDefaultInstance();
-            ContactKey contactKey = realm.where(ContactKey.class).equalTo("keyBase64",to).findFirst();
+            ContactKey contactKey = realm.where(ContactKey.class).equalTo("keyBase64", to).findFirst();
 
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(to, contactKey.getDeviceId());
 
             // Instantiate a SessionBuilder for a remote recipientId + deviceId tuple.
             SessionBuilder sessionBuilder = new SessionBuilder(sessionStore, preKeyStore, signedPreKeyStore,
-                identityKeyStore, signalProtocolAddress);
+                    identityKeyStore, signalProtocolAddress);
 
 
             // Build a session with a PreKey retrieved from the server.
@@ -144,11 +137,8 @@ public class ClientService {
                 protected OneTimeKeyTO doInBackground(Void... params) {
                     try {
                         return getOneTimeKey(to);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return null;
-                    } catch (InvalidKeyException e) {
-                        e.printStackTrace();
+                    } catch (IOException | InvalidKeyException e) {
+                        Log.getStackTraceString(e);
                         return null;
                     }
                 }
@@ -157,7 +147,7 @@ public class ClientService {
             OneTimeKeyTO oneTimeKeyTO = getKeyTask.execute().get();
             byte[] decoded = Base64.decode(oneTimeKeyTO.getKeyBase64(), Base64.NO_WRAP | Base64.URL_SAFE);
 
-            ECPublicKey oneTimeKeyEC =  Curve.decodePoint(decoded, 0);
+            ECPublicKey oneTimeKeyEC = Curve.decodePoint(decoded, 0);
 
 
             AsyncTask<Void, Void, SignedKeyTO> getSignedKeyTask = new AsyncTask<Void, Void, SignedKeyTO>() {
@@ -165,11 +155,8 @@ public class ClientService {
                 protected SignedKeyTO doInBackground(Void... params) {
                     try {
                         return getSignedKey(to);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return null;
-                    } catch (InvalidKeyException e) {
-                        e.printStackTrace();
+                    } catch (IOException | InvalidKeyException e) {
+                        Log.getStackTraceString(e);
                         return null;
                     }
                 }
@@ -180,16 +167,14 @@ public class ClientService {
             byte[] decodedSignature = Base64.decode(signedKeyTO.getSignatureBase64(), Base64.NO_WRAP | Base64.URL_SAFE);
 
 
-            ECPublicKey signedKeyEC =  Curve.decodePoint(decodedKey, 0);
+            ECPublicKey signedKeyEC = Curve.decodePoint(decodedKey, 0);
 
-            IdentityKey contactIdentity = new IdentityKey(contactKey.getSerialized(),0);
+            IdentityKey contactIdentity = new IdentityKey(contactKey.getSerialized(), 0);
 
-            Account account = realm.where(Account.class).equalTo("active", true).findFirst();
-            SignedPreKeyRecord record = new SignedPreKeyRecord(account.getSignedKey().getSerializedKey());
 
             SessionRecord mySession = sessionStore.loadSession(signalProtocolAddress);
 
-            if(mySession==null){
+            if (mySession == null) {
                 sessionStore.storeSession(signalProtocolAddress, new SessionRecord());
 
                 PreKeyBundle preKeyBundle = new PreKeyBundle(0, 0, oneTimeKeyTO.getOneTimeKeyId(), oneTimeKeyEC, signedKeyTO.getSignedKeyId(), signedKeyEC, decodedSignature, contactIdentity);
@@ -206,7 +191,7 @@ public class ClientService {
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(frame);
 
-            client.send("/app/message/test/"+to,json)
+            client.send("/app/message/test/" + to, json)
                     .subscribe(new Action1<Void>() {
                         @Override
                         public void call(Void aVoid) {
@@ -223,42 +208,30 @@ public class ClientService {
 
             realm.close();
 
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (UntrustedIdentityException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+        } catch (IOException | UntrustedIdentityException | InvalidKeyException | InterruptedException | ExecutionException e) {
+            Log.getStackTraceString(e);
         }
     }
 
     private static OneTimeKeyTO getOneTimeKey(String to) throws IOException, InvalidKeyException {
         Call<OneTimeKeyTO> getKeyCall = keyService.getOneTimeKey(to);
         Response<OneTimeKeyTO> response = getKeyCall.execute();
-        OneTimeKeyTO oneTimeKeyTO = response.body();
 
-        return  oneTimeKeyTO;
+        return response.body();
     }
 
     private static SignedKeyTO getSignedKey(String to) throws IOException, InvalidKeyException {
 
         Call<SignedKeyTO> getKeyCall = keyService.getSignedKey(to);
         Response<SignedKeyTO> response = getKeyCall.execute();
-        SignedKeyTO signedKeyTO = response.body();
 
 
-        return signedKeyTO;
+        return response.body();
     }
 
-    public static void sendMessage(final String text){
+    public static void sendMessage(final String text) {
         Log.v("HAI/StompService", "Sending default message!");
-        client.send("/app/hello",text)
+        client.send("/app/hello", text)
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
@@ -269,13 +242,12 @@ public class ClientService {
                     @Override
                     public void call(Throwable throwable) {
                         Log.v("HAI/MESSAGE", "Error " + text);
-
                     }
                 });
 
     }
 
-    public static void disconnect(){
+    public static void disconnect() {
         client.disconnect();
     }
 

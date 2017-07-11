@@ -41,12 +41,9 @@ import butterknife.OnItemLongClick;
 import cz.msebera.android.httpclient.client.HttpClient;
 import cz.msebera.android.httpclient.client.methods.HttpGet;
 import cz.msebera.android.httpclient.impl.client.BasicResponseHandler;
-import info.guardianproject.netcipher.NetCipher;
 import info.guardianproject.netcipher.client.StrongBuilder;
 import io.realm.Realm;
 import io.realm.RealmResults;
-
-//import com.apap.director.manager.AccountManager;
 
 public class LoginActivity extends AppCompatActivity implements StrongBuilder.Callback<HttpClient> {
 
@@ -54,24 +51,21 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
     //    String HS_URL = "http://3zk5ak4bcbfvwgha.onion";
     String HS_URL = "http://www.wp.pl/static.html";
 
+    @Inject
+    AccountManager accountManager;
+    @Inject
+    UserService userService;
+    @Inject
+    Realm realm;
 
     @BindView(R.id.accountsView)
     ListView accountsListView;
-
-    @Inject
-    Realm realm;
 
     private ArrayList<Account> accountList;
     private RealmResults<Account> realmAccounts;
     private ArrayAdapterChangeListener<Account, RealmResults<Account>> listener;
     private ArrayAdapter<Account> arrayAdapter;
     private String newAccName;
-
-    @Inject
-    AccountManager accountManager;
-
-    @Inject
-    UserService userService;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -83,14 +77,10 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
 
         shimmer();
 
-
-        /**
-         * Account List View
-         */
         realmAccounts = realm.where(Account.class).findAll();
 
-        accountList = new ArrayList<Account>();
-        arrayAdapter = new ArrayAdapter<Account>(
+        accountList = new ArrayList<>();
+        arrayAdapter = new ArrayAdapter<>(
                 getApplicationContext(),
                 android.R.layout.simple_list_item_single_choice,
                 accountList);
@@ -103,21 +93,6 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
         realmAccounts.addChangeListener(listener);
     }
 
-    private void shimmer() {
-        ShimmerTextView shimmerTextView = (ShimmerTextView) findViewById(R.id.shimmer_tv);
-        shimmerTextView.setTextColor(new ColorStateList(
-                new int[][]{
-                        new int[]{}
-                },
-                new int[]{
-                        Color.argb(255, 102, 102, 255)
-                }
-        ));
-        shimmer = new Shimmer();
-        shimmer.start(shimmerTextView);
-        getSupportActionBar().show();
-    }
-
     @Override
     public void onBackPressed() {
         ClientService.disconnect();
@@ -127,9 +102,9 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
     public boolean deleteAccount(int position) {
         String name = accountList.get(position).getName();
         boolean deleted = accountManager.deleteAccount(name);
-        if (deleted == false)
-            Log.v("HAI/LoginActivity", "Account " + name + " failed to delete itself");
-        else Log.v("HAI/LoginActivity", "Account " + name + " deleted");
+        if (!deleted)
+            Log.v(getClass().getSimpleName(), "Account " + name + " failed to delete itself");
+        else Log.v(getClass().getSimpleName(), "Account " + name + " deleted");
         Toast.makeText(this, "Account " + name + " deleted", Toast.LENGTH_LONG).show();
         return false;
     }
@@ -137,7 +112,7 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
     @OnItemClick(R.id.accountsView)
     public void chooseAccount(int position) {
         boolean success = accountManager.chooseAccount(accountList.get(position).getName());
-        Toast.makeText(this, accountManager.getActiveAccountName() + " " +success, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, accountManager.getActiveAccountName() + " " + success, Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -149,97 +124,20 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.tor_conn_on:
-                NetCipher.useTor();
-                return true;
-            case R.id.tor_conn_off:
-                NetCipher.clearProxy();
-                return true;
-            case R.id.swapId:
-                Log.v("HAI/LoginActivity", "Swap Id pressed");
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.swapId) {
+            Log.v(getClass().getSimpleName(), "Swap Id pressed");
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
         }
-    }
-
-    @OnClick(R.id.postLoginButton)
-    public void onClick(View view) {
-        try {
-            if (accountManager.getActiveAccount() == null) {
-                Toast.makeText(this, "Choose an account", Toast.LENGTH_LONG).show();
-                return;
-            } else Log.d("active account", accountManager.getActiveAccountName());
-
-
-            String cookie = null;
-
-            for(int i = 0; i<3; i++) {
-                AsyncTask<Void, Void, String> asyncTask = new AsyncTask<Void, Void, String>() {
-                    @Override
-                    protected String doInBackground(Void... params) {
-                        return accountManager.logIn();
-                    }
-                };
-
-                cookie = asyncTask.execute().get();
-                if(cookie!=null) break;
-            }
-
-
-            AsyncTask<Void, Void, Void> keysTask = new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... params) {
-                    try {
-                        Log.v("HAI/LoginActivity", "Trying to post keys");
-                        accountManager.postSignedKey();
-                        accountManager.postOneTimeKeys();
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                }
-            };
-
-            keysTask.execute().get();
-
-            Log.v("HAI/LoginActivity", "Choosen account: "+accountManager.getActiveAccount()+ " cookie" +accountManager.getActiveAccount().getCookie());
-
-            realm.beginTransaction();
-                Account account = realm.where(Account.class).equalTo("active", true).findFirst();
-                String cookie2 = account.getCookie();
-                Log.v("HAI/LoginActivity", "cookie2 "+cookie2);
-            realm.commitTransaction();
-
-            ClientService.connect(cookie);
-            shimmer.cancel();
-            Intent selectedIntent = new Intent(LoginActivity.this, AuthUserActivity.class);
-            startActivity(selectedIntent);
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    @OnClick(R.id.newAccButton)
-    public void newAccount(View view) {
-        Intent newAccIntent = new Intent(LoginActivity.this, NewAccountActivity.class);
-        startActivityForResult(newAccIntent, 1);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 1) {
-            if (resultCode == Activity.RESULT_OK) {
-                newAccName = data.getStringExtra("accountName");
-                Account testAccount = accountManager.createAccount(newAccName);
-                accountManager.signUp(testAccount);
-            }
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            newAccName = data.getStringExtra("accountName");
+            Account testAccount = accountManager.createAccount(newAccName);
+            accountManager.signUp(testAccount);
         }
     }
 
@@ -254,7 +152,7 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
 
                     String result = httpClient.execute(get, new BasicResponseHandler());
 
-                    System.out.println(result);
+                    Log.v("LoginActivity", result);
                 } catch (IOException e) {
                     onConnectionException(e);
                 }
@@ -324,5 +222,86 @@ public class LoginActivity extends AppCompatActivity implements StrongBuilder.Ca
     protected void onDestroy() {
         super.onDestroy();
         realmAccounts.removeChangeListener(listener);
+    }
+
+    @OnClick(R.id.postLoginButton)
+    public void onClick(View view) {
+        try {
+            if (accountManager.getActiveAccount() == null) {
+                Toast.makeText(this, "Choose an account", Toast.LENGTH_LONG).show();
+                return;
+            } else Log.d("active account", accountManager.getActiveAccountName());
+
+
+            String cookie = null;
+
+            for (int i = 0; i < 3; i++) {
+                AsyncTask<Void, Void, String> asyncTask = new AsyncTask<Void, Void, String>() {
+                    @Override
+                    protected String doInBackground(Void... params) {
+                        return accountManager.logIn();
+                    }
+                };
+
+                cookie = asyncTask.execute().get();
+                if (cookie != null)
+                    break;
+            }
+
+
+            AsyncTask<Void, Void, Void> keysTask = new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    try {
+                        Log.v("HAI/" + getClass().getSimpleName(), "Trying to post keys");
+                        accountManager.postSignedKey();
+                        accountManager.postOneTimeKeys();
+
+                    } catch (IOException e) {
+                        Log.getStackTraceString(e);
+                    }
+                    return null;
+                }
+            };
+
+            keysTask.execute().get();
+
+            Log.v(getClass().getSimpleName(), "Choosen account: " + accountManager.getActiveAccount() + " cookie" + accountManager.getActiveAccount().getCookie());
+
+            realm.beginTransaction();
+            Account account = realm.where(Account.class).equalTo("active", true).findFirst();
+            String cookie2 = account.getCookie();
+            Log.v(getClass().getSimpleName(), "cookie2 " + cookie2);
+            realm.commitTransaction();
+
+            ClientService.connect(cookie);
+            shimmer.cancel();
+            startActivity(new Intent(LoginActivity.this, AuthUserActivity.class));
+
+        } catch (InterruptedException | ExecutionException e) {
+            Log.getStackTraceString(e);
+        }
+
+    }
+
+    @OnClick(R.id.newAccButton)
+    public void newAccount(View view) {
+        Intent newAccIntent = new Intent(LoginActivity.this, NewAccountActivity.class);
+        startActivityForResult(newAccIntent, 1);
+    }
+
+    private void shimmer() {
+        ShimmerTextView shimmerTextView = (ShimmerTextView) findViewById(R.id.shimmer_tv);
+        shimmerTextView.setTextColor(new ColorStateList(
+                new int[][]{
+                        new int[]{}
+                },
+                new int[]{
+                        Color.argb(255, 102, 102, 255)
+                }
+        ));
+        shimmer = new Shimmer();
+        shimmer.start(shimmerTextView);
+        getSupportActionBar().show();
     }
 }

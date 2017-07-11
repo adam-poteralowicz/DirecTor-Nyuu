@@ -36,18 +36,16 @@ public class DirecTorPagerAdapter extends FragmentPagerAdapter {
     }
 
 
-
     @Override
     public CharSequence getPageTitle(int position) {
 
         String contacts = App.getContext().getResources().getString(R.string.title_section_1).toUpperCase();
         String inbox = App.getContext().getResources().getString(R.string.title_section_2).toUpperCase();
 
-        switch (position) {
-            case 0:
-                return contacts;
-            case 1:
-                return inbox;
+        if (position == 0) {
+            return contacts;
+        } else if (position == 1) {
+            return inbox;
         }
         return null;
     }

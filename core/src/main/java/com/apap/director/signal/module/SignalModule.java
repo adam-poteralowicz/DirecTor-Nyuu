@@ -2,11 +2,11 @@ package com.apap.director.signal.module;
 
 import android.content.Context;
 
+import com.apap.director.manager.AccountManager;
 import com.apap.director.signal.DirectorIdentityKeyStore;
 import com.apap.director.signal.DirectorPreKeyStore;
 import com.apap.director.signal.DirectorSessionStore;
 import com.apap.director.signal.DirectorSignedPreKeyStore;
-import com.apap.director.manager.AccountManager;
 
 import org.whispersystems.curve25519.Curve25519;
 
@@ -21,38 +21,38 @@ public class SignalModule {
 
     private Context context;
 
-    public SignalModule(Context context){
+    public SignalModule(Context context) {
         this.context = context;
     }
 
 
     @Provides
     @Singleton
-    public Curve25519 provideCurve25519(){
+    public Curve25519 provideCurve25519() {
         return Curve25519.getInstance(Curve25519.BEST);
     }
 
     @Provides
     @Singleton
-    public DirectorIdentityKeyStore provideIdentityKeyStore(Realm realm, AccountManager manager){
+    public DirectorIdentityKeyStore provideIdentityKeyStore(Realm realm, AccountManager manager) {
         return new DirectorIdentityKeyStore(realm, manager);
     }
 
     @Provides
     @Singleton
-    public DirectorPreKeyStore providePreKeyStore(Realm realm){
+    public DirectorPreKeyStore providePreKeyStore(Realm realm) {
         return new DirectorPreKeyStore(realm);
     }
 
     @Provides
     @Singleton
-    public DirectorSessionStore provideSessionStore(Realm realm){
+    public DirectorSessionStore provideSessionStore(Realm realm) {
         return new DirectorSessionStore(realm);
     }
 
     @Provides
     @Singleton
-    public DirectorSignedPreKeyStore provideSignedPreKeyStore(Realm realm){
+    public DirectorSignedPreKeyStore provideSignedPreKeyStore(Realm realm) {
         return new DirectorSignedPreKeyStore(realm);
     }
 

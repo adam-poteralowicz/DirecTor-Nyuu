@@ -32,20 +32,35 @@ import dagger.Component;
 public interface MainComponent {
 
     void inject(AddContactActivity addContactActivity);
+
     void inject(ContactsFragment contactsFragment);
+
     void inject(SingleContactActivity singleContactActivity);
+
     void inject(InboxFragment inboxFragment);
+
     void inject(NewMsgActivity newMsgActivity);
+
     void inject(LoginActivity loginActivity);
+
     void inject(NewAccountActivity newAccountActivity);
+
     void inject(AuthUserActivity authUserActivity);
+
     void inject(App app);
+
     void inject(NewContactActivity newContactActivity);
+
     MessageAction getMessageAction();
+
     KeyService getKeyService();
+
     DirectorIdentityKeyStore getDirectorIdentityKeyStore();
+
     DirectorPreKeyStore getDirectorPreKeyStore();
+
     DirectorSignedPreKeyStore getDirectorSignedPreKeyStore();
+
     DirectorSessionStore getDirectorSessionStore();
 
 }

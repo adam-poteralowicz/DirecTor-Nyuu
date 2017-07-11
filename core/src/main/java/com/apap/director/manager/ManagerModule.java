@@ -24,8 +24,8 @@ public class ManagerModule {
 
     @Provides
     @Singleton
-    ContactManager provideContactManager(Realm realm, AccountManager manager, KeyService keyService) {
-        return new ContactManager(realm, manager, keyService);
+    ContactManager provideContactManager(Realm realm, AccountManager manager) {
+        return new ContactManager(realm, manager);
     }
 
     @Provides

@@ -1,8 +1,7 @@
 package com.apap.director.signal;
 
-import android.util.Base64;
+import android.util.Log;
 
-import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.SignedKey;
 
 import org.whispersystems.libsignal.InvalidKeyIdException;
@@ -35,11 +34,12 @@ public class DirectorSignedPreKeyStore implements SignedPreKeyStore {
                     .equalTo("signedKeyId", signedPreKeyId)
                     .findFirst();
 
-            if(signedKey == null) throw new InvalidKeyIdException("No such key " + signedPreKeyId);
+            if(signedKey == null)
+                throw new InvalidKeyIdException("No such key " + signedPreKeyId);
 
             return new SignedPreKeyRecord(signedKey.getSerializedKey());
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.getStackTraceString(e);
 
             throw new InvalidKeyIdException("IO exception: "+e.getMessage());
         }
@@ -58,7 +58,7 @@ public class DirectorSignedPreKeyStore implements SignedPreKeyStore {
 
             return records;
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.getStackTraceString(e);
             return null;
         }
 
@@ -87,7 +87,7 @@ public class DirectorSignedPreKeyStore implements SignedPreKeyStore {
 
     @Override
     public boolean containsSignedPreKey(int signedPreKeyId) {
-        return realm.where(SignedKey.class).equalTo("signedKeyId", signedPreKeyId).findFirst() == null ? false : true;
+        return realm.where(SignedKey.class).equalTo("signedKeyId", signedPreKeyId).findFirst() != null;
     }
 
     @Override
