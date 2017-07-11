@@ -9,13 +9,14 @@ import com.apap.director.client.activity.ErrorActivity;
 import com.apap.director.client.activity.LoginActivity;
 import com.apap.director.client.component.DaggerMainComponent;
 import com.apap.director.client.component.MainComponent;
-import com.apap.director.db.dao.module.DaoModule;
 import com.apap.director.db.realm.module.RealmModule;
 import com.apap.director.im.websocket.module.WebSocketModule;
 import com.apap.director.manager.ManagerModule;
+import com.apap.director.net.NetModule;
 import com.apap.director.network.rest.module.RestModule;
 import com.apap.director.signal.module.SignalModule;
 
+import info.guardianproject.netcipher.client.StrongOkHttpClientBuilder;
 import info.guardianproject.netcipher.proxy.OrbotHelper;
 import io.realm.Realm;
 import okhttp3.OkHttpClient;
@@ -89,11 +90,11 @@ public class App extends Application implements StrongOkHttpClientBuilder.Callba
         Log.v("App", "Setting up injection");
         mainComponent = DaggerMainComponent.builder()
                 .managerModule(new ManagerModule())
-                .daoModule(new DaoModule(this))
-                .realmModule(new RealmModule())
+                .realmModule(new RealmModule(this))
                 .restModule(new RestModule())
                 .signalModule(new SignalModule(this))
                 .webSocketModule(new WebSocketModule(this))
+                .netModule(new NetModule(client))
                 .build();
         Log.v("App", "Finished setting up injection");
     }

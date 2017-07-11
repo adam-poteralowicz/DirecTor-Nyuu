@@ -1,7 +1,6 @@
 package com.apap.director.client.activity;
 
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentFilter.MalformedMimeTypeException;
@@ -16,7 +15,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +22,6 @@ import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.util.NFCUtils;
 import com.apap.director.db.realm.model.Account;
-import com.apap.director.db.realm.model.Contact;
 import com.apap.director.manager.AccountManager;
 import com.apap.director.manager.ContactManager;
 import com.apap.director.manager.ConversationManager;
@@ -32,14 +29,12 @@ import com.apap.director.manager.ConversationManager;
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.InvalidKeyException;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import io.realm.Realm;
 
 public class AddContactActivity extends AppCompatActivity {
@@ -83,12 +78,9 @@ public class AddContactActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-
-
         getSupportActionBar().show();
         initNFC();
     }
-
 
     @Override
     protected void onDestroy() {
