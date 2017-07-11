@@ -13,6 +13,7 @@ import com.apap.director.client.domain.interactor.login.GetAccountListInteractor
 import com.apap.director.client.domain.interactor.login.LoginInteractor;
 import com.apap.director.client.domain.interactor.login.PostOneTimeKeysInteractor;
 import com.apap.director.client.domain.interactor.login.PostSignedKeysInteractor;
+import com.apap.director.client.domain.interactor.login.SignUpInteractor;
 import com.apap.director.client.domain.model.AccountModel;
 import com.apap.director.client.presentation.ui.login.contract.LoginContract;
 
@@ -37,6 +38,7 @@ public class LoginPresenter implements LoginContract.Presenter {
     private PostSignedKeysInteractor postSignedKeysInteractor;
     private ChooseAccountInteractor chooseAccountInteractor;
     private DeleteAccountInteractor deleteAccountInteractor;
+    private SignUpInteractor signUpInteractor;
 
     private AccountMapper accountMapper;
     private AccountStore accountStore;
@@ -51,7 +53,8 @@ public class LoginPresenter implements LoginContract.Presenter {
                           PostOneTimeKeysInteractor postOneTimeKeysInteractor,
                           PostSignedKeysInteractor postSignedKeysInteractor,
                           ChooseAccountInteractor chooseAccountInteractor,
-                          DeleteAccountInteractor deleteAccountInteractor) {
+                          DeleteAccountInteractor deleteAccountInteractor,
+                          SignUpInteractor signUpInteractor) {
         this.view = view;
         this.getAccountListInteractor = getAccountListInteractor;
         this.getActiveAccountInteractor = getActiveAccountInteractor;
@@ -61,6 +64,7 @@ public class LoginPresenter implements LoginContract.Presenter {
         this.postSignedKeysInteractor = postSignedKeysInteractor;
         this.chooseAccountInteractor = chooseAccountInteractor;
         this.deleteAccountInteractor = deleteAccountInteractor;
+        this.signUpInteractor = signUpInteractor;
 
         subscriptions = new CompositeDisposable();
     }
@@ -98,7 +102,9 @@ public class LoginPresenter implements LoginContract.Presenter {
 
     @Override
     public void signUp(AccountEntity accountEntity) {
-        // to be implemented
+        subscriptions.add(signUpInteractor.execute(accountMapper.mapToModel(accountEntity))
+                .subscribe(responseBody -> view.handleSuccess(responseBody.string()),
+                        throwable -> view.handleException(throwable)));
     }
 
     @Override
