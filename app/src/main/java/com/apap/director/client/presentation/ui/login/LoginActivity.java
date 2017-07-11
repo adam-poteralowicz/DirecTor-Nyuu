@@ -2,27 +2,23 @@ package com.apap.director.client.presentation.ui.login;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.data.db.entity.AccountEntity;
-import com.apap.director.client.data.db.mapper.AccountMapper;
-import com.apap.director.client.data.net.service.WebSocketService;
 import com.apap.director.client.presentation.ui.common.view.NetActivity;
 import com.apap.director.client.presentation.ui.home.HomeActivity;
-import com.apap.director.client.presentation.ui.login.adapter.AccountAdapter;
 import com.apap.director.client.presentation.ui.login.contract.LoginContract;
 import com.apap.director.client.presentation.ui.login.di.component.DaggerLoginContractComponent;
 import com.apap.director.client.presentation.ui.login.di.module.LoginContractModule;
@@ -31,7 +27,6 @@ import com.apap.director.client.presentation.ui.register.NewAccountActivity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
@@ -40,7 +35,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnItemClick;
 import butterknife.OnItemLongClick;
-import io.realm.Realm;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -56,7 +50,7 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     LoginPresenter loginPresenter;
 
     @BindView(R.id.accountsView)
-    RecyclerView accountsRecyclerView;
+    ListView accountsListView;
     @BindView(R.id.loginActivity_dialog)
     View masterPasswordDialog;
     @BindView(R.id.masterPasswordVerification_button)
@@ -65,13 +59,12 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
     EditText masterPasswordEditText;
     @BindView(R.id.loginActivity_layout)
     View rootLayout;
-
     @BindView(R.id.postLoginButton)
     Button loginButton;
 
     private ArrayList<AccountEntity> accountList;
     private String accountName;
-    private AccountAdapter accountAdapter;
+    private ArrayAdapter<AccountEntity> arrayAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,16 +74,21 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
         ButterKnife.bind(this);
 
         setUpInjection();
-        setUpRecyclerView();
+
+        setUpArrayAdapter();
 
         loginButton.setEnabled(false);
         loginButton.setAlpha(0.5f);
     }
 
-    private void setUpRecyclerView() {
-        accountAdapter = new AccountAdapter(this);
-        accountsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        accountsRecyclerView.setAdapter(accountAdapter);
+    private void setUpArrayAdapter() {
+        accountList = new ArrayList<>();
+
+        arrayAdapter = new ArrayAdapter<>(
+                getApplicationContext(),
+                android.R.layout.simple_list_item_single_choice,
+                accountList);
+        accountsListView.setAdapter(arrayAdapter);
     }
 
     private void setUpInjection() {
@@ -155,21 +153,19 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
         }
     }
 
-    //TODO: do sth
-//    @OnItemClick(R.id.accountsView)
-//    public void chooseAccount(int position) {
-//        loginPresenter.chooseAccount(accountList.get(position).getName());
-//        loginButton.setEnabled(true);
-//        loginButton.setAlpha(1);
-//    }
+    @OnItemClick(R.id.accountsView)
+    public void chooseAccount(int position) {
+        loginPresenter.chooseAccount(accountList.get(position).getName());
+        loginButton.setEnabled(true);
+        loginButton.setAlpha(1);
+    }
 
-    //TODO : fix
-//    @OnItemLongClick(R.id.accountsView)
-//    public boolean displayVerificationDialog(int position) {
-//        accountName = accountList.get(position).getName();
-//        masterPasswordDialog.setVisibility(VISIBLE);
-//        return true;
-//    }
+    @OnItemLongClick(R.id.accountsView)
+    public boolean displayVerificationDialog(int position) {
+        accountName = accountList.get(position).getName();
+        masterPasswordDialog.setVisibility(VISIBLE);
+        return true;
+    }
 
     public boolean verifyMasterPassword(String password) {
         return password.equals(getSharedPreferences(SHARED_PREFERENCES_FILENAME, MODE_PRIVATE).getString(KEY, ""));
@@ -181,8 +177,9 @@ public class LoginActivity extends NetActivity implements LoginContract.View {
 
     @Override
     public void refreshAccountList(List<AccountEntity> newList) {
-        accountAdapter.clear();
-        accountAdapter.update(newList);
+        arrayAdapter.clear();
+        arrayAdapter.addAll(newList);
+        arrayAdapter.notifyDataSetChanged();
     }
 
     @Override

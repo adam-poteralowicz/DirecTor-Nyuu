@@ -4,13 +4,15 @@ import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 public class AccountEntity extends RealmObject {
+
+    public AccountEntity() {
+        // not called
+    }
 
     @PrimaryKey
     private String keyBase64;

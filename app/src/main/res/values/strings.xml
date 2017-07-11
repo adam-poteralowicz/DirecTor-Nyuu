@@ -44,4 +44,5 @@
     <string name="please_activate_nfc">Please activate NFC</string>
     <string name="nfc_enabled">NFC enabled</string>
     <string name="nfc_not_supported">NFC feature not supported</string>
+    <string name="ready">Ready</string>
 </resources>

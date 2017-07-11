@@ -21,7 +21,18 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="90dp"
         android:background="@color/inactive_button_color"
+        android:clickable="true"
         android:id="@+id/saveAccButton"
         android:onClick="saveAccount"/>
+
+    <Button
+        android:id="@+id/readyButton"
+        android:text="@string/ready"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@id/saveAccButton"
+        android:clickable="true"
+        android:onClick="enableSaveAccButton"/>
 
 </RelativeLayout>

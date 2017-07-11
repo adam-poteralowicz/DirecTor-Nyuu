@@ -138,7 +138,7 @@ public class App extends Application implements StrongOkHttpClientBuilder.Callba
     private void sanityCheckOrbot() {
         if(!OrbotHelper.isOrbotInstalled(this)) {
             Log.v(App.class.getSimpleName(), "Orbot not installed");
-            startActivity(new Intent(this, ErrorActivity.class).putExtra("error", "Orbot not installed"));
+            startActivity(new Intent(this, ErrorActivity.class).putExtra("error", "Orbot not installed").setFlags(FLAG_ACTIVITY_NEW_TASK));
         }
     }
 

@@ -1,16 +1,17 @@
 package com.apap.director.client.data.db.entity;
 
 import java.util.Date;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 public class MessageEntity extends RealmObject {
+
+    public MessageEntity() {}
 
     @PrimaryKey
     private long id;

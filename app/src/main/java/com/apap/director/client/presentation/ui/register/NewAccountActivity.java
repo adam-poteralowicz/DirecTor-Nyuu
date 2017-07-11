@@ -43,6 +43,9 @@ public class NewAccountActivity extends Activity implements Validator.Validation
     @BindView(R.id.saveAccButton)
     Button saveButton;
 
+    @BindView(R.id.readyButton)
+    Button readyButton;
+
     private Validator validator;
 
     @Override
@@ -52,11 +55,11 @@ public class NewAccountActivity extends Activity implements Validator.Validation
 
         ButterKnife.bind(this);
 
-        saveButton.setEnabled(false);
-        saveButton.setAlpha(0.5f);
-
         setUpInjection();
         setUpValidator();
+
+        saveButton.setEnabled(false);
+        saveButton.setAlpha(0.5f);
 
         accountNameEditText.setHint("ACCOUNT NAME");
     }
@@ -71,7 +74,7 @@ public class NewAccountActivity extends Activity implements Validator.Validation
 
     @Override
     public void onValidationFailed(List<ValidationError> errors) {
-        saveButton.setEnabled(false);
+        saveButton.setEnabled(true);
     }
 
     @Override
@@ -100,6 +103,13 @@ public class NewAccountActivity extends Activity implements Validator.Validation
         String accountName = String.valueOf(accountNameEditText.getText());
 
         presenter.signUp(accountName);
+    }
+
+    @OnClick(R.id.readyButton)
+    public void enableSaveAccButton(View view) {
+        saveButton.setEnabled(true);
+        saveButton.setAlpha(1);
+        saveButton.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
     }
 
     private void setUpValidator() {
