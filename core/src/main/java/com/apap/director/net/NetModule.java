@@ -31,7 +31,7 @@ public class NetModule {
 
     @Provides
     @Singleton
-    OkHttpClient provideOkHttpClient(Context context) {
+    OkHttpClient provideOkHttpClient() {
         return client;
     }
 

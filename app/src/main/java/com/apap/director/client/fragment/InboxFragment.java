@@ -14,7 +14,6 @@ import android.widget.Toast;
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.activity.NewMsgActivity;
-import com.apap.director.db.manager.DatabaseManager;
 import com.apap.director.db.realm.model.Conversation;
 import com.apap.director.manager.ConversationManager;
 
