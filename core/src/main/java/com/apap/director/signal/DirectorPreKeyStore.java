@@ -1,8 +1,9 @@
 package com.apap.director.signal;
 
+import android.util.Log;
+
 import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.OneTimeKey;
-import com.apap.director.db.realm.model.SignedKey;
 
 import org.whispersystems.libsignal.InvalidKeyIdException;
 import org.whispersystems.libsignal.state.PreKeyRecord;
@@ -17,7 +18,6 @@ import io.realm.Realm;
 
 public class DirectorPreKeyStore implements PreKeyStore {
 
-
     private Realm realm;
 
     @Inject
@@ -31,11 +31,12 @@ public class DirectorPreKeyStore implements PreKeyStore {
         try {
             OneTimeKey preKey = realm.where(OneTimeKey.class).equalTo("oneTimeKeyId", preKeyId).findFirst();
 
-            if ( preKey == null ) throw new InvalidKeyIdException("No such key id");
+            if (preKey == null)
+                throw new InvalidKeyIdException("No such key id");
 
             return new PreKeyRecord(preKey.getSerializedKey());
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.getStackTraceString(e);
             return null;
         }
     }
@@ -43,20 +44,18 @@ public class DirectorPreKeyStore implements PreKeyStore {
     @Override
     public void storePreKey(int preKeyId, PreKeyRecord record) {
         realm.beginTransaction();
-            Account active = realm.where(Account.class).equalTo("active", true).findFirst();
-            OneTimeKey oneTimeKey = new OneTimeKey();
+        OneTimeKey oneTimeKey = new OneTimeKey();
 
         long id;
-        if(realm.where(OneTimeKey.class).findFirst() == null){
+        if (realm.where(OneTimeKey.class).findFirst() == null) {
             id = 0;
+        } else {
+            id = realm.where(OneTimeKey.class).max("id").longValue() + 1;
         }
-        else{
-            id = realm.where(OneTimeKey.class).max("id").longValue()+1;
-        }
-            oneTimeKey.setId(id);
-            oneTimeKey.setOneTimeKeyId(preKeyId);
-            oneTimeKey.setSerializedKey(record.serialize());
-            realm.copyToRealmOrUpdate(oneTimeKey);
+        oneTimeKey.setId(id);
+        oneTimeKey.setOneTimeKeyId(preKeyId);
+        oneTimeKey.setSerializedKey(record.serialize());
+        realm.copyToRealmOrUpdate(oneTimeKey);
         realm.commitTransaction();
 
     }
@@ -64,7 +63,7 @@ public class DirectorPreKeyStore implements PreKeyStore {
     @Override
     public boolean containsPreKey(int preKeyId) {
 
-        return realm.where(OneTimeKey.class).equalTo("oneTimeKeyId", preKeyId).findFirst() == null ? false : true;
+        return realm.where(OneTimeKey.class).equalTo("oneTimeKeyId", preKeyId).findFirst() != null;
 
     }
 
@@ -73,7 +72,7 @@ public class DirectorPreKeyStore implements PreKeyStore {
 
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
-            realm.where(OneTimeKey.class).equalTo("oneTimeKeyId", preKeyId).findFirst().deleteFromRealm();
+        realm.where(OneTimeKey.class).equalTo("oneTimeKeyId", preKeyId).findFirst().deleteFromRealm();
         realm.commitTransaction();
 
     }

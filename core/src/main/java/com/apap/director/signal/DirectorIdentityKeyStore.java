@@ -22,7 +22,7 @@ public class DirectorIdentityKeyStore implements IdentityKeyStore {
     private AccountManager accountManager;
 
     @Inject
-    public DirectorIdentityKeyStore(Realm realm, AccountManager accountManager){
+    public DirectorIdentityKeyStore(Realm realm, AccountManager accountManager) {
         this.realm = realm;
         this.accountManager = accountManager;
     }
@@ -47,23 +47,23 @@ public class DirectorIdentityKeyStore implements IdentityKeyStore {
 
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
-            ContactKey sameName = realm.where(ContactKey.class).equalTo("keyBase64", address.getName()).equalTo("deviceId", address.getDeviceId()).findFirst();
+        ContactKey sameName = realm.where(ContactKey.class).equalTo("keyBase64", address.getName()).equalTo("deviceId", address.getDeviceId()).findFirst();
 
-            if(sameName != null) {
-                realm.commitTransaction();
-                return;
-            }
+        if (sameName != null) {
+            realm.commitTransaction();
+            return;
+        }
 
-            ContactKey contactKey = realm.createObject(ContactKey.class);
-            contactKey.setDeviceId(address.getDeviceId());
-            contactKey.setKeyBase64(address.getName());
+        ContactKey contactKey = realm.createObject(ContactKey.class);
+        contactKey.setDeviceId(address.getDeviceId());
+        contactKey.setKeyBase64(address.getName());
 
-            Contact contact = realm.where(Contact.class)
-                                .equalTo("id", Long.valueOf(address.getName()))
-                                .findFirst();
+        Contact contact = realm.where(Contact.class)
+                .equalTo("id", Long.valueOf(address.getName()))
+                .findFirst();
 
-            contact.getContactKeys().add(contactKey);
-            contactKey.setContact(contact);
+        contact.getContactKeys().add(contactKey);
+        contactKey.setContact(contact);
 
         realm.commitTransaction();
     }
@@ -77,7 +77,7 @@ public class DirectorIdentityKeyStore implements IdentityKeyStore {
                 .equalTo("deviceId", address.getDeviceId())
                 .findFirst();
 
-        return contactKey == null ? false : true;
+        return contactKey != null;
 
     }
 

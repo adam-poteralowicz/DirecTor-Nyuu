@@ -1,8 +1,6 @@
 package com.apap.director.network.rest.service;
 
 
-import com.apap.director.db.realm.model.OneTimeKey;
-import com.apap.director.db.realm.model.SignedKey;
 import com.apap.director.db.realm.to.OneTimeKeyTO;
 import com.apap.director.db.realm.to.SignedKeyTO;
 

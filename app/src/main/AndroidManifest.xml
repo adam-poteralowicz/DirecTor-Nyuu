@@ -24,6 +24,7 @@
         <service android:name="com.apap.director.im.websocket.service.StompService" />
 
         <activity android:name=".activity.LoginActivity"/>
+        <activity android:name=".activity.ErrorActivity"/>
         <activity android:name=".activity.AuthUserActivity"/>
         <activity android:name=".activity.InboxActivity"/>
         <activity android:name=".activity.NewMsgActivity"/>

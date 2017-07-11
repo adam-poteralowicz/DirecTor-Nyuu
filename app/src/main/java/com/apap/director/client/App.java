@@ -33,7 +33,6 @@ public class App extends Application implements StrongOkHttpClientBuilder.Callba
         super.onCreate();
         Log.d(App.class.getSimpleName(), "App is starting...");
         mContext = App.this;
-
         Realm.init(this);
 
         initOrbot();

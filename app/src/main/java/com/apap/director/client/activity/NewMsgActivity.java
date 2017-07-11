@@ -1,9 +1,9 @@
 package com.apap.director.client.activity;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -34,23 +34,25 @@ import io.realm.RealmResults;
 
 public class NewMsgActivity extends Activity {
 
-    @BindView(R.id.messengerField) EditText newMessageField;
-    @BindView(R.id.newMsgRecipient) TextView recipient;
-    @BindView(R.id.conversationView) ListView messagesView;
-    ArrayAdapter<Message> arrayAdapter;
+    @Inject
+    Realm realm;
+    @Inject
+    MessageManager messageManager;
+    @Inject
+    ConversationManager conversationManager;
+
+    @BindView(R.id.messengerField)
+    EditText newMessageField;
+    @BindView(R.id.newMsgRecipient)
+    TextView recipient;
+    @BindView(R.id.conversationView)
+    ListView messagesView;
+
+    private ArrayAdapter<Message> arrayAdapter;
     private Long contactIdFromIntent;
     private List<Message> myMessages;
     private ArrayAdapterChangeListener<Message, RealmResults<Message>> changeListener;
-    RealmResults<Message> allMessages;
-    @Inject
-    Realm realm;
-
-
-    @Inject
-    MessageManager messageManager;
-
-    @Inject
-    ConversationManager conversationManager;
+    private RealmResults<Message> allMessages;
 
     //TODO: Split this method
 
@@ -61,7 +63,7 @@ public class NewMsgActivity extends Activity {
 
         ClientService.sendMessage("NewMsgActivity");
         setContentView(R.layout.new_msg_view);
-       // setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ButterKnife.bind(this);
 
         if (getIntent().getStringExtra("recipient") != null) {
@@ -71,7 +73,6 @@ public class NewMsgActivity extends Activity {
         }
 
         contactIdFromIntent = getIntent().getLongExtra("contactId", 1L);
-        final Conversation conversation = conversationManager.getConversationByContactId(contactIdFromIntent);
 
         myMessages = new ArrayList<>();
         arrayAdapter = new MessageAdapter(this, R.layout.item_chat_left, myMessages);
@@ -89,9 +90,16 @@ public class NewMsgActivity extends Activity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        allMessages.removeChangeListener(changeListener);
+        super.onDestroy();
+        realm.close();
+    }
+
     @OnItemLongClick(R.id.conversationView)
-    public boolean deleteMessage(int position){
-        Log.v("DTOR/NewMsgActivity", "Deleting message, position: "+position);
+    public boolean deleteMessage(int position) {
+        Log.v("DTOR/NewMsgActivity", "Deleting message, position: " + position);
         Long messageId = myMessages.get(position).getId();
         messageManager.deleteMessage(messageId);
         return true;
@@ -105,22 +113,12 @@ public class NewMsgActivity extends Activity {
         if ("".equals(newMessage))
             return;
 
-
         Conversation conversation = conversationManager.getConversationByContactId(contactIdFromIntent);
-        Message message = messageManager.addMessage(conversation, newMessage, to, true);
 
-        ClientService.sendEncryptedMessage(conversation.getContact().getContactKeys().get(0).getKeyBase64(),realm.where(Account.class).equalTo("active", true).findFirst().getKeyBase64(),newMessage);
+        ClientService.sendEncryptedMessage(conversation.getContact().getContactKeys().get(0).getKeyBase64(), realm.where(Account.class).equalTo("active", true).findFirst().getKeyBase64(), newMessage);
         newMessageField.setText("");
 
     }
-
-    @Override
-    protected void onDestroy() {
-        allMessages.removeChangeListener(changeListener);
-        super.onDestroy();
-        realm.close();
-    }
-
 }
 
 

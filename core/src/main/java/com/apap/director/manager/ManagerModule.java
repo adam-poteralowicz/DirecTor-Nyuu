@@ -1,11 +1,9 @@
 package com.apap.director.manager;
 
-import com.apap.director.db.dao.model.Conversation;
 import com.apap.director.network.rest.service.KeyService;
 import com.apap.director.network.rest.service.UserService;
 import com.apap.director.signal.DirectorPreKeyStore;
 import com.apap.director.signal.DirectorSignedPreKeyStore;
-import com.fasterxml.jackson.databind.annotation.JsonAppend;
 
 import org.whispersystems.curve25519.Curve25519;
 
@@ -26,8 +24,8 @@ public class ManagerModule {
 
     @Provides
     @Singleton
-    ContactManager provideContactManager(Realm realm, AccountManager manager, KeyService keyService) {
-        return new ContactManager(realm, manager, keyService);
+    ContactManager provideContactManager(Realm realm, AccountManager manager) {
+        return new ContactManager(realm, manager);
     }
 
     @Provides

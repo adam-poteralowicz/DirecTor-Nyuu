@@ -12,7 +12,6 @@ import android.widget.ListView;
 import com.apap.director.client.App;
 import com.apap.director.client.R;
 import com.apap.director.client.activity.AddContactActivity;
-import com.apap.director.client.activity.NewContactActivity;
 import com.apap.director.client.activity.SingleContactActivity;
 import com.apap.director.db.realm.model.Account;
 import com.apap.director.db.realm.model.Contact;
@@ -33,16 +32,17 @@ import io.realm.RealmResults;
 
 public class ContactsFragment extends Fragment {
 
+    @Inject
+    AccountManager accountManager;
+
+    @BindView(R.id.contactsView)
+    ListView contactsListView;
+
     private ArrayList<Contact> contactList;
     private ArrayAdapter<Contact> arrayAdapter;
     private Realm realm;
     private ArrayAdapterChangeListener<Contact, RealmResults<Contact>> changeListener;
     private RealmResults<Contact> allContacts;
-    @BindView(R.id.contactsView) ListView contactsListView;
-
-    @Inject
-    AccountManager accountManager;
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -60,17 +60,11 @@ public class ContactsFragment extends Fragment {
         realm = Realm.getDefaultInstance();
 
         Account active = realm.where(Account.class).equalTo("active", true).findFirst();
-
         allContacts = realm.where(Contact.class).equalTo("account.id", active.getId()).findAll();
 
-        contactList = new ArrayList<Contact>(allContacts);
-        arrayAdapter = new ArrayAdapter<Contact>(
-                App.getContext(),
-                android.R.layout.simple_list_item_1,
-                contactList);
-        contactsListView.setAdapter(arrayAdapter);
+        setUpArrayAdapter();
 
-        changeListener = new ArrayAdapterChangeListener<Contact, RealmResults<Contact>>(arrayAdapter, "contacts fragment listner");
+        changeListener = new ArrayAdapterChangeListener<>(arrayAdapter, "contacts fragment listner");
         allContacts.addChangeListener(changeListener);
     }
 
@@ -78,22 +72,6 @@ public class ContactsFragment extends Fragment {
     public void onDestroy() {
         allContacts.removeChangeListener(changeListener);
         super.onDestroy();
-    }
-
-
-    @OnItemClick(R.id.contactsView)
-    public void showContactDetails(int position){
-        Intent intent = new Intent(App.getContext(), SingleContactActivity.class);
-        intent.putExtra("contactName", contactList.get(position).getName());
-        intent.putExtra("contactId", contactList.get(position).getId());
-        startActivity(intent);
-    }
-
-
-    @OnClick(R.id.addNewContactButton)
-    public void onClick(View view) {
-            Intent selectedIntent = new Intent(getActivity(), AddContactActivity.class);
-            startActivity(selectedIntent);
     }
 
     @Override
@@ -107,5 +85,30 @@ public class ContactsFragment extends Fragment {
         allContacts.removeChangeListener(changeListener);
         super.onStop();
         realm.close();
+    }
+
+
+    @OnItemClick(R.id.contactsView)
+    public void showContactDetails(int position) {
+        Intent intent = new Intent(App.getContext(), SingleContactActivity.class);
+        intent.putExtra("contactName", contactList.get(position).getName());
+        intent.putExtra("contactId", contactList.get(position).getId());
+        startActivity(intent);
+    }
+
+
+    @OnClick(R.id.addNewContactButton)
+    public void onClick(View view) {
+        Intent selectedIntent = new Intent(getActivity(), AddContactActivity.class);
+        startActivity(selectedIntent);
+    }
+
+    private void setUpArrayAdapter() {
+        contactList = new ArrayList<>(allContacts);
+        arrayAdapter = new ArrayAdapter<>(
+                App.getContext(),
+                android.R.layout.simple_list_item_1,
+                contactList);
+        contactsListView.setAdapter(arrayAdapter);
     }
 }

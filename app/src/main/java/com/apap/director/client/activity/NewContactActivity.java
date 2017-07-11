@@ -21,17 +21,17 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
 
-import static android.R.attr.name;
-
 public class NewContactActivity extends Activity {
 
-
-    @BindView(R.id.contactNameEditText) EditText contactNameEditText;
-    @BindView(R.id.theirPublicKey) TextView textView;
     @Inject
     ContactManager contactManager;
     @Inject
     ConversationManager conversationManager;
+
+    @BindView(R.id.contactNameEditText)
+    EditText contactNameEditText;
+    @BindView(R.id.theirPublicKey)
+    TextView textView;
 
     private String contactPublicKey;
 
@@ -44,15 +44,15 @@ public class NewContactActivity extends Activity {
 
         ((App) getApplication()).getComponent().inject(this);
         contactPublicKey = getIntent().getExtras().getString("key");
-        textView.setText("Contact public key: "+contactPublicKey);
+        textView.setText("Contact public key: " + contactPublicKey);
 
 
     }
 
     @OnClick(R.id.saveContactButton)
-    public void addContact(){
+    public void addContact() {
 
-        if(contactNameEditText.getText().length()==0){
+        if (contactNameEditText.getText().length() == 0) {
             Toast.makeText(this, "Type a valid name", Toast.LENGTH_SHORT);
             return;
         }

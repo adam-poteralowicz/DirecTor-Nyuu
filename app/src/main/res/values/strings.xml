@@ -29,4 +29,7 @@
     <string name="read_button_label">Read message</string>
     <string name="bt_not_found">Bluetooth not found</string>
     <string name="bt_cancelled">Bluetooth cancelled</string>
+    <string name="nfc_enabled">NFC enabled</string>
+    <string name="activate_nfc">Please activate NFC</string>
+    <string name="nfc_not_supported">NFC feature not supported</string>
 </resources>
